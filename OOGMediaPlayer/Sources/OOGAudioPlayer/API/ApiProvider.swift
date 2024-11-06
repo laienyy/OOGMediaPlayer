@@ -8,20 +8,10 @@
 import Foundation
 
 
-/**
- * `Entity` — 用于数据库交互
- *
- * `DTO` — 用户服务端与客户端进行交互
- *
- *  暂未实现数据库，暂时直接将`DTO`转为`Model`
- *
- */
-
 public class ApiProvider {
     
-    public static func getBackgroundMedia(_ project: OOGProject, _ type: BgmPlayType) async throws -> [AudioAlbumDTO] {
-        let api = BackgroundMediaAPI.getBGM(project, type)
-        let res: JsonArrayResponse<AudioAlbumDTO> = try await Request(api: api).resume()
+    public static func getBackgroundMedia(_ param: GetBGMListApiInfo) async throws -> [AudioAlbumDTO] {
+        let res: JsonArrayResponse<AudioAlbumDTO> = try await Request(api: param).resume()
         
         if let error = res.error() {
             throw error

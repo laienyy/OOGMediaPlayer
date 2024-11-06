@@ -233,7 +233,7 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
             return
         }
-        play(indexPath: indexPath, isForward: true)
+        toPlay(indexPath: indexPath)
     }
     
     /// 播放上一条
@@ -244,17 +244,17 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
             return
         }
-        play(indexPath: indexPath, isForward: false)
+        toPlay(indexPath: indexPath)
     }
     
     /// 播放指定索引 （不受`loopModel`影响）
     open func play(indexPath: IndexPath) {
         lastPlayDirection = .specified
-        play(indexPath: indexPath, isForward: true)
+        toPlay(indexPath: indexPath)
     }
     
     /// 根据索引播放
-    func play(indexPath: IndexPath, isForward: Bool) {
+    func toPlay(indexPath: IndexPath) {
         
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))")
         
@@ -289,7 +289,7 @@ open class MediaPlayerControl: NSObject {
                 return
             }
             
-            log(prefix: .mediaPlayer, "Play \(isForward ? "next" : "previous") item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown")")
+            log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
             
             if let item = item(at: next) {
                 history.append(item)

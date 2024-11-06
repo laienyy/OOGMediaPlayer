@@ -102,13 +102,13 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         preparingItems.removeAll(where: { $0.id == item.id } )
     }
     
-    override func play(indexPath: IndexPath, isForward: Bool) {
+    override func toPlay(indexPath: IndexPath) {
         
         if let item = currentItem() as? LocalMediaPlayable {
             setItemStatus(item, status: .idle)
         }
         
-        super.play(indexPath: indexPath, isForward: isForward)
+        super.toPlay(indexPath: indexPath)
     }
     
     /// 准备播放
@@ -236,21 +236,21 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
 
 public extension LocalAudioPlayerProvider {
     static func dukeOtherAudio() {
-//        do {
-//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
-//            try AVAudioSession.sharedInstance().setActive(true)
-//        } catch {
-//            print("Set duck other audio, error:", error)
-//        }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Set duck other audio, error:", error)
+        }
     }
 
     static func mixOtherAudio() {
-//        do {
-//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
-//            try AVAudioSession.sharedInstance().setActive(true)
-//        } catch {
-//            print("Set mix other audio, error:", error)
-//        }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Set mix other audio, error:", error)
+        }
     }
 }
 

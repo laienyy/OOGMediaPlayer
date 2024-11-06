@@ -11,7 +11,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 18CA4BCC2CD9B7470008E7A5 /* Build configuration list for PBXAggregateTarget "OOGMediaPlayerLib" */;
 			buildPhases = (
-				18CA4BCF2CD9B7800008E7A5 /* ShellScript */,
+				18CA4BCF2CD9B7800008E7A5 /* Run Script */,
 			);
 			dependencies = (
 			);
@@ -187,7 +187,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		18CA4BCF2CD9B7800008E7A5 /* ShellScript */ = {
+		18CA4BCF2CD9B7800008E7A5 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -196,6 +196,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
