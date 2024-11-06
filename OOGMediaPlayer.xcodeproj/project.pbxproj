@@ -25,12 +25,14 @@
 /* Begin PBXBuildFile section */
 		182E995F2CD8E484005B7AF9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182E995E2CD8E484005B7AF9 /* UIKit.framework */; platformFilter = ios; };
 		18D74DCE2CDB486000940448 /* libswiftAVFoundation.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74DCD2CDB486000940448 /* libswiftAVFoundation.tbd */; };
+		18D74ECE2CDB5F3900940448 /* OOGMediaPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		182E995E2CD8E484005B7AF9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		183014472CC8AE850014469C /* OOGMediaPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OOGMediaPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		18D74DCD2CDB486000940448 /* libswiftAVFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftAVFoundation.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/usr/lib/swift/libswiftAVFoundation.tbd; sourceTree = DEVELOPER_DIR; };
+		18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = OOGMediaPlayer.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -79,6 +81,7 @@
 		1830143D2CC8AE850014469C = {
 			isa = PBXGroup;
 			children = (
+				18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */,
 				183014492CC8AE850014469C /* OOGMediaPlayer */,
 				182E995D2CD8E484005B7AF9 /* Frameworks */,
 				183014482CC8AE850014469C /* Products */,
@@ -171,6 +174,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18D74ECE2CDB5F3900940448 /* OOGMediaPlayer.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,7 +235,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACH_O_TYPE = staticlib;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 1.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = com.4m.mediaPlayer.OOGMediaPlayer;
@@ -270,7 +274,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACH_O_TYPE = staticlib;
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 1.0.0;
 				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
 				PRODUCT_BUNDLE_IDENTIFIER = com.4m.mediaPlayer.OOGMediaPlayer;

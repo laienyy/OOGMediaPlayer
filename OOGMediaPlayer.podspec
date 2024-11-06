@@ -1,33 +1,140 @@
+#
+#  Be sure to run `pod spec lint OOGMediaPlayer.podspec' to ensure this is a
+#  valid spec and to remove all comments including this before submitting the spec.
+#
+#  To learn more about Podspec attributes see https://guides.cocoapods.org/syntax/podspec.html
+#  To see working Podspecs in the CocoaPods repo see https://github.com/CocoaPods/Specs/
+#
 
-Pod::Spec.new do |s|
-  s.name         = "OOGMediaPlayer"                #名称
-  s.version      = "0.0.1"                #版本号
-  s.summary      = "多媒体播放器"        #简短介绍
-  s.description  = <<-DESC
-                      私有Pods测试
-                      * Markdown 格式
+Pod::Spec.new do |spec|
+
+  # ―――  Spec Metadata  ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  These will help people to find your library, and whilst it
+  #  can feel like a chore to fill in it's definitely to your advantage. The
+  #  summary should be tweet-length, and the description more in depth.
+  #
+
+  spec.name         = "OOGMediaPlayer"
+  spec.version      = "1.0.0"
+  spec.summary      = "A short description of OOGMediaPlayer."
+
+  # This description is used to generate tags and improve search results.
+  #   * Think: What does it do? Why did you write it? What is the focus?
+  #   * Try to keep it short, snappy and to the point.
+  #   * Write the description between the DESC delimiters below.
+  #   * Finally, don't worry about the indent, CocoaPods strips it!
+  spec.description  = <<-DESC
+  播放器
                    DESC
 
-  s.homepage     = "https://github.com/laienyy/OOGMediaPlayer"
-  # s.screenshots  = "www.example.com/screenshots_1.gif"
-  s.license      = "MIT"                #开源协议
-  s.author             = { "yiyuan" => "yiyuan@laien.io" }
+  spec.homepage     = "http://EXAMPLE/OOGMediaPlayer"
+  # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
-  s.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer.git" }
 
-  ## 这里不支持ssh的地址，只支持HTTP和HTTPS，最好使用HTTPS
-  ## 正常情况下我们会使用稳定的tag版本来访问，如果是在开发测试的时候，不需要发布release版本，直接指向git地址使用
-  ## 待测试通过完成后我们再发布指定release版本，使用如下方式
-  #s.source       = { :git => "http://EXAMPLE/O2View.git", :tag => version }
+  # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  Licensing your code is important. See https://choosealicense.com for more info.
+  #  CocoaPods will detect a license file if there is a named LICENSE*
+  #  Popular ones are 'MIT', 'BSD' and 'Apache License, Version 2.0'.
+  #
 
-  s.platform     = :ios, "15.0"            #支持的平台及版本，这里我们呢用swift，直接上9.0
-  s.requires_arc = true                    #是否使用ARC
+  # spec.license      = "MIT (example)"
+  spec.license      = { :type => "MIT", :file => "LICENSE" }
 
-  s.source_files  = "Sources/**/*.{h,m,swift}"
 
-  s.frameworks = 'UIKit', 'Foundation', 'AVFoundation'  #所需的framework,多个用逗号隔开
-  s.module_name = 'OOGMediaPlayer'                #模块名称
+  # ――― Author Metadata  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  Specify the authors of the library, with email addresses. Email addresses
+  #  of the authors are extracted from the SCM log. E.g. $ git log. CocoaPods also
+  #  accepts just a name if you'd rather not provide an email address.
+  #
+  #  Specify a social_media_url where others can refer to, for example a twitter
+  #  profile URL.
+  #
 
-  # s.dependency "JSONKit", "~> 1.4"    #依赖关系，该项目所依赖的其他库，如果有多个可以写多个 s.dependency
+  spec.author             = { "yy" => "yiyuan@laien.io" }
+  # Or just: spec.author    = "yy"
+  # spec.authors            = { "yy" => "yiyuan@laien.io" }
+  # spec.social_media_url   = "https://twitter.com/yy"
+
+  # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  If this Pod runs only on iOS or OS X, then specify the platform and
+  #  the deployment target. You can optionally include the target after the platform.
+  #
+
+  spec.platform     = :ios, "15.0"
+  # spec.platform     = :ios, "5.0"
+
+  #  When using multiple platforms
+  # spec.ios.deployment_target = "5.0"
+  # spec.osx.deployment_target = "10.7"
+  # spec.watchos.deployment_target = "2.0"
+  # spec.tvos.deployment_target = "9.0"
+  # spec.visionos.deployment_target = "1.0"
+
+
+  # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  Specify the location from where the source should be retrieved.
+  #  Supports git, hg, bzr, svn and HTTP.
+  #
+
+  spec.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer.git", :branch => 'main' }
+
+
+  # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  CocoaPods is smart about how it includes source code. For source files
+  #  giving a folder will include any swift, h, m, mm, c & cpp files.
+  #  For header files it will include any header in the folder.
+  #  Not including the public_header_files will make all headers public.
+  #
+
+  spec.source_files  = "Sources/**/*"
+  # spec.exclude_files = "Classes/Exclude"
+
+  # spec.public_header_files = "Classes/**/*.h"
+
+
+  # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  A list of resources included with the Pod. These are copied into the
+  #  target bundle with a build phase script. Anything else will be cleaned.
+  #  You can preserve files from being cleaned, please don't preserve
+  #  non-essential files like tests, examples and documentation.
+  #
+
+  # spec.resource  = "icon.png"
+  # spec.resources = "Resources/*.png"
+
+  # spec.preserve_paths = "FilesToSave", "MoreFilesToSave"
+
+
+  # ――― Project Linking ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  Link your library with frameworks, or libraries. Libraries do not include
+  #  the lib prefix of their name.
+  #
+
+  spec.framework  = ["UIKit", "AVFoundation"]
+  # spec.frameworks = "SomeFramework", "AnotherFramework"
+
+  # spec.library   = "iconv"
+  # spec.libraries = "iconv", "xml2"
+
+
+  # ――― Project Settings ――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
+  #
+  #  If your library depends on compiler flags you can set them in the xcconfig hash
+  #  where they will only apply to your library. If you depend on other Podspecs
+  #  you can include multiple dependencies to ensure it works.
+
+  # spec.requires_arc = true
+  spec.module_name = "OOGMediaPlayer"
+
+  # spec.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
+  # spec.dependency "JSONKit", "~> 1.4"
 
 end
