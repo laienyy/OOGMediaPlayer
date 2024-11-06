@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.license      = "MIT"                #开源协议
   s.author             = { "yiyuan" => "yiyuan@laien.io" }
 
-  s.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer" }
+  s.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer.git" }
 
   ## 这里不支持ssh的地址，只支持HTTP和HTTPS，最好使用HTTPS
   ## 正常情况下我们会使用稳定的tag版本来访问，如果是在开发测试的时候，不需要发布release版本，直接指向git地址使用
