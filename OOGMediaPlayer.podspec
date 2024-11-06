@@ -81,7 +81,7 @@ Pod::Spec.new do |spec|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer.git", :branch => 'main' }
+  spec.source       = { :git => "https://github.com/laienyy/OOGMediaPlayer.git", :tap => spec.version }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
