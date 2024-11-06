@@ -236,21 +236,21 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
 
 public extension LocalAudioPlayerProvider {
     static func dukeOtherAudio() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Set duck other audio, error:", error)
-        }
+//        do {
+//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers, .duckOthers])
+//            try AVAudioSession.sharedInstance().setActive(true)
+//        } catch {
+//            print("Set duck other audio, error:", error)
+//        }
     }
 
     static func mixOtherAudio() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Set mix other audio, error:", error)
-        }
+//        do {
+//            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+//            try AVAudioSession.sharedInstance().setActive(true)
+//        } catch {
+//            print("Set mix other audio, error:", error)
+//        }
     }
 }
 
