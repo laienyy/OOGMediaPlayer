@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "OOGMediaPlayer"
-  spec.version      = "1.0.0"
+  spec.version      = "1.0.1"
   spec.summary      = "A short description of OOGMediaPlayer."
 
   # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
   播放器
                    DESC
 
-  spec.homepage     = "http://EXAMPLE/OOGMediaPlayer"
+  spec.homepage     = "https://github.com/laienyy/OOGMediaPlayer"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -92,8 +92,7 @@ Pod::Spec.new do |spec|
   #  Not including the public_header_files will make all headers public.
   #
 
-  spec.source_files  = "Sources/**/*"
-  # spec.exclude_files = "Classes/Exclude"
+  spec.source_files  = "OOGMediaPlayer/Sources/**/*.swift", "OOGMediaPlayer/Sources/**/**/*.swift", "OOGMediaPlayer/Sources/**/**/**/*.swift"
 
   # spec.public_header_files = "Classes/**/*.h"
 
