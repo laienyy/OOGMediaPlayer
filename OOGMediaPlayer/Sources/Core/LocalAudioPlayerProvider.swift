@@ -7,6 +7,7 @@
 
 import UIKit
 import AVFoundation
+import AVFAudio
 
 public enum LocalMediaStatus {
     case idle
