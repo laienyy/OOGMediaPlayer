@@ -12,7 +12,7 @@ public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     /// 专辑列表
     public var albumList: [Album] = [] {
         didSet {
-            reloadItems(albumList)
+            reloadData(albumList)
         }
     }
     /// 是否使用缓存

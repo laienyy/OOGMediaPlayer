@@ -25,7 +25,7 @@ public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     }
     
     
-    func getMusics(_ scheme: ProjectScheme, _ project: OOGProject, types: [BgmPlayType], playAutomatically: Bool = true) async throws {
+    func getMusics(_ scheme: ProjectScheme, _ project: OOGProject, types: [BgmPlayType], playAutomatically: Bool ) async throws {
         
         do {
             var models: [AudioAlbumModel] = []

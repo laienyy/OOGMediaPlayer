@@ -7,6 +7,7 @@
 
 import UIKit
 
+
 //MARK: - OOGAudioPlayerProvider & OOGAudioPlayerSettings
 public extension OOGAudioPlayerProvider {
     
@@ -16,12 +17,10 @@ public extension OOGAudioPlayerProvider {
         isUseCache = settings.isEnableCache
         volumn = settings.volumn
         loopMode = settings.loopMode
-        
-        playAudioBySetting(settings)
     }
     
     // 根据设置播放歌曲
-    func playAudioBySetting(_ settings: OOGAudioPlayerSettings) {
+    func resumePlayAudioBySetting(_ settings: OOGAudioPlayerSettings) {
         // 恢复单曲循环播放
         if settings.loopMode == .single,
            let id = settings.loopDesignatedSongID,

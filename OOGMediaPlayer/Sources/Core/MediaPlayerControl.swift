@@ -138,6 +138,11 @@ public enum MediaPlayerControlError: Error, LocalizedError {
 @MainActor
 open class MediaPlayerControl: NSObject {
     
+    public struct HistoryItem {
+        public var media: any MediaPlayable
+        public var indexPath: IndexPath
+    }
+    
     public enum PlayDirection {
         // 指定的条目
         case specified
@@ -157,9 +162,13 @@ open class MediaPlayerControl: NSObject {
     public var loopMode: LoopMode = .order
     
     /// 播放历史
-    public var history: [any MediaPlayable] = []
+    public var history: [HistoryItem] = []
     /// 当前播放位置，停止时为`nil`
-    public var currentIndexPath: IndexPath?
+    public var currentIndexPath: IndexPath? {
+        didSet {
+            log(prefix: .mediaPlayer, "CurrentIndexPath: \(currentIndexPath?.description ?? "nil")")
+        }
+    }
     
     
     /// 最后一次播放的方向
@@ -172,32 +181,24 @@ open class MediaPlayerControl: NSObject {
         return items
     }
     
-    func reloadItems(_ items: [any MediaAlbum]) {
-        let oldItem = currentItem()
-        self.items = items
-        
-        guard let oldItem = oldItem else {
-            return
-        }
-        
-        for album in items.enumerated() {
-            for media in album.element.mediaList.enumerated() {
-                if media.element.id == oldItem.id {
-                    // 刷新后更新播放器当前播放的下标
-                    currentIndexPath = IndexPath(row: media.offset, section: album.offset)
-                    break
-                }
-            }
-        }
-    }
-    
-    open func resetCurrentIndexBy(_ media: MediaPlayable) {
+    /**
+     根据 Media 重置 `CurrentIndexPath`，
+     
+        - Parameters:
+            - media: 目标
+            - playFirstIfNotCatch: 未找到当前播放的时候是否自动播放
+     */
+    open func resetCurrentIndexBy(_ media: MediaPlayable, playFirstIfNotCatch: Bool = false) {
         currentIndexPath = indexPathOf(mediaID: media.id)
+        
+        if currentIndexPath == nil, playFirstIfNotCatch, let indexPath = getValidMediaIndexPaths().first {
+            play(indexPath: indexPath)
+        }
     }
     
     /// 获取上一条数据
     open  func getHistoryLastItem() -> MediaPlayable? {
-        return history.last
+        return history.last?.media
     }
     
     /// 获取当前播放音频
@@ -209,16 +210,26 @@ open class MediaPlayerControl: NSObject {
         return item(at: indexPath)
     }
     
-    /// 刷新播放列表
-    open func reloadData(_ items: [any MediaAlbum], playAutomatically: Bool = true) {
+    /**
+     *  刷新播放列表
+     *
+     *  调用这个函数会重新定位 `currentIndexPath`，未定位到并`playAutomatically` = `true` 时，会重新从首歌有效多媒体开始播放
+     */
+    open func reloadData(_ items: [any MediaAlbum], playAutomatically: Bool = false) {
         // 删除历史记录
         history.removeAll()
         
+        let playingMedia = currentItem()
+        
         self.items = items
         self.playAutomatically = playAutomatically
-        currentIndexPath = nil
         
-        guard playAutomatically else {
+        if let media = playingMedia {
+            // 重新定位正在播放的歌曲的下标
+            resetCurrentIndexBy(media, playFirstIfNotCatch: playAutomatically)
+        }
+        
+        guard playAutomatically, currentIndexPath == nil else {
             return
         }
         
@@ -258,14 +269,14 @@ open class MediaPlayerControl: NSObject {
         
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))")
         
+        // 暂停当前播放
+        stop()
+        
         guard let next = delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath) else {
             log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
             playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
             return
         }
-        
-        // 暂停当前播放
-        stop()
         
         currentIndexPath = next
         
@@ -282,9 +293,9 @@ open class MediaPlayerControl: NSObject {
                 return
             }
             
-            guard next == self.currentIndexPath else {
+            guard self.currentIndexPath?.elementsEqual(next) ?? true else {
                 // 全局当前索引 != 本次流程需执行索引
-                let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(next.descriptionForPlayer), Now: \(next.descriptionForPlayer)"
+                let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(self.currentIndexPath?.descriptionForPlayer ?? "Nil"), Now: \(next.descriptionForPlayer)"
                 log(prefix: .mediaPlayer, msg)
                 return
             }
@@ -292,7 +303,7 @@ open class MediaPlayerControl: NSObject {
             log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
             
             if let item = item(at: next) {
-                history.append(item)
+                history.append(.init(media: item, indexPath: next))
             }
             // 播放
             play()

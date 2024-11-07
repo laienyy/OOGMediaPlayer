@@ -69,7 +69,7 @@ public class DownloadRequest {
                 preProgress = Int(data.count)
                 progress.completedUnitCount = Int64(data.count)
                 
-                log(prefix: .mediaPlayer, String(format: "Progress: %ld / %ld - %.1f%%  -- (\(url.relativePath))",
+                log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(url.relativePath))",
                              progress.completedUnitCount,
                              progress.totalUnitCount,
                              progress.percentComplete * 100))

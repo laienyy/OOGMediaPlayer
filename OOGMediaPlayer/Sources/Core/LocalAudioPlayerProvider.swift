@@ -103,11 +103,6 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
     
     override func toPlay(indexPath: IndexPath) {
-        
-        if let item = currentItem() as? LocalMediaPlayable {
-            setItemStatus(item, status: .idle)
-        }
-        
         super.toPlay(indexPath: indexPath)
     }
     
@@ -193,7 +188,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         player?.play()
         setCurrentItemStatus(.playing)
         
-        delegate?.mediaPlayerControl(self, startPlaying: self.currentIndexPath!)
+        delegate?.mediaPlayerControl(self, startPlaying: currentIndexPath!)
     }
     
     /// 停止播放
