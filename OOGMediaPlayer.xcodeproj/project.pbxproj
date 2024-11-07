@@ -26,13 +26,11 @@
 		182E995F2CD8E484005B7AF9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182E995E2CD8E484005B7AF9 /* UIKit.framework */; platformFilter = ios; };
 		18D74ECE2CDB5F3900940448 /* OOGMediaPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */; };
 		18D74ED02CDB69BF00940448 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74ECF2CDB69BF00940448 /* AVFoundation.framework */; };
-		18D74ED22CDB69C700940448 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74ED12CDB69C700940448 /* AVFAudio.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		182E995E2CD8E484005B7AF9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		183014472CC8AE850014469C /* OOGMediaPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OOGMediaPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		18D74DCD2CDB486000940448 /* libswiftAVFoundation.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libswiftAVFoundation.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/usr/lib/swift/libswiftAVFoundation.tbd; sourceTree = DEVELOPER_DIR; };
 		18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = OOGMediaPlayer.podspec; sourceTree = "<group>"; };
 		18D74ECF2CDB69BF00940448 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		18D74ED12CDB69C700940448 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
@@ -64,7 +62,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18D74ED22CDB69C700940448 /* AVFAudio.framework in Frameworks */,
 				18D74ED02CDB69BF00940448 /* AVFoundation.framework in Frameworks */,
 				182E995F2CD8E484005B7AF9 /* UIKit.framework in Frameworks */,
 			);
@@ -78,7 +75,6 @@
 			children = (
 				18D74ED12CDB69C700940448 /* AVFAudio.framework */,
 				18D74ECF2CDB69BF00940448 /* AVFoundation.framework */,
-				18D74DCD2CDB486000940448 /* libswiftAVFoundation.tbd */,
 				182E995E2CD8E484005B7AF9 /* UIKit.framework */,
 			);
 			name = Frameworks;

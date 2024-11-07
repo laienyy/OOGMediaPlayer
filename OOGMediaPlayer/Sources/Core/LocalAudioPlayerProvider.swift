@@ -7,7 +7,6 @@
 
 import UIKit
 import AVFoundation
-import AVFAudio
 
 public enum LocalMediaStatus {
     case idle
@@ -227,30 +226,6 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
     public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
         setStatus(.error)
         log(prefix: .mediaPlayer, "Decode error", error)
-    }
-}
-
-public extension LocalAudioPlayerProvider {
-    static func dukeOtherAudio() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback,
-                                                            mode: AVAudioSession.Mode.default,
-                                                            options: [.mixWithOthers, .duckOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Set duck other audio, error:", error)
-        }
-    }
-
-    static func mixOtherAudio() {
-        do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback,
-                                                            mode: AVAudioSession.Mode.default,
-                                                            options: [.mixWithOthers])
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("Set mix other audio, error:", error)
-        }
     }
 }
 
