@@ -109,30 +109,27 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     open override func prepareToPlayItem(at indexPath: IndexPath) async throws {
         try await super.prepareToPlayItem(at: indexPath)
         
-        guard let item = currentItem() as? LocalMediaPlayable else {
-            log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
-            throw MediaPlayerControlError.currentItemIsNil
+        let item: LocalMediaPlayable = try await MainActor.run {
+            
+            guard let item = currentItem() as? LocalMediaPlayable else {
+                log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
+                throw MediaPlayerControlError.currentItemIsNil
+            }
+            
+            guard !isIndexPathInPreparingQueue(indexPath) else {
+                // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
+                log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
+                setItemStatus(item, status: .stoped)
+                throw MediaPlayerControlError.alreadyBeenPreparing
+            }
+            
+            // 加入等待队列
+            appendToPreparingQueue(item)
+            setItemStatus(item, status: .downloading)
+            return item
         }
         
-        // 判断是否正在播放
-        guard currentIndexPath != nil else {
-            log(prefix: .mediaPlayer, "Current item (\(indexPath.descriptionForPlayer) is already playing")
-            return
-        }
-        
-        
-        guard !isIndexPathInPreparingQueue(indexPath) else {
-            // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
-            log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
-            setItemStatus(item, status: .stoped)
-            return
-        }
-        
-        // 加入等待队列
-        appendToPreparingQueue(item)
-        setItemStatus(item, status: .downloading)
-        
-        // 等待外部返回文件URL
+        // *** 等待外部返回文件URL
         let fileUrl = try await item.getLocalFileUrl()
         
         // 移出等待队列
@@ -209,10 +206,14 @@ extension LocalAudioPlayerProvider {
     }
     
     func setItemStatus(_ item: LocalMediaPlayable, status: LocalMediaStatus) {
-        let sameItems = items.flatMap({ $0.mediaList }).compactMap({ $0 as? LocalMediaPlayable }) .filter { $0.id == item.id }
-        sameItems.forEach {
-            $0.setNewPlayerStatus(status)
+        let sameItems = self.items.flatMap({ $0.mediaList }).compactMap({ $0 as? LocalMediaPlayable }) .filter { $0.id == item.id }
+        
+        DispatchQueue.main.async {
+            sameItems.forEach {
+                $0.setNewPlayerStatus(status)
+            }
         }
+
     }
 }
 

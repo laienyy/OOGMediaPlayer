@@ -12,6 +12,16 @@ extension LogPrefix {
     static let mediaPlayer = "MediaPlayer"
 }
 
+func performOnMainThread(_ block: @escaping () -> Void) {
+    if Thread.isMainThread {
+        block()
+    } else {
+        DispatchQueue.main.async {
+            block()
+        }
+    }
+}
+
 public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
 
 extension MediaPlayerControl {
@@ -122,6 +132,8 @@ public enum MediaPlayerControlError: Error, LocalizedError {
     case noInvalidItem
     case currentItemIsNil
     case sourceTypeInvalid
+    // 文件已经在准备播放期间
+    case alreadyBeenPreparing
     
     public var errorDescription: String? {
         switch self {
@@ -131,11 +143,12 @@ public enum MediaPlayerControlError: Error, LocalizedError {
             return "Player current item indexPath is none or the indexPath is valid (at indexPath can not found media item)"
         case .sourceTypeInvalid:
             return "Source type is wrong"
+        case .alreadyBeenPreparing:
+            return "File already been preparing (Downloading or some another reason)"
         }
     }
 }
 
-@MainActor
 open class MediaPlayerControl: NSObject {
     
     public struct HistoryItem {
@@ -267,6 +280,7 @@ open class MediaPlayerControl: NSObject {
     /// 根据索引播放
     func toPlay(indexPath: IndexPath) {
         
+        
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))")
         
         // 暂停当前播放
@@ -277,38 +291,46 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
             return
         }
-        
         currentIndexPath = next
         
         // 更新`indexPath` 可能由delegate返回一个新的
         delegate?.mediaPlayerControl(self, willPlay: next)
         
-    
+        // 准备开始播放
         Task {
-            // 准备开始播放
             do {
                 try await prepareToPlayItem(at: next)
+                await MainActor.run {
+                    alreadyToPlay(next)
+                }
             } catch let error {
                 playError(at: next, error: error)
                 return
             }
-            
-            guard self.currentIndexPath?.elementsEqual(next) ?? true else {
-                // 全局当前索引 != 本次流程需执行索引
-                let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(self.currentIndexPath?.descriptionForPlayer ?? "Nil"), Now: \(next.descriptionForPlayer)"
-                log(prefix: .mediaPlayer, msg)
-                return
-            }
-            
-            log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
-            
-            if let item = item(at: next) {
-                history.append(.init(media: item, indexPath: next))
-            }
-            // 播放
-            play()
         }
+        
     }
+    
+    /// 已经准备好播放，需要判断
+    private func alreadyToPlay(_ indexPath: IndexPath) {
+
+        let next = indexPath
+        guard self.currentIndexPath?.elementsEqual(next) ?? true else {
+            // 全局当前索引 != 本次流程需执行索引
+            let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(self.currentIndexPath?.descriptionForPlayer ?? "Nil"), Now: \(next.descriptionForPlayer)"
+            log(prefix: .mediaPlayer, msg)
+            return
+        }
+        
+        log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
+        
+        if let item = item(at: next) {
+            history.append(.init(media: item, indexPath: next))
+        }
+        // 播放
+        play()
+    }
+    
     
     /// 准备播放
     open func prepareToPlayItem(at indexPath: IndexPath) async throws {
@@ -339,8 +361,10 @@ open class MediaPlayerControl: NSObject {
 
 public extension MediaPlayerControl {
     func setStatus(_ status: PlayerStatus) {
-        playerStatus = status
-        delegate?.mediaPlayerControlStatusDidChanged(self)
+        DispatchQueue.main.async {
+            self.playerStatus = status
+            self.delegate?.mediaPlayerControlStatusDidChanged(self)
+        }
     }
 }
 
