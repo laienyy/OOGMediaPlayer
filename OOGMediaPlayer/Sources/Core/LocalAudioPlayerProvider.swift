@@ -196,6 +196,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         super.stop()
         player?.stop()
         setCurrentItemStatus(.stoped)
+        currentIndexPath = nil
     }
 
 }
