@@ -9,7 +9,25 @@ import Foundation
 
 // MARK: - 音乐
 
-public class AudioModel: NSObject {
+public class AudioModel: NSObject, Codable {
+    
+    enum CodingKeys: CodingKey {
+        case id
+        case resId
+        case audio
+        case audioDuration
+        case audioName
+        case coverImgUrl
+        case detailImgUrl
+        case displayName
+        case musicName
+        case musicType
+        case shortLink
+        case subscription
+        case useCache
+        case isFavorite
+        case status
+    }
     
     public var id: Int = 0
     /// 数据ID

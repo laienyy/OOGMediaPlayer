@@ -8,9 +8,9 @@
 import Foundation
 
 public struct GetBGMListApiInfo: API {
-    let scheme: ProjectScheme
-    let project: OOGProject
-    let type: BgmPlayType
+    public let scheme: ProjectScheme
+    public let project: OOGProject
+    public let type: BgmPlayType
     
     public init(scheme: ProjectScheme, project: OOGProject, type: BgmPlayType) {
         self.scheme = scheme

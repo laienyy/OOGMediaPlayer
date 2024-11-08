@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-public enum LocalMediaStatus {
+public enum LocalMediaStatus: Int, Codable {
     case idle
     case downloading
     case prepareToPlay
@@ -62,24 +62,24 @@ public enum LocalMediaPlayerError: Error, LocalizedError {
 
 open class LocalAudioPlayerProvider: MediaPlayerControl {
     
-    var player: AVAudioPlayer?
+    public var audioPlayer: AVAudioPlayer?
     
-    open var currentTime: TimeInterval { player?.currentTime ?? 0 }
-    open var duration: TimeInterval { player?.duration ?? 0 }
+    open var currentTime: TimeInterval { audioPlayer?.currentTime ?? 0 }
+    open var duration: TimeInterval { audioPlayer?.duration ?? 0 }
     open var volumn: Float = 1.0 {
         didSet {
-            player?.volume = volumn
+            audioPlayer?.volume = volumn
         }
     }
     
-    open var isRateEnable: Bool { return player?.enableRate ?? false }
+    open var isRateEnable: Bool { return audioPlayer?.enableRate ?? false }
     
     open var rate: Float {
         get {
-            return player?.rate ?? 0
+            return audioPlayer?.rate ?? 0
         }
         set {
-            player?.rate = newValue
+            audioPlayer?.rate = newValue
         }
     }
     
@@ -150,12 +150,12 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         }
         
         let data = try Data(contentsOf: fileUrl)
-        player = try AVAudioPlayer(data: data)
-        player?.delegate = self
-        player?.rate = 2
-        player?.volume = volumn
+        audioPlayer = try AVAudioPlayer(data: data)
+        audioPlayer?.delegate = self
+        audioPlayer?.rate = 2
+        audioPlayer?.volume = volumn
         
-        guard let player = self.player else {
+        guard let player = self.audioPlayer else {
             setItemStatus(item, status: .error)
             throw LocalMediaPlayerError.prepareToPlayFailed
         }
@@ -168,7 +168,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     open override func pause() {
         super.pause()
-        player?.pause()
+        audioPlayer?.pause()
         setCurrentItemStatus(.paused)
     }
     
@@ -176,12 +176,12 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     override open func play() {
         super.play()
         
-        guard let playing = player?.isPlaying, !playing else {
+        guard let playing = audioPlayer?.isPlaying, !playing else {
             log(prefix: .mediaPlayer, "Ignore play for this time, the player is playing")
             setCurrentItemStatus(.error)
             return
         }
-        player?.play()
+        audioPlayer?.play()
         setCurrentItemStatus(.playing)
         
         delegate?.mediaPlayerControl(self, startPlaying: currentIndexPath!)
@@ -190,7 +190,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     /// 停止播放
     override open func stop() {
         super.stop()
-        player?.stop()
+        audioPlayer?.stop()
         setCurrentItemStatus(.stoped)
         currentIndexPath = nil
     }

@@ -9,7 +9,18 @@ import UIKit
 
 // MARK: - 专辑
 
-public class AudioAlbumModel: NSObject, BGMAlbum {
+public class AudioAlbumModel: NSObject, BGMAlbum, Codable {
+    
+    enum CodingKeys: CodingKey {
+        case id
+        case subscription
+        case playlistName
+        case phoneCoverImgUrl
+        case phoneDetailImgUrl
+        case tabletCoverImgUrl
+        case tabletDetailImgUrl
+        case mediaList
+    }
     
     public var name: String? { playlistName }
     
@@ -41,3 +52,40 @@ public class AudioAlbumModel: NSObject, BGMAlbum {
     }
 }
 
+
+public extension [AudioAlbumModel] {
+    
+    @discardableResult
+    func storeListToCache(_ type: BgmPlayType) -> Bool {
+        do {
+            let fileItem = FileItem.bgmAlbumListJson(type)
+            try fileItem.write(data: try JSONEncoder().encode(self))
+            return true
+        } catch let error {
+            log(prefix: .mediaPlayer, "Save AudioAlbumModel list of type (\(type.description) failed:", error)
+            return false
+        }
+    }
+    
+    static func getListFromCache(_ type: BgmPlayType) -> [AudioAlbumModel]? {
+        do {
+            let fileItem = FileItem.bgmAlbumListJson(type)
+            guard let data = fileItem.getDataFromDisk() else {
+                return nil
+            }
+            return try JSONDecoder().decode(Self.self, from: data)
+            
+        } catch let error {
+            log(prefix: .mediaPlayer, "Get AudioAlbumModel list of type (\(type.description) from disk cache failed:", error)
+            return nil
+        }
+    }
+    
+    static func getListFromAPI(_ destination: GetBGMListApiInfo) async throws -> [AudioAlbumModel] {
+        let info = GetBGMListApiInfo(scheme: destination.scheme, project: destination.project, type: destination.type)
+        let dtos: [AudioAlbumDTO] = try await ApiProvider.getBackgroundMedia(info)
+        // 转换数据类型
+        let albumList = dtos.map({ $0.asAlbumEntity().asAlbumModel() })
+        return albumList
+    }
+}

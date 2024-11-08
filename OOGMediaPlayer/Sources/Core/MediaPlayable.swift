@@ -7,13 +7,13 @@
 
 import Foundation
 
-public protocol MediaAlbum: Equatable {
+public protocol MediaAlbum: Equatable, Codable {
     associatedtype MediaType: MediaPlayable
     var id: Int { get }
     var mediaList: [MediaType] { get }
 }
 
-public protocol MediaPlayable {
+public protocol MediaPlayable: Codable {
     var id: Int { get }
     // 多媒体名称
     var fileName: String { get }

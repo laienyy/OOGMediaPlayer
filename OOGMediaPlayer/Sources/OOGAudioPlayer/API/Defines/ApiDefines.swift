@@ -61,4 +61,15 @@ public enum BgmPlayType {
             return ["playType" : "Animation"]
         }
     }
+    
+    var description: String {
+        switch self {
+        case .planClassicAndChair:
+            return "Plan_Classic and Chair"
+        case .poseLibrary:
+            return "Pose Library"
+        case .animation:
+            return "Animation"
+        }
+    }
 }

@@ -11,11 +11,11 @@ import Foundation
 public struct FileItem: Codable {
     
     /// 根目录
-    let root: FileRootDirectory
+    public let root: FileRootDirectory
     /// 自定义目录
-    let directory: FileDirectory
+    public let directory: FileDirectory
     /// 文件名
-    let fileName: String
+    public let fileName: String
     
 }
 
