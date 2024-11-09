@@ -9,13 +9,13 @@
 /* Begin PBXBuildFile section */
 		182E99642CD8E5BF005B7AF9 /* OOGMediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182E99622CD8E5A4005B7AF9 /* OOGMediaPlayer.framework */; };
 		182E99652CD8E5C0005B7AF9 /* OOGMediaPlayer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 182E99622CD8E5A4005B7AF9 /* OOGMediaPlayer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		18CAF4292CD36C1600DF5A93 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 18CAF4282CD36C1600DF5A93 /* Lottie */; };
-		18D74D6D2CD9B99200940448 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18601E632CD0E9BE003BE37D /* SnapKit */; };
-		18D74DB02CD9BCE600940448 /* MBProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 18D74DAF2CD9BCE600940448 /* MBProgressHUD */; };
-		18D74DB62CD9C14800940448 /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 18D74DB52CD9C14800940448 /* SDWebImage */; };
-		18D74DB82CD9C14800940448 /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18D74DB72CD9C14800940448 /* SDWebImageMapKit */; };
 		18D74EDE2CDC906100940448 /* AVFAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74EDD2CDC906100940448 /* AVFAudio.framework */; };
 		18D74EE02CDC906800940448 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74EDF2CDC906800940448 /* AVFoundation.framework */; };
+		E08155482CDF3F7100EC9A9D /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18601E632CD0E9BE003BE37D /* SnapKit */; };
+		E081554A2CDF3F7100EC9A9D /* SDWebImage in Frameworks */ = {isa = PBXBuildFile; productRef = 18D74DB52CD9C14800940448 /* SDWebImage */; };
+		E081554B2CDF3F7100EC9A9D /* SDWebImageMapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18D74DB72CD9C14800940448 /* SDWebImageMapKit */; };
+		E08155E72CDF407500EC9A9D /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = E08155E62CDF407500EC9A9D /* Lottie */; };
+		E08155EA2CDF40B000EC9A9D /* MBProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E08155E92CDF40B000EC9A9D /* MBProgressHUD */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -66,14 +66,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E081554B2CDF3F7100EC9A9D /* SDWebImageMapKit in Frameworks */,
+				E081554A2CDF3F7100EC9A9D /* SDWebImage in Frameworks */,
+				E08155EA2CDF40B000EC9A9D /* MBProgressHUD in Frameworks */,
+				E08155482CDF3F7100EC9A9D /* SnapKit in Frameworks */,
 				18D74EE02CDC906800940448 /* AVFoundation.framework in Frameworks */,
 				18D74EDE2CDC906100940448 /* AVFAudio.framework in Frameworks */,
-				18D74D6D2CD9B99200940448 /* SnapKit in Frameworks */,
-				18CAF4292CD36C1600DF5A93 /* Lottie in Frameworks */,
-				18D74DB02CD9BCE600940448 /* MBProgressHUD in Frameworks */,
 				182E99642CD8E5BF005B7AF9 /* OOGMediaPlayer.framework in Frameworks */,
-				18D74DB82CD9C14800940448 /* SDWebImageMapKit in Frameworks */,
-				18D74DB62CD9C14800940448 /* SDWebImage in Frameworks */,
+				E08155E72CDF407500EC9A9D /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,10 +130,10 @@
 			packageProductDependencies = (
 				18601E632CD0E9BE003BE37D /* SnapKit */,
 				18601E652CD0E9BE003BE37D /* SnapKit-Dynamic */,
-				18CAF4282CD36C1600DF5A93 /* Lottie */,
-				18D74DAF2CD9BCE600940448 /* MBProgressHUD */,
 				18D74DB52CD9C14800940448 /* SDWebImage */,
 				18D74DB72CD9C14800940448 /* SDWebImageMapKit */,
+				E08155E62CDF407500EC9A9D /* Lottie */,
+				E08155E92CDF40B000EC9A9D /* MBProgressHUD */,
 			);
 			productName = "iOS Sample";
 			productReference = 1830148A2CC8AF270014469C /* iOS Sample.app */;
@@ -165,9 +165,9 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				18601E622CD0E9BE003BE37D /* XCRemoteSwiftPackageReference "SnapKit" */,
-				18CAF4272CD36C1600DF5A93 /* XCRemoteSwiftPackageReference "lottie-ios" */,
-				18D74DAE2CD9BCE600940448 /* XCRemoteSwiftPackageReference "MBProgressHUD" */,
 				18D74DB42CD9C14800940448 /* XCRemoteSwiftPackageReference "SDWebImage" */,
+				E08155E52CDF407500EC9A9D /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				E08155E82CDF40B000EC9A9D /* XCRemoteSwiftPackageReference "MBProgressHUD" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1830148B2CC8AF270014469C /* Products */;
@@ -421,7 +421,15 @@
 				minimumVersion = 5.0.1;
 			};
 		};
-		18CAF4272CD36C1600DF5A93 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+		18D74DB42CD9C14800940448 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.20.0;
+			};
+		};
+		E08155E52CDF407500EC9A9D /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/airbnb/lottie-ios";
 			requirement = {
@@ -429,20 +437,12 @@
 				minimumVersion = 4.5.0;
 			};
 		};
-		18D74DAE2CD9BCE600940448 /* XCRemoteSwiftPackageReference "MBProgressHUD" */ = {
+		E08155E82CDF40B000EC9A9D /* XCRemoteSwiftPackageReference "MBProgressHUD" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jdg/MBProgressHUD";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.2.0;
-			};
-		};
-		18D74DB42CD9C14800940448 /* XCRemoteSwiftPackageReference "SDWebImage" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImage";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.20.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -458,16 +458,6 @@
 			package = 18601E622CD0E9BE003BE37D /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = "SnapKit-Dynamic";
 		};
-		18CAF4282CD36C1600DF5A93 /* Lottie */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18CAF4272CD36C1600DF5A93 /* XCRemoteSwiftPackageReference "lottie-ios" */;
-			productName = Lottie;
-		};
-		18D74DAF2CD9BCE600940448 /* MBProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18D74DAE2CD9BCE600940448 /* XCRemoteSwiftPackageReference "MBProgressHUD" */;
-			productName = MBProgressHUD;
-		};
 		18D74DB52CD9C14800940448 /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 18D74DB42CD9C14800940448 /* XCRemoteSwiftPackageReference "SDWebImage" */;
@@ -477,6 +467,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18D74DB42CD9C14800940448 /* XCRemoteSwiftPackageReference "SDWebImage" */;
 			productName = SDWebImageMapKit;
+		};
+		E08155E62CDF407500EC9A9D /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E08155E52CDF407500EC9A9D /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		E08155E92CDF40B000EC9A9D /* MBProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E08155E82CDF40B000EC9A9D /* XCRemoteSwiftPackageReference "MBProgressHUD" */;
+			productName = MBProgressHUD;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
