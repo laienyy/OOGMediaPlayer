@@ -29,7 +29,7 @@ public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     func addMusicsFromServer(_ scheme: ProjectScheme, _ project: OOGProject, types: [BgmPlayType], playAutomatically: Bool ) async throws {
         
         for type in types {
-            let info = GetBGMListApiInfo(scheme: scheme, project: project, type: type)
+            let info = GetBGMListApiInfo(scheme: scheme, project: project, type: type, language: "en")
             try await addMusicsFromServer(info: info, playAutomatically: false)
         }
         

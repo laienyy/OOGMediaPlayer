@@ -11,16 +11,20 @@ public struct GetBGMListApiInfo: API {
     public let scheme: ProjectScheme
     public let project: OOGProject
     public let type: BgmPlayType
+    public let language: String
     
-    public init(scheme: ProjectScheme, project: OOGProject, type: BgmPlayType) {
+    public init(scheme: ProjectScheme, project: OOGProject, type: BgmPlayType, language: String) {
         self.scheme = scheme
         self.project = project
         self.type = type
+        self.language = language
     }
     
     var method: ApiMethod = .GET
     var parameters: [String: AnyHashable]? {
-        return type.asParameter()
+        var dic = type.asParameter()
+        dic["lang"] = language
+        return dic
     }
     
     func asURL() -> URL {

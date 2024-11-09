@@ -62,7 +62,7 @@ class LocalAudioPlayerViewController: UIViewController {
         
         Task {
             do {
-                let info = GetBGMListApiInfo(scheme: .dev, project: .oog200, type: .animation)
+                let info = GetBGMListApiInfo(scheme: .dev, project: .oog200, type: .animation, language: "en")
                 try await playerProvider.addMusicsFromServer(info: info)
             } catch let error {
 //                self.statusLabel.text = ""

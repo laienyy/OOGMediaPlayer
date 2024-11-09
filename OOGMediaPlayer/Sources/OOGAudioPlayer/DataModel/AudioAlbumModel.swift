@@ -82,7 +82,7 @@ public extension [AudioAlbumModel] {
     }
     
     static func getListFromAPI(_ destination: GetBGMListApiInfo) async throws -> [AudioAlbumModel] {
-        let info = GetBGMListApiInfo(scheme: destination.scheme, project: destination.project, type: destination.type)
+        let info = GetBGMListApiInfo(scheme: destination.scheme, project: destination.project, type: destination.type, language: "en")
         let dtos: [AudioAlbumDTO] = try await ApiProvider.getBackgroundMedia(info)
         // 转换数据类型
         let albumList = dtos.map({ $0.asAlbumEntity().asAlbumModel() })
