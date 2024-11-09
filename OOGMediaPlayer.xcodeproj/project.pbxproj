@@ -23,17 +23,91 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		182E995F2CD8E484005B7AF9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182E995E2CD8E484005B7AF9 /* UIKit.framework */; platformFilter = ios; };
 		18D74ECE2CDB5F3900940448 /* OOGMediaPlayer.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */; };
-		18D74ED02CDB69BF00940448 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18D74ECF2CDB69BF00940448 /* AVFoundation.framework */; };
+		E0E041E42CDF383400821354 /* Xib+Shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C02CDF383400821354 /* Xib+Shortcut.swift */; };
+		E0E041E52CDF383400821354 /* LocalAudioPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C22CDF383400821354 /* LocalAudioPlayerViewController.swift */; };
+		E0E041E62CDF383400821354 /* UIView+SnapKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041DD2CDF383400821354 /* UIView+SnapKit.swift */; };
+		E0E041E72CDF383400821354 /* BGMAlbumTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C82CDF383400821354 /* BGMAlbumTableHeaderView.swift */; };
+		E0E041E82CDF383400821354 /* OOG200AudioListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041CF2CDF383400821354 /* OOG200AudioListViewController.swift */; };
+		E0E041E92CDF383400821354 /* AudioPlayerWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C72CDF383400821354 /* AudioPlayerWidgetView.swift */; };
+		E0E041EA2CDF383400821354 /* AudioTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041BC2CDF383400821354 /* AudioTableViewCell.swift */; };
+		E0E041EB2CDF383400821354 /* BGMItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041CB2CDF383400821354 /* BGMItemTableViewCell.swift */; };
+		E0E041EC2CDF383400821354 /* BGMAlbumTableSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041CA2CDF383400821354 /* BGMAlbumTableSectionHeaderView.swift */; };
+		E0E041ED2CDF383400821354 /* OOGSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041CD2CDF383400821354 /* OOGSlider.swift */; };
+		E0E041EE2CDF383400821354 /* AudioPlayerOwner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C52CDF383400821354 /* AudioPlayerOwner.swift */; };
+		E0E041EF2CDF383400821354 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041DE2CDF383400821354 /* ViewController.swift */; };
+		E0E041F02CDF383400821354 /* MediaItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041BE2CDF383400821354 /* MediaItemTableViewCell.swift */; };
+		E0E041F12CDF383400821354 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041D22CDF383400821354 /* AppDelegate.swift */; };
+		E0E041F22CDF383400821354 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041D32CDF383400821354 /* SceneDelegate.swift */; };
+		E0E041F32CDF383400821354 /* BGMAlbumTableSectionFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C92CDF383400821354 /* BGMAlbumTableSectionFooterView.swift */; };
+		E0E041F42CDF383400821354 /* CircleProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041CC2CDF383400821354 /* CircleProgressView.swift */; };
+		E0E041F52CDF383400821354 /* MediaListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041C32CDF383400821354 /* MediaListViewController.swift */; };
+		E0E041F62CDF383400821354 /* AudioAlbumTableHeaderFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041B92CDF383400821354 /* AudioAlbumTableHeaderFooterView.swift */; };
+		E0E041F72CDF383400821354 /* OOG200AudioPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041D02CDF383400821354 /* OOG200AudioPlayerViewController.swift */; };
+		E0E041F82CDF383400821354 /* AudioPlayerWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E041BB2CDF383400821354 /* AudioPlayerWidgetView.swift */; };
+		E0E041F92CDF383400821354 /* AudioTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E0E041BD2CDF383400821354 /* AudioTableViewCell.xib */; };
+		E0E041FA2CDF383400821354 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0E041DC2CDF383400821354 /* Main.storyboard */; };
+		E0E041FB2CDF383400821354 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E0E041D72CDF383400821354 /* Assets.xcassets */; };
+		E0E041FC2CDF383400821354 /* AudioAlbumTableHeaderFooterView.xib in Resources */ = {isa = PBXBuildFile; fileRef = E0E041BA2CDF383400821354 /* AudioAlbumTableHeaderFooterView.xib */; };
+		E0E041FD2CDF383400821354 /* MediaItemTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = E0E041BF2CDF383400821354 /* MediaItemTableViewCell.xib */; };
+		E0E041FE2CDF383400821354 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E0E041DA2CDF383400821354 /* LaunchScreen.storyboard */; };
+		E0E041FF2CDF383400821354 /* bgm_playing.json in Resources */ = {isa = PBXBuildFile; fileRef = E0E041D52CDF383400821354 /* bgm_playing.json */; };
+		E0E042002CDF383400821354 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E0E041D82CDF383400821354 /* Info.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E0E03FEF2CDF366600821354 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1830143E2CC8AE850014469C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E0E03FD82CDF366500821354;
+			remoteInfo = iOS;
+		};
+		E0E03FF92CDF366600821354 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1830143E2CC8AE850014469C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E0E03FD82CDF366500821354;
+			remoteInfo = iOS;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		182E995E2CD8E484005B7AF9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		183014472CC8AE850014469C /* OOGMediaPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = OOGMediaPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = OOGMediaPlayer.podspec; sourceTree = "<group>"; };
-		18D74ECF2CDB69BF00940448 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		18D74ED12CDB69C700940448 /* AVFAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFAudio.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/AVFAudio.framework; sourceTree = DEVELOPER_DIR; };
+		E0E03FD92CDF366500821354 /* iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0E03FEE2CDF366600821354 /* iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0E03FF82CDF366600821354 /* iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0E041B92CDF383400821354 /* AudioAlbumTableHeaderFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAlbumTableHeaderFooterView.swift; sourceTree = "<group>"; };
+		E0E041BA2CDF383400821354 /* AudioAlbumTableHeaderFooterView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AudioAlbumTableHeaderFooterView.xib; sourceTree = "<group>"; };
+		E0E041BB2CDF383400821354 /* AudioPlayerWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerWidgetView.swift; sourceTree = "<group>"; };
+		E0E041BC2CDF383400821354 /* AudioTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTableViewCell.swift; sourceTree = "<group>"; };
+		E0E041BD2CDF383400821354 /* AudioTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AudioTableViewCell.xib; sourceTree = "<group>"; };
+		E0E041BE2CDF383400821354 /* MediaItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaItemTableViewCell.swift; sourceTree = "<group>"; };
+		E0E041BF2CDF383400821354 /* MediaItemTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MediaItemTableViewCell.xib; sourceTree = "<group>"; };
+		E0E041C02CDF383400821354 /* Xib+Shortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Xib+Shortcut.swift"; sourceTree = "<group>"; };
+		E0E041C22CDF383400821354 /* LocalAudioPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAudioPlayerViewController.swift; sourceTree = "<group>"; };
+		E0E041C32CDF383400821354 /* MediaListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaListViewController.swift; sourceTree = "<group>"; };
+		E0E041C52CDF383400821354 /* AudioPlayerOwner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerOwner.swift; sourceTree = "<group>"; };
+		E0E041C72CDF383400821354 /* AudioPlayerWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerWidgetView.swift; sourceTree = "<group>"; };
+		E0E041C82CDF383400821354 /* BGMAlbumTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGMAlbumTableHeaderView.swift; sourceTree = "<group>"; };
+		E0E041C92CDF383400821354 /* BGMAlbumTableSectionFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGMAlbumTableSectionFooterView.swift; sourceTree = "<group>"; };
+		E0E041CA2CDF383400821354 /* BGMAlbumTableSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGMAlbumTableSectionHeaderView.swift; sourceTree = "<group>"; };
+		E0E041CB2CDF383400821354 /* BGMItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGMItemTableViewCell.swift; sourceTree = "<group>"; };
+		E0E041CC2CDF383400821354 /* CircleProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleProgressView.swift; sourceTree = "<group>"; };
+		E0E041CD2CDF383400821354 /* OOGSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OOGSlider.swift; sourceTree = "<group>"; };
+		E0E041CF2CDF383400821354 /* OOG200AudioListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OOG200AudioListViewController.swift; sourceTree = "<group>"; };
+		E0E041D02CDF383400821354 /* OOG200AudioPlayerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OOG200AudioPlayerViewController.swift; sourceTree = "<group>"; };
+		E0E041D22CDF383400821354 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E0E041D32CDF383400821354 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		E0E041D52CDF383400821354 /* bgm_playing.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = bgm_playing.json; sourceTree = "<group>"; };
+		E0E041D72CDF383400821354 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E0E041D82CDF383400821354 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E0E041D92CDF383400821354 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		E0E041DB2CDF383400821354 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E0E041DD2CDF383400821354 /* UIView+SnapKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+SnapKit.swift"; sourceTree = "<group>"; };
+		E0E041DE2CDF383400821354 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E0E041E02CDF383400821354 /* iOS Sample.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "iOS Sample.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -62,30 +136,39 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18D74ED02CDB69BF00940448 /* AVFoundation.framework in Frameworks */,
-				182E995F2CD8E484005B7AF9 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FD62CDF366500821354 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FEB2CDF366600821354 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FF52CDF366600821354 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		182E995D2CD8E484005B7AF9 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				18D74ED12CDB69C700940448 /* AVFAudio.framework */,
-				18D74ECF2CDB69BF00940448 /* AVFoundation.framework */,
-				182E995E2CD8E484005B7AF9 /* UIKit.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		1830143D2CC8AE850014469C = {
 			isa = PBXGroup;
 			children = (
+				E0E041E12CDF383400821354 /* Sample */,
 				18D74ECD2CDB5F3900940448 /* OOGMediaPlayer.podspec */,
 				183014492CC8AE850014469C /* OOGMediaPlayer */,
-				182E995D2CD8E484005B7AF9 /* Frameworks */,
 				183014482CC8AE850014469C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -94,6 +177,117 @@
 			isa = PBXGroup;
 			children = (
 				183014472CC8AE850014469C /* OOGMediaPlayer.framework */,
+				E0E03FD92CDF366500821354 /* iOS.app */,
+				E0E03FEE2CDF366600821354 /* iOSTests.xctest */,
+				E0E03FF82CDF366600821354 /* iOSUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E0E041C12CDF383400821354 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041B92CDF383400821354 /* AudioAlbumTableHeaderFooterView.swift */,
+				E0E041BA2CDF383400821354 /* AudioAlbumTableHeaderFooterView.xib */,
+				E0E041BB2CDF383400821354 /* AudioPlayerWidgetView.swift */,
+				E0E041BC2CDF383400821354 /* AudioTableViewCell.swift */,
+				E0E041BD2CDF383400821354 /* AudioTableViewCell.xib */,
+				E0E041BE2CDF383400821354 /* MediaItemTableViewCell.swift */,
+				E0E041BF2CDF383400821354 /* MediaItemTableViewCell.xib */,
+				E0E041C02CDF383400821354 /* Xib+Shortcut.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		E0E041C42CDF383400821354 /* LocalAudioPlayer */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041C12CDF383400821354 /* View */,
+				E0E041C22CDF383400821354 /* LocalAudioPlayerViewController.swift */,
+				E0E041C32CDF383400821354 /* MediaListViewController.swift */,
+			);
+			path = LocalAudioPlayer;
+			sourceTree = "<group>";
+		};
+		E0E041C62CDF383400821354 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041C52CDF383400821354 /* AudioPlayerOwner.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		E0E041CE2CDF383400821354 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041C72CDF383400821354 /* AudioPlayerWidgetView.swift */,
+				E0E041C82CDF383400821354 /* BGMAlbumTableHeaderView.swift */,
+				E0E041C92CDF383400821354 /* BGMAlbumTableSectionFooterView.swift */,
+				E0E041CA2CDF383400821354 /* BGMAlbumTableSectionHeaderView.swift */,
+				E0E041CB2CDF383400821354 /* BGMItemTableViewCell.swift */,
+				E0E041CC2CDF383400821354 /* CircleProgressView.swift */,
+				E0E041CD2CDF383400821354 /* OOGSlider.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		E0E041D12CDF383400821354 /* OOG200 */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041C62CDF383400821354 /* Protocol */,
+				E0E041CE2CDF383400821354 /* View */,
+				E0E041CF2CDF383400821354 /* OOG200AudioListViewController.swift */,
+				E0E041D02CDF383400821354 /* OOG200AudioPlayerViewController.swift */,
+			);
+			path = OOG200;
+			sourceTree = "<group>";
+		};
+		E0E041D42CDF383400821354 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041C42CDF383400821354 /* LocalAudioPlayer */,
+				E0E041D12CDF383400821354 /* OOG200 */,
+				E0E041D22CDF383400821354 /* AppDelegate.swift */,
+				E0E041D32CDF383400821354 /* SceneDelegate.swift */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		E0E041D62CDF383400821354 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041D52CDF383400821354 /* bgm_playing.json */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
+		E0E041DF2CDF383400821354 /* iOS Sample */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041D42CDF383400821354 /* Classes */,
+				E0E041D62CDF383400821354 /* Resource */,
+				E0E041D72CDF383400821354 /* Assets.xcassets */,
+				E0E041D82CDF383400821354 /* Info.plist */,
+				E0E041DA2CDF383400821354 /* LaunchScreen.storyboard */,
+				E0E041DC2CDF383400821354 /* Main.storyboard */,
+				E0E041DD2CDF383400821354 /* UIView+SnapKit.swift */,
+				E0E041DE2CDF383400821354 /* ViewController.swift */,
+			);
+			path = "iOS Sample";
+			sourceTree = "<group>";
+		};
+		E0E041E12CDF383400821354 /* Sample */ = {
+			isa = PBXGroup;
+			children = (
+				E0E041DF2CDF383400821354 /* iOS Sample */,
+				E0E041E02CDF383400821354 /* iOS Sample.xcodeproj */,
+			);
+			path = Sample;
+			sourceTree = "<group>";
+		};
+		E0E041E22CDF383400821354 /* Products */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -134,6 +328,65 @@
 			productReference = 183014472CC8AE850014469C /* OOGMediaPlayer.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		E0E03FD82CDF366500821354 /* iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0E040072CDF366600821354 /* Build configuration list for PBXNativeTarget "iOS" */;
+			buildPhases = (
+				E0E03FD52CDF366500821354 /* Sources */,
+				E0E03FD62CDF366500821354 /* Frameworks */,
+				E0E03FD72CDF366500821354 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = iOS;
+			packageProductDependencies = (
+			);
+			productName = iOS;
+			productReference = E0E03FD92CDF366500821354 /* iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E0E03FED2CDF366600821354 /* iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0E040082CDF366600821354 /* Build configuration list for PBXNativeTarget "iOSTests" */;
+			buildPhases = (
+				E0E03FEA2CDF366600821354 /* Sources */,
+				E0E03FEB2CDF366600821354 /* Frameworks */,
+				E0E03FEC2CDF366600821354 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E0E03FF02CDF366600821354 /* PBXTargetDependency */,
+			);
+			name = iOSTests;
+			packageProductDependencies = (
+			);
+			productName = iOSTests;
+			productReference = E0E03FEE2CDF366600821354 /* iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E0E03FF72CDF366600821354 /* iOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0E040092CDF366600821354 /* Build configuration list for PBXNativeTarget "iOSUITests" */;
+			buildPhases = (
+				E0E03FF42CDF366600821354 /* Sources */,
+				E0E03FF52CDF366600821354 /* Frameworks */,
+				E0E03FF62CDF366600821354 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E0E03FFA2CDF366600821354 /* PBXTargetDependency */,
+			);
+			name = iOSUITests;
+			packageProductDependencies = (
+			);
+			productName = iOSUITests;
+			productReference = E0E03FF82CDF366600821354 /* iOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -141,6 +394,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1610;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					183014462CC8AE850014469C = {
@@ -148,6 +402,17 @@
 					};
 					18CA4BCB2CD9B7470008E7A5 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					E0E03FD82CDF366500821354 = {
+						CreatedOnToolsVersion = 16.1;
+					};
+					E0E03FED2CDF366600821354 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = E0E03FD82CDF366500821354;
+					};
+					E0E03FF72CDF366600821354 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = E0E03FD82CDF366500821354;
 					};
 				};
 			};
@@ -163,10 +428,19 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 183014482CC8AE850014469C /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = E0E041E22CDF383400821354 /* Products */;
+					ProjectRef = E0E041E02CDF383400821354 /* iOS Sample.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				183014462CC8AE850014469C /* OOGMediaPlayer */,
 				18CA4BCB2CD9B7470008E7A5 /* OOGMediaPlayerLib */,
+				E0E03FD82CDF366500821354 /* iOS */,
+				E0E03FED2CDF366600821354 /* iOSTests */,
+				E0E03FF72CDF366600821354 /* iOSUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -177,6 +451,35 @@
 			buildActionMask = 2147483647;
 			files = (
 				18D74ECE2CDB5F3900940448 /* OOGMediaPlayer.podspec in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FD72CDF366500821354 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0E041F92CDF383400821354 /* AudioTableViewCell.xib in Resources */,
+				E0E041FA2CDF383400821354 /* Main.storyboard in Resources */,
+				E0E041FB2CDF383400821354 /* Assets.xcassets in Resources */,
+				E0E041FC2CDF383400821354 /* AudioAlbumTableHeaderFooterView.xib in Resources */,
+				E0E041FD2CDF383400821354 /* MediaItemTableViewCell.xib in Resources */,
+				E0E041FE2CDF383400821354 /* LaunchScreen.storyboard in Resources */,
+				E0E041FF2CDF383400821354 /* bgm_playing.json in Resources */,
+				E0E042002CDF383400821354 /* Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FEC2CDF366600821354 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FF62CDF366600821354 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -211,7 +514,81 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E0E03FD52CDF366500821354 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0E041E42CDF383400821354 /* Xib+Shortcut.swift in Sources */,
+				E0E041E52CDF383400821354 /* LocalAudioPlayerViewController.swift in Sources */,
+				E0E041E62CDF383400821354 /* UIView+SnapKit.swift in Sources */,
+				E0E041E72CDF383400821354 /* BGMAlbumTableHeaderView.swift in Sources */,
+				E0E041E82CDF383400821354 /* OOG200AudioListViewController.swift in Sources */,
+				E0E041E92CDF383400821354 /* AudioPlayerWidgetView.swift in Sources */,
+				E0E041EA2CDF383400821354 /* AudioTableViewCell.swift in Sources */,
+				E0E041EB2CDF383400821354 /* BGMItemTableViewCell.swift in Sources */,
+				E0E041EC2CDF383400821354 /* BGMAlbumTableSectionHeaderView.swift in Sources */,
+				E0E041ED2CDF383400821354 /* OOGSlider.swift in Sources */,
+				E0E041EE2CDF383400821354 /* AudioPlayerOwner.swift in Sources */,
+				E0E041EF2CDF383400821354 /* ViewController.swift in Sources */,
+				E0E041F02CDF383400821354 /* MediaItemTableViewCell.swift in Sources */,
+				E0E041F12CDF383400821354 /* AppDelegate.swift in Sources */,
+				E0E041F22CDF383400821354 /* SceneDelegate.swift in Sources */,
+				E0E041F32CDF383400821354 /* BGMAlbumTableSectionFooterView.swift in Sources */,
+				E0E041F42CDF383400821354 /* CircleProgressView.swift in Sources */,
+				E0E041F52CDF383400821354 /* MediaListViewController.swift in Sources */,
+				E0E041F62CDF383400821354 /* AudioAlbumTableHeaderFooterView.swift in Sources */,
+				E0E041F72CDF383400821354 /* OOG200AudioPlayerViewController.swift in Sources */,
+				E0E041F82CDF383400821354 /* AudioPlayerWidgetView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FEA2CDF366600821354 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0E03FF42CDF366600821354 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E0E03FF02CDF366600821354 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E0E03FD82CDF366500821354 /* iOS */;
+			targetProxy = E0E03FEF2CDF366600821354 /* PBXContainerItemProxy */;
+		};
+		E0E03FFA2CDF366600821354 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E0E03FD82CDF366500821354 /* iOS */;
+			targetProxy = E0E03FF92CDF366600821354 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E0E041DA2CDF383400821354 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E0E041D92CDF383400821354 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		E0E041DC2CDF383400821354 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E0E041DB2CDF383400821354 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		183014502CC8AE850014469C /* Debug */ = {
@@ -432,6 +809,147 @@
 			};
 			name = Release;
 		};
+		E0E040002CDF366600821354 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E0E040012CDF366600821354 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E0E040022CDF366600821354 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iOS";
+			};
+			name = Debug;
+		};
+		E0E040032CDF366600821354 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOSTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iOS";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E0E040042CDF366600821354 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOSUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iOS;
+			};
+			name = Debug;
+		};
+		E0E040052CDF366600821354 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3AG88B5ZDR;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lorugef.app.iOSUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = iOS;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -458,6 +976,33 @@
 			buildConfigurations = (
 				18CA4BCD2CD9B7470008E7A5 /* Debug */,
 				18CA4BCE2CD9B7470008E7A5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E0E040072CDF366600821354 /* Build configuration list for PBXNativeTarget "iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0E040002CDF366600821354 /* Debug */,
+				E0E040012CDF366600821354 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E0E040082CDF366600821354 /* Build configuration list for PBXNativeTarget "iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0E040022CDF366600821354 /* Debug */,
+				E0E040032CDF366600821354 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E0E040092CDF366600821354 /* Build configuration list for PBXNativeTarget "iOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0E040042CDF366600821354 /* Debug */,
+				E0E040052CDF366600821354 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
