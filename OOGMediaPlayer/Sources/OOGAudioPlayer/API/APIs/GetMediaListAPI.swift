@@ -13,7 +13,7 @@ public struct GetBGMListApiInfo: API {
     public let type: BgmPlayType
     public let language: String
     
-    public init(scheme: ProjectScheme, project: OOGProject, type: BgmPlayType, language: String) {
+    public init(scheme: ProjectScheme, project: OOGProject, type: BgmPlayType, language: String = "en") {
         self.scheme = scheme
         self.project = project
         self.type = type
