@@ -289,7 +289,7 @@ open class MediaPlayerControl: NSObject {
         let delegateResponseIndexPath = delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
         
         // 如果 delegate == nil，直接使用 currentIndexPath，不能够直接使用 ?? 添加默认indexPath
-        let next = delegate != nil ? currentIndexPath : delegateResponseIndexPath
+        let next = delegate != nil ? indexPath : delegateResponseIndexPath
         
         guard let next = next else {
             log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
