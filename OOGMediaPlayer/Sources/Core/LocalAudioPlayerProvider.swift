@@ -60,7 +60,7 @@ public enum LocalMediaPlayerError: Error, LocalizedError {
     }
 }
 
-extension Notification.Name {
+public extension Notification.Name {
     
     // 通知 - 已经开始播放音频
     static let oogAudioPlayerDidStartPlayAudioNotification = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didStartPlayAudio")
