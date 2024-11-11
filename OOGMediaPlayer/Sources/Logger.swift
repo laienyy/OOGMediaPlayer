@@ -34,11 +34,11 @@ class Logger {
         let fileName = file.components(separatedBy: ["/"]).last!
         let content = args.map { "\($0)" }.joined(separator: " ")
         if let prefix = prefix {
-//            print(time, "[\(prefix)] \(fileName)[\(line)]", content)
-//            print(time, "[\(prefix)]", content)
+            print(time, "[\(prefix)] \(fileName)[\(line)]", content)
+            print(time, "[\(prefix)]", content)
         } else {
-//            print(time, "\(fileName)<\(line)>", content)
-//            print(time, content)
+            print(time, "\(fileName)<\(line)>", content)
+            print(time, content)
         }
     }
 }

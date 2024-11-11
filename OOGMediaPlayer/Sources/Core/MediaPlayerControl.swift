@@ -220,7 +220,7 @@ open class MediaPlayerControl: NSObject {
             return nil
         }
         
-        return item(at: indexPath)
+        return media(at: indexPath)
     }
     
     /**
@@ -329,7 +329,7 @@ open class MediaPlayerControl: NSObject {
         
         log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
         
-        if let item = item(at: next) {
+        if let item = media(at: next) {
             history.append(.init(media: item, indexPath: next))
         }
         // 播放
@@ -384,7 +384,14 @@ public extension MediaPlayerControl {
         return nil
     }
     
-    func item(at indexPath: IndexPath) -> MediaPlayable? {
+    func album(at section: Int) -> (any MediaAlbum)? {
+        guard items.count > section else {
+            return nil
+        }
+        return items[section]
+    }
+    
+    func media(at indexPath: IndexPath) -> MediaPlayable? {
         guard isValidIndexPath(indexPath) else {
             log(prefix: .mediaPlayer, "IndexPath is out of range", indexPath, items.count)
             return nil

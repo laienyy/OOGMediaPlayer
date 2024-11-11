@@ -60,6 +60,12 @@ public enum LocalMediaPlayerError: Error, LocalizedError {
     }
 }
 
+extension Notification.Name {
+    
+    // 通知 - 已经开始播放音频
+    static let oogAudioPlayerDidStartPlayAudioNotification = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didStartPlayAudio")
+}
+
 open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     public var audioPlayer: AVAudioPlayer?
@@ -87,7 +93,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     /// 检查indexPath是否正在获取（下载）音频本地文件
     func isIndexPathInPreparingQueue(_ indexPath: IndexPath) -> Bool {
-        guard let item = item(at: indexPath) else {
+        guard let item = media(at: indexPath) else {
             return false
         }
         return preparingItems.contains(where: { $0.id == item.id})
@@ -162,7 +168,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         guard player.prepareToPlay() else {
             setItemStatus(item, status: .error)
-            throw NSError(domain: "[AVAudioPlayer prepareToPlay] failed", code: 0, userInfo: nil)
+            throw LocalMediaPlayerError.prepareToPlayFailed
         }
     }
     
@@ -184,7 +190,15 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer?.play()
         setCurrentItemStatus(.playing)
         
-        delegate?.mediaPlayerControl(self, startPlaying: currentIndexPath!)
+        guard let indexPath = currentIndexPath else {
+            log(prefix: .mediaPlayer, "ERROR, Can not to post `DidStartPlayingAudio` Notification and call delegate, because currentIndexPath is nil")
+            return
+        }
+        var userInfo = ["indexPath" : indexPath] as [String : Any]
+        userInfo["album"] = album(at: indexPath.section)
+        userInfo["audio"] = media(at: indexPath)
+        NotificationCenter.default.post(name: .oogAudioPlayerDidStartPlayAudioNotification, object: self, userInfo: userInfo)
+        delegate?.mediaPlayerControl(self, startPlaying: indexPath)
     }
     
     /// 停止播放
