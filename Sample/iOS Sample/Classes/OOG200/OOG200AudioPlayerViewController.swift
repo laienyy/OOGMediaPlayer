@@ -137,7 +137,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
         // 更新播放器设置
         playerProvider.isUseCache = settings.isEnableCache
         // 更新播放器音量
-        playerProvider.volumn = settings.volumn
+        playerProvider.volume = settings.volumn
 
         // 更新是否使用缓存
         cacheEnableSwitch.isOn = settings.isEnableCache
@@ -237,7 +237,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     }
     
     func updateVolumnSliderValue() {
-        playerWidgetView.setVolumn(playerProvider.volumn, animated: true)
+        playerWidgetView.setVolumn(playerProvider.volume, animated: true)
     }
     
 }
@@ -325,7 +325,7 @@ extension OOG200AudioPlayerViewController {
     }
     
     func setVolumn(_ volumn: Float) {
-        playerProvider.volumn = volumn
+        playerProvider.volume = volumn
         playerWidgetView.soundSlider.setValue(volumn, animated: true)
         settings.volumn = volumn
         try? settings.save()

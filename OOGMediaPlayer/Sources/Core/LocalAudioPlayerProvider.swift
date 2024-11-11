@@ -70,9 +70,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     open var currentTime: TimeInterval { audioPlayer?.currentTime ?? 0 }
     open var duration: TimeInterval { audioPlayer?.duration ?? 0 }
-    open var volumn: Float = 1.0 {
+    open var volume: Float = 1.0 {
         didSet {
-            audioPlayer?.volume = volumn
+            audioPlayer?.volume = volume
         }
     }
     
@@ -157,7 +157,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer = try AVAudioPlayer(data: data)
         audioPlayer?.delegate = self
         audioPlayer?.rate = 2
-        audioPlayer?.volume = volumn
+        audioPlayer?.volume = volume
         
         guard let player = self.audioPlayer else {
             setItemStatus(item, status: .error)

@@ -15,7 +15,7 @@ public extension OOGAudioPlayerProvider {
     func syncSettings(_ settings: OOGAudioPlayerSettings) {
         
         isUseCache = settings.isEnableCache
-        volumn = settings.volumn
+        volume = settings.volumn
         loopMode = settings.loopMode
     }
     
