@@ -73,7 +73,6 @@ extension BackgroundMediaAlbumEntity {
         
         model.mediaList = musicList.map({ song in
             let model = AudioModel()
-            model.id = song.id
             model.resId = song.resId
             model.audio = song.audio
             model.audioDuration = song.audioDuration

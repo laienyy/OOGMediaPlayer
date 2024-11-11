@@ -14,7 +14,7 @@ public protocol MediaAlbum: Equatable, Codable {
 }
 
 public protocol MediaPlayable: Codable {
-    var id: Int { get }
+    var resId: Int { get }
     // 多媒体名称
     var fileName: String { get }
     // 当前是否无效

@@ -202,7 +202,7 @@ open class MediaPlayerControl: NSObject {
             - playFirstIfNotCatch: 未找到当前播放的时候是否自动播放
      */
     open func resetCurrentIndexBy(_ media: MediaPlayable, playFirstIfNotCatch: Bool = false) {
-        currentIndexPath = indexPathOf(mediaID: media.id)
+        currentIndexPath = indexPathOf(mediaID: media.resId)
         
         if currentIndexPath == nil, playFirstIfNotCatch, let indexPath = getValidMediaIndexPaths().first {
             play(indexPath: indexPath)
@@ -327,7 +327,7 @@ open class MediaPlayerControl: NSObject {
             return
         }
         
-        log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.id ?? -1))")
+        log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.resId ?? -1))")
         
         if let item = media(at: next) {
             history.append(.init(media: item, indexPath: next))
@@ -377,7 +377,7 @@ public extension MediaPlayerControl {
     
     func indexPathOf(mediaID: Int) -> IndexPath? {
         for section in items.enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.id == mediaID }) {
+            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
                 return .init(row: index, section: section.offset)
             }
         }

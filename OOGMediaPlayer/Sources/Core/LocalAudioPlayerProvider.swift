@@ -22,8 +22,6 @@ public typealias StatusChangedClosure = (any LocalMediaPlayable, LocalMediaStatu
 
 public protocol LocalMediaPlayable: MediaPlayable, Downloadable {
     
-    var id: Int { get }
-    
     /// 状态
     var status: LocalMediaStatus { get set }
     
@@ -96,7 +94,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         guard let item = media(at: indexPath) else {
             return false
         }
-        return preparingItems.contains(where: { $0.id == item.id})
+        return preparingItems.contains(where: { $0.resId == item.resId })
     }
     
     func appendToPreparingQueue(_ item: LocalMediaPlayable) {
@@ -104,7 +102,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
     
     func removeFromPreparingQueue(_ item: LocalMediaPlayable) {
-        preparingItems.removeAll(where: { $0.id == item.id } )
+        preparingItems.removeAll(where: { $0.resId == item.resId } )
     }
     
     override func toPlay(indexPath: IndexPath) {
@@ -220,7 +218,7 @@ extension LocalAudioPlayerProvider {
     }
     
     func setItemStatus(_ item: LocalMediaPlayable, status: LocalMediaStatus) {
-        let sameItems = self.items.flatMap({ $0.mediaList }).compactMap({ $0 as? LocalMediaPlayable }) .filter { $0.id == item.id }
+        let sameItems = self.items.flatMap({ $0.mediaList }).compactMap({ $0 as? LocalMediaPlayable }) .filter { $0.resId == item.resId }
         
         DispatchQueue.main.async {
             sameItems.forEach {

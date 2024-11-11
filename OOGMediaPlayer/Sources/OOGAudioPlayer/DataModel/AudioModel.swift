@@ -12,7 +12,6 @@ import Foundation
 public class AudioModel: NSObject, Codable {
     
     enum CodingKeys: CodingKey {
-        case id
         case resId
         case audio
         case audioDuration
@@ -29,7 +28,6 @@ public class AudioModel: NSObject, Codable {
         case status
     }
     
-    public var id: Int = 0
     /// 数据ID
     public var resId: Int = 0
     /// 音频文件url
@@ -117,6 +115,10 @@ public class AudioModel: NSObject, Codable {
 
 extension AudioModel: BGMSong {
 
+    public var id: Int {
+        return resId
+    }
+    
     /// 文件下载链接
     public var fileUrlString: String? {
         return audio
