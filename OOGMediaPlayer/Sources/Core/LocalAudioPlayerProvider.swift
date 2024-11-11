@@ -41,6 +41,13 @@ public protocol LocalMediaPlayable: MediaPlayable, Downloadable {
     func getLocalFileUrl() async throws -> URL
 }
 
+/// 本地音频淡出淡入模式
+public enum LocalAudioVolumeFadeMode {
+    case none
+    case first(TimeInterval)
+    case each(TimeInterval)
+}
+
 public enum LocalMediaPlayerError: Error, LocalizedError {
     case generatePlayerFailed
     case prepareToPlayFailed
@@ -67,6 +74,13 @@ public extension Notification.Name {
 open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     public var audioPlayer: AVAudioPlayer?
+    
+    open var playFadeMode: LocalAudioVolumeFadeMode = .none
+    open var isFaded: Bool = false
+    
+    func resetFadedFlag() {
+        isFaded = false
+    }
     
     open var currentTime: TimeInterval { audioPlayer?.currentTime ?? 0 }
     open var duration: TimeInterval { audioPlayer?.duration ?? 0 }
@@ -156,8 +170,6 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         let data = try Data(contentsOf: fileUrl)
         audioPlayer = try AVAudioPlayer(data: data)
         audioPlayer?.delegate = self
-        audioPlayer?.rate = 2
-        audioPlayer?.volume = volume
         
         guard let player = self.audioPlayer else {
             setItemStatus(item, status: .error)
@@ -187,6 +199,24 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         }
         audioPlayer?.play()
         setCurrentItemStatus(.playing)
+        
+        switch playFadeMode {
+        case .none:
+            audioPlayer?.volume = volume
+        case .first(let duration):
+            guard !isFaded else {
+                audioPlayer?.volume = volume
+                return
+            }
+            audioPlayer?.volume = 0
+            audioPlayer?.setVolume(volume, fadeDuration: duration)
+            
+        case .each(let duration):
+            audioPlayer?.volume = 0
+            audioPlayer?.setVolume(volume, fadeDuration: duration)
+        }
+        
+        isFaded = true
         
         guard let indexPath = currentIndexPath else {
             log(prefix: .mediaPlayer, "ERROR, Can not to post `DidStartPlayingAudio` Notification and call delegate, because currentIndexPath is nil")

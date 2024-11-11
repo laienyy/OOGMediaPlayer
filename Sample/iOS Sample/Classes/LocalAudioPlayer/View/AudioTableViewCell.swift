@@ -74,7 +74,7 @@ class AudioTableViewCell: UITableViewCell {
         
         model.observeDownloadProgress(self) { [weak self] model, status in
             guard let `self` = self else { return false }
-            guard self.model != nil, self.model?.id == model.id else {
+            guard self.model != nil, self.model?.resId == model.resId else {
                 return false
             }
             self.reloadProgressLabel(with: status)

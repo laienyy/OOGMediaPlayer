@@ -192,7 +192,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         
         if let nextSong = playerProvider.getSong(at: indexPath) {
             nextSong.observeDownloadProgress(self) { [weak self] item, status in
-                guard let `self` = self, self.playerProvider.currentItem()?.id == item.id else {
+                guard let `self` = self, self.playerProvider.currentItem()?.resId == item.resId else {
                     // 当自身释放 or 当前item不是正在播放的item时，释放本closure
                     return false
                 }

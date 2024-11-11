@@ -108,7 +108,7 @@ class BGMItemTableViewCell: UITableViewCell {
     
     lazy var statusChangedAction: StatusChangedClosure = {
         return { [weak self] item, status in
-            guard let `self` = self, let currentModel = self.model, currentModel.id == item.id else {
+            guard let `self` = self, let currentModel = self.model, currentModel.resId == item.resId else {
                 return false
             }
             print("Status changed", status, item.fileName)
@@ -281,7 +281,7 @@ extension BGMItemTableViewCell {
         downloadProgressView.isHidden = false
         
         model?.observeDownloadProgress(self) { [weak self] model, status in
-            guard self?.model?.id == model.id else {
+            guard self?.model?.resId == model.resId else {
                 return false
             }
             switch status {
