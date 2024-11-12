@@ -43,8 +43,11 @@ public protocol LocalMediaPlayable: MediaPlayable, Downloadable {
 
 /// 本地音频淡出淡入模式
 public enum LocalAudioVolumeFadeMode {
+    /// 没有淡进
     case none
-    case first(TimeInterval)
+    /// 淡进一次
+    case once(TimeInterval)
+    /// 每次
     case each(TimeInterval)
 }
 
@@ -196,24 +199,32 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
             setCurrentItemStatus(.error)
             return
         }
-        audioPlayer?.play()
+        
         setCurrentItemStatus(.playing)
         
         switch playFadeMode {
         case .none:
             audioPlayer?.volume = volume
-        case .first(let duration):
+        case .once(let duration):
             guard !isFaded else {
                 audioPlayer?.volume = volume
-                return
+                break
             }
-            audioPlayer?.volume = 0
-            audioPlayer?.setVolume(volume, fadeDuration: duration)
+            self.audioPlayer?.setVolume(0, fadeDuration: 0)
+            DispatchQueue.main.async {
+                // 淡入需要延时
+                self.audioPlayer?.setVolume(self.volume, fadeDuration: duration)
+            }
             
         case .each(let duration):
-            audioPlayer?.volume = 0
-            audioPlayer?.setVolume(volume, fadeDuration: duration)
+            self.audioPlayer?.setVolume(0, fadeDuration: 0)
+            DispatchQueue.main.async {
+                // 淡入需要延时
+                self.audioPlayer?.setVolume(self.volume, fadeDuration: duration)
+            }
         }
+        
+        audioPlayer?.play()
         
         isFaded = true
         

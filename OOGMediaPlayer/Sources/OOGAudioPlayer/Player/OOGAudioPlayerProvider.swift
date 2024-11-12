@@ -9,13 +9,11 @@ import Foundation
 
 public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     
-    /// 专辑列表
-    public var albumList: [Album] = [] {
-        didSet {
-            reloadData(albumList)
-            log(prefix: .mediaPlayer, "Album List Did Reload \(self)\n\(albumList)")
-        }
+    public var albumList: [Album] {
+        get { (self.items as? [Album]) ?? [] }
+        set { self.items = newValue }
     }
+    
     /// 是否使用缓存
     public var isUseCache: Bool = true {
         didSet { updateSongsUseCacheState(isUseCache) }
@@ -31,8 +29,8 @@ public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     }
     
     /// 当前播放的音乐
-    public func currentSong() -> BGMSong? {
-        return currentItem() as? BGMSong
+    public func currentSong() -> Album.BGMAudioType? {
+        return currentItem() as? Album.BGMAudioType
     }
     
     /// 根据`section`获取专辑

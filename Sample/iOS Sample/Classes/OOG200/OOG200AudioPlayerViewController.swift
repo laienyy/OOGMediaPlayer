@@ -103,7 +103,8 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                 hud.show(animated: true)
                 // 加载歌曲
                 try await playerProvider.addMusicsFromServer(scheme, .oog200, types: [.animation], playAutomatically: false)
-                
+                // 设置淡进模式 （）
+                playerProvider.playFadeMode = .once(8.0)
                 hud.hide(animated: true, afterDelay: 0.5)
                 // 根据设置，同步播放器
                 playerProvider.syncSettings(settings)
@@ -113,11 +114,6 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                     // 当根据设置未开始自动播放时，此处开始自动播放第一首
                     playerProvider.playNext()
                 }
-                
-                // 激活静音下可播放声音
-                let session = AVAudioSession.sharedInstance()
-                try? session.setCategory(.playback, options: .mixWithOthers)
-                try? session.setActive(true)
                 
             } catch let error {
                 statusLabel.text = "获取歌曲列表失败，错误：\(error.localizedDescription)"
@@ -385,7 +381,7 @@ extension OOG200AudioPlayerViewController: MediaPlayerProviderDelegate {
     
     func mediaPlayerControl(_ provider: MediaPlayerControl, startPlaying indexPath: IndexPath) {
         
-        updateVolumnSliderValue()
+//        updateVolumnSliderValue()
         startActivityIndicator(false)
 
         let name = playerProvider.getSong(at: indexPath)?.displayName ?? "无"
