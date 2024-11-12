@@ -138,7 +138,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         
         settings.setFavorite(for: item, true)
         
-        guard !favAlbum.mediaList.contains(where: { $0.id == item.id }) else {
+        guard !favAlbum.mediaList.contains(where: { $0.resId == item.resId }) else {
             return
         }
         
@@ -193,7 +193,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         
         settings.setFavorite(for: item, false)
         
-        guard let index = favAlbum.mediaList.firstIndex(where: { $0.id == item.id }) else {
+        guard let index = favAlbum.mediaList.firstIndex(where: { $0.resId == item.resId }) else {
             return
         }
 
@@ -270,7 +270,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         cell.isLoop = isLoop(song: song)
         cell.isLock = song.subscription
         cell.loopAction = { [weak self] cell in
-            guard let `self` = self, cell.model?.id == song.id else { return }
+            guard let `self` = self, cell.model?.resId == song.resId else { return }
             
             let isLoop = cell.loopButton.isSelected
             if isLoop {
@@ -285,7 +285,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
             self.tableView.reloadData()
         }
         cell.favoriteAction = { [weak self] cell in
-            guard let `self` = self, cell.model?.id == song.id else { return }
+            guard let `self` = self, cell.model?.resId == song.resId else { return }
             
             let isFavorite = self.settings.isFavorite(song)
             if album.id != favoriteAlbumID {
@@ -422,7 +422,7 @@ extension OOG200AudioListViewController: MediaPlayerProviderDelegate {
             return
         }
         
-        settings.currentAudioID = albums[indexPath.section].mediaList[indexPath.row].id
+        settings.currentAudioID = albums[indexPath.section].mediaList[indexPath.row].resId
         try? settings.save()
     }
     

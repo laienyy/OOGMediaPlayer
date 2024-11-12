@@ -41,12 +41,12 @@ extension AudioPlayerOwner {
         playerProvider.loopMode = .single
         settings.loopMode = .single
         
-        settings.loopDesignatedSongID = song.id
+        settings.loopDesignatedSongID = song.resId
         settings.loopDesignateAlbumID = nil
         
         do {
             try settings.save()
-            print("AudioPlayer - Set loop mode: \(playerProvider.loopMode.userInterfaceDisplay), song ID: \(song.id)")
+            print("AudioPlayer - Set loop mode: \(playerProvider.loopMode.userInterfaceDisplay), song ID: \(song.resId)")
         } catch {
             print("Save settings error:", error)
         }
@@ -70,11 +70,11 @@ extension AudioPlayerOwner {
     
     
     func isFavorite(song: BGMSong) -> Bool {
-        return settings.favoriteList.contains(song.id)
+        return settings.favoriteList.contains(song.resId)
     }
     
     func isLoop(song: BGMSong) -> Bool {
-        return playerProvider.loopMode == .single && settings.loopDesignatedSongID == song.id
+        return playerProvider.loopMode == .single && settings.loopDesignatedSongID == song.resId
     }
     
     func isLoop(album: any BGMAlbum) -> Bool {

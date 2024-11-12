@@ -47,7 +47,7 @@ public extension OOGAudioPlayerProvider {
         }
         // 恢复常规播放
         else if let id = settings.currentAudioID,
-           currentSong()?.id != id,
+           currentSong()?.resId != id,
            let indexPath = indexPathOf(mediaID: id) {
             play(indexPath: indexPath)
         }
@@ -67,7 +67,7 @@ public extension OOGAudioPlayerProvider {
         
         if loopMode == .single,
            let songId = settings.loopDesignatedSongID,
-           currentSong()?.id != songId {
+           currentSong()?.resId != songId {
             
             playIfExists(id: songId)
         }

@@ -47,16 +47,16 @@ class MediaListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
-        Task {
-            do {
+//        Task {
+//            do {
 //                let info = GetBGMListApiInfo
 //                let medias = try await ApiProvider.getBackgroundMedia()
 //                print(medias)
-            } catch let error {
-                print("Get media list failed:", error)
-            }
+//            } catch let error {
+//                print("Get media list failed:", error)
+//            }
             
-        }
+//        }
         
     }
     

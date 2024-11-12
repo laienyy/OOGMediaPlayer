@@ -13,6 +13,7 @@ public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     public var albumList: [Album] = [] {
         didSet {
             reloadData(albumList)
+            log(prefix: .mediaPlayer, "Album List Did Reload \(self)\n\(albumList)")
         }
     }
     /// 是否使用缓存

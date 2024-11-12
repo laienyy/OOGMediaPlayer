@@ -108,16 +108,13 @@ public class AudioModel: NSObject, Codable {
     }
     
     public override var description: String {
-        return "ID: \(id), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
+        let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
+        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
     }
 }
 
 
 extension AudioModel: BGMSong {
-
-    public var id: Int {
-        return resId
-    }
     
     /// 文件下载链接
     public var fileUrlString: String? {

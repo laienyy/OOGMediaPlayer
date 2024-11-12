@@ -396,8 +396,8 @@ public extension MediaPlayerControl {
             log(prefix: .mediaPlayer, "IndexPath is out of range", indexPath, items.count)
             return nil
         }
-        
-        return items[indexPath.section].mediaList[indexPath.row]
+        let media = items[indexPath.section].mediaList[indexPath.row]
+        return media
     }
     
     /// 获取基于当前索引的前一个索引，返回`none` =  需停止播放

@@ -15,7 +15,6 @@ import Foundation
 
 public protocol BGMSong: LocalMediaPlayable {
     
-    var `id`: Int { get }
     /// 数据ID
     var resId: Int { get }
     /// 音频文件url

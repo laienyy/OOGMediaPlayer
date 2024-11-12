@@ -397,7 +397,7 @@ extension OOG200AudioPlayerViewController: MediaPlayerProviderDelegate {
         
         //        print("Playing `\(media.name)`, at [\(indexPath.section), \(indexPath.row)]")
         statusLabel.text = "正在播放 - \(media.fileName) [\(indexPath.section) - \(indexPath.row)]"
-        settings.currentAudioID = media.id
+        settings.currentAudioID = media.resId
     }
     
     func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl) {

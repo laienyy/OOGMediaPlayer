@@ -201,7 +201,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
                     self.progressView.isHidden = true
                     self.progressView.progress = 0
                 case let .failed(error):
-                    break
+                    print("Download failed:", error)
                 case let .downloading(progress):
                     self.progressView.isHidden = false
                     self.progressView.progress = Float(progress)

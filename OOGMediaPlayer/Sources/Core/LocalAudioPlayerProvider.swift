@@ -78,7 +78,8 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     open var playFadeMode: LocalAudioVolumeFadeMode = .none
     open var isFaded: Bool = false
     
-    func resetFadedFlag() {
+    /// 重置已经播放淡入的标志
+    open func resetFadedFlag() {
         isFaded = false
     }
     
@@ -127,25 +128,23 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     open override func prepareToPlayItem(at indexPath: IndexPath) async throws {
         try await super.prepareToPlayItem(at: indexPath)
         
-        let item: LocalMediaPlayable = try await MainActor.run {
-            
-            guard let item = currentItem() as? LocalMediaPlayable else {
-                log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
-                throw MediaPlayerControlError.currentItemIsNil
-            }
-            
-            guard !isIndexPathInPreparingQueue(indexPath) else {
-                // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
-                log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
-                setItemStatus(item, status: .stoped)
-                throw MediaPlayerControlError.alreadyBeenPreparing
-            }
-            
-            // 加入等待队列
-            appendToPreparingQueue(item)
-            setItemStatus(item, status: .downloading)
-            return item
+        guard let item = currentItem() as? LocalMediaPlayable else {
+            log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
+            throw MediaPlayerControlError.currentItemIsNil
         }
+        
+        guard !isIndexPathInPreparingQueue(indexPath) else {
+            // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
+            log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
+            await MainActor.run {
+                setItemStatus(item, status: .stoped)
+            }
+            throw MediaPlayerControlError.alreadyBeenPreparing
+        }
+        
+        // 加入等待队列
+        appendToPreparingQueue(item)
+        setItemStatus(item, status: .downloading)
         
         // *** 等待外部返回文件URL
         let fileUrl = try await item.getLocalFileUrl()
@@ -268,7 +267,7 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
     
     public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
         setStatus(.error)
-        log(prefix: .mediaPlayer, "Decode error", error)
+        log(prefix: .mediaPlayer, "Decode error", error as Any)
     }
 }
 

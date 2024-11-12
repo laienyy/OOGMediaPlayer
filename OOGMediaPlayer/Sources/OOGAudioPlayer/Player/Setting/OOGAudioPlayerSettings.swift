@@ -86,18 +86,18 @@ extension OOGAudioPlayerSettings {
     }
     
     public func isFavorite(_ song: BGMSong) -> Bool {
-        favoriteList.contains(song.id)
+        favoriteList.contains(song.resId)
     }
     
     public func setFavorite(for song: BGMSong, _ isFavorite: Bool) {
         if isFavorite {
-            guard !favoriteList.contains(where: { $0 == song.id }) else {
+            guard !favoriteList.contains(where: { $0 == song.resId }) else {
                 return // 已经添加
             }
-            favoriteList.append(song.id)
+            favoriteList.append(song.resId)
             log(prefix: .mediaPlayer, "Add favorite song:", song)
         } else {
-            favoriteList.removeAll(where: { $0 == song.id })
+            favoriteList.removeAll(where: { $0 == song.resId })
             log(prefix: .mediaPlayer, "Remove favorite song:", song)
         }
         do {
@@ -109,7 +109,7 @@ extension OOGAudioPlayerSettings {
     
     public func selectFavoriteSongs<T: BGMSong>(by songs: [T]) -> [T] {
         return favoriteList.compactMap { id in
-            let song = songs.first(where: { $0.id == id })
+            let song = songs.first(where: { $0.resId == id })
             return song
         }
     }
@@ -118,11 +118,11 @@ extension OOGAudioPlayerSettings {
 
 extension OOGAudioPlayerSettings {
     public func isLoop(_ song: BGMSong) -> Bool {
-        return loopDesignatedSongID == song.id
+        return loopDesignatedSongID == song.resId
     }
     
     public func setDesignatedSongLoop(_ song: BGMSong?) {
-        loopDesignatedSongID = song?.id
+        loopDesignatedSongID = song?.resId
     }
     
     public func removeDesignatedSongLoop() {

@@ -57,7 +57,7 @@ class AudioTableViewCell: UITableViewCell {
         favoriteAction?(self)
         favoriteButton.isSelected = !favoriteButton.isSelected
         if let model = model {
-            UserDefaults.standard.set(favoriteButton.isSelected, forKey: "favorite-\(model.id)")
+            UserDefaults.standard.set(favoriteButton.isSelected, forKey: "favorite-\(model.resId)")
         }
     }
     

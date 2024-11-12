@@ -34,7 +34,7 @@ struct BackgroundMediaAlbumEntity: Codable {
 }
 
 struct BackgroundMediaEntity: Codable {
-    public var id: Int = 0
+
     /// 数据ID
     public var resId: Int = 0
     /// 音频文件url

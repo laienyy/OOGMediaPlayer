@@ -75,7 +75,6 @@ extension AudioAlbumDTO {
         
         model.musicList = musicList?.map({ song in
             var model = BackgroundMediaEntity()
-            model.id = song.id
             model.resId = song.resId
             model.audio = song.audio
             model.audioDuration = song.audioDuration
