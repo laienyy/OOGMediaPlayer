@@ -86,6 +86,14 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     open var playFadeMode: LocalAudioVolumeFadeMode = .none
     open var isFaded: Bool = false
     
+    public override var isEnable: Bool {
+        didSet {
+            if !isEnable, audioPlayer?.isPlaying ?? false {
+                pause()
+            }
+        }
+    }
+    
     /// 重置已经播放淡入的标志
     open func resetFadedFlag() {
         isFaded = false

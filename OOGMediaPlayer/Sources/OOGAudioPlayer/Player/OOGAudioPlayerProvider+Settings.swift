@@ -17,7 +17,8 @@ public extension OOGAudioPlayerProvider {
         isUseCache = settings.isEnableCache
         volume = settings.volumn
         loopMode = settings.loopMode
-        
+        isEnable = settings.isEnablePlayer
+
         if let id = settings.currentAudioID, let indexPath = indexPathOf(mediaID: id) {
             currentIndexPath = indexPath
         }
@@ -100,6 +101,5 @@ public extension OOGAudioPlayerProvider {
             play(indexPath: indexPath)
         }
         
-
     }
 }

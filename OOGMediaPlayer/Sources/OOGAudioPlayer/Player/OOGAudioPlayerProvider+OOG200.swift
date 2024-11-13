@@ -11,10 +11,7 @@ public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     
     func getMusicFromServer(_ info: GetBGMListApiInfo, updateToCache: Bool = true)
     async throws -> [AudioAlbumModel] {
-        let info = GetBGMListApiInfo(scheme: info.scheme,
-                                     project: info.project,
-                                     type: info.type,
-                                     language: "en")
+        let info = GetBGMListApiInfo(scheme: info.scheme, project: info.project, type: info.type, language: "en")
         let models = try await [AudioAlbumModel].getListFromAPI(info)
         models.storeListToCache(info.type)
         updateSongsUseCacheState(isUseCache)
