@@ -77,10 +77,10 @@ public class OOGAudioPlayerSettings: Codable {
     }
 }
 
-extension OOGAudioPlayerSettings {
+public extension OOGAudioPlayerSettings {
     
     /// 根据 `Scheme` 加载 `Settings` 缓存
-    public static func loadScheme(_ scheme: AudioPlayerSettingScheme, defaultSettings: OOGAudioPlayerSettings?)
+    static func loadScheme(_ scheme: AudioPlayerSettingScheme, defaultSettings: OOGAudioPlayerSettings?)
     -> OOGAudioPlayerSettings {
         guard let settingsData: Data = UserDefaults.standard.value(forKey: .settings, scheme: scheme),
               let settings = try? JSONDecoder().decode(OOGAudioPlayerSettings.self, from: settingsData) else {
@@ -96,12 +96,12 @@ extension OOGAudioPlayerSettings {
     }
     
     /// 判断音频是否是喜爱的
-    public func isFavorite(_ song: BGMSong) -> Bool {
+    func isFavorite(_ song: BGMSong) -> Bool {
         favoriteList.contains(song.resId)
     }
     
     /// 存储喜欢的音频
-    public func setFavorite(for song: BGMSong, _ isFavorite: Bool) {
+    func setFavorite(for song: BGMSong, _ isFavorite: Bool) {
         if isFavorite {
             guard !favoriteList.contains(where: { $0 == song.resId }) else {
                 return // 已经添加
@@ -120,7 +120,7 @@ extension OOGAudioPlayerSettings {
     }
     
     /// 从音频列表中选出喜欢的歌曲
-    public func selectFavoriteSongs<T: BGMSong>(by songs: [T]) -> [T] {
+    func selectFavoriteSongs<T: BGMSong>(by songs: [T]) -> [T] {
         return favoriteList.compactMap { id in
             let song = songs.first(where: { $0.resId == id })
             return song
