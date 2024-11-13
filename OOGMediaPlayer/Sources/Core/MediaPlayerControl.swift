@@ -129,6 +129,7 @@ public extension MediaPlayerProviderDelegate {
 }
 
 public enum MediaPlayerControlError: Error, LocalizedError {
+    case isNotEnable
     case noInvalidItem
     case currentItemIsNil
     case sourceTypeInvalid
@@ -137,6 +138,8 @@ public enum MediaPlayerControlError: Error, LocalizedError {
     
     public var errorDescription: String? {
         switch self {
+        case .isNotEnable:
+            return "Player is not enable"
         case .noInvalidItem:
             return "No valid playable item for now"
         case .currentItemIsNil:
@@ -167,8 +170,10 @@ open class MediaPlayerControl: NSObject {
     
     public weak var delegate: MediaPlayerProviderDelegate?
     
+    public var isEnable: Bool = true
+    
     /// 自动播放
-    public var playAutomatically: Bool = true
+    public var playAutomatically: Bool = false
     /// 播放器状态
     public var playerStatus: PlayerStatus = .stoped
     /// 循环模式
@@ -280,6 +285,10 @@ open class MediaPlayerControl: NSObject {
     /// 根据索引播放
     func toPlay(indexPath: IndexPath) {
         
+        guard isEnable else  {
+            playError(at: <#T##IndexPath?#>, error: <#T##any Error#>)
+            return
+        }
         
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath))
         
