@@ -7,28 +7,15 @@
 
 import Foundation
 
-// MARK: - 音乐
+// MARK: - 音频
 
 public class AudioModel: NSObject, Codable {
     
     enum CodingKeys: CodingKey {
-        case resId
-        case audio
-        case audioDuration
-        case audioName
-        case coverImgUrl
-        case detailImgUrl
-        case displayName
-        case musicName
-        case musicType
-        case shortLink
-        case subscription
-        case useCache
-        case isFavorite
-        case status
+        case resId, audio, audioDuration, audioName, coverImgUrl, detailImgUrl, displayName, musicName, musicType, shortLink, subscription, useCache, isFavorite, status
     }
     
-    /// 数据ID
+    /// 数据ID（唯一标识符）
     public var resId: Int = 0
     /// 音频文件url
     public var audio: String?
@@ -51,11 +38,14 @@ public class AudioModel: NSObject, Codable {
     // 0不收费 1收费
     public var subscription: Bool = false
     
-    public var useCache: Bool = true
-    
     public var isFavorite: Bool = false
     
+    // 主要用于debug使用，正常业务逻辑并不会修改为 false
+    public var useCache: Bool = true
 
+    
+    
+    
     //MARK: - Play Status ( LocalMediaPlayable )
     
     /// 播放状态
@@ -76,9 +66,6 @@ public class AudioModel: NSObject, Codable {
         self.status = status
         self.statusChangedActions = self.statusChangedActions.filter({
             let keepLife = $0.value(self, status)
-//            if !keepLife {
-//                print("StatusChangedClosure is removed")
-//            }
             return keepLife
         })
     }
@@ -95,10 +82,12 @@ public class AudioModel: NSObject, Codable {
         downloadProgressChangedActions[observer] = progression
     }
     
+    /// 移除下载进度监听
     public func removeDownloadProgressObserver(_ observer: AnyHashable) {
         downloadProgressChangedActions[self] = nil
     }
     
+    /// 更新下载进度
     public func updateFileProgress(_ progress: FileDownloadProgress) {
         downloadProgress = progress
         // 回调并释放掉需要释放的closure
@@ -107,10 +96,6 @@ public class AudioModel: NSObject, Codable {
         }
     }
     
-    public override var description: String {
-        let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
-        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
-    }
 }
 
 

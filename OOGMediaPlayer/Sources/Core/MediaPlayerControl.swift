@@ -281,10 +281,12 @@ open class MediaPlayerControl: NSObject {
     func toPlay(indexPath: IndexPath) {
         
         
-        log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))")
+        log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath))
         
         // 暂停当前播放
-        stop()
+        if currentIndexPath != nil {
+            stop()
+        }
         
         let delegateResponseIndexPath = delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
         
@@ -301,16 +303,14 @@ open class MediaPlayerControl: NSObject {
         // 更新`indexPath` 可能由delegate返回一个新的
         delegate?.mediaPlayerControl(self, willPlay: next)
         
-        // 准备开始播放
         Task {
             do {
+                // 准备开始播放
                 try await prepareToPlayItem(at: next)
-                await MainActor.run {
-                    alreadyToPlay(next)
-                }
+                alreadyToPlay(next)
             } catch let error {
+                log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
                 playError(at: next, error: error)
-                return
             }
         }
         
@@ -320,7 +320,7 @@ open class MediaPlayerControl: NSObject {
     private func alreadyToPlay(_ indexPath: IndexPath) {
 
         let next = indexPath
-        guard self.currentIndexPath?.elementsEqual(next) ?? true else {
+        guard currentItem()?.resId == media(at: next)?.resId else {
             // 全局当前索引 != 本次流程需执行索引
             let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(self.currentIndexPath?.descriptionForPlayer ?? "Nil"), Now: \(next.descriptionForPlayer)"
             log(prefix: .mediaPlayer, msg)
@@ -358,8 +358,8 @@ open class MediaPlayerControl: NSObject {
         if indexPath != nil, indexPath == currentIndexPath {
             setStatus(.error)
         }
-        if lastPlayDirection == .previous {
-            delegate?.mediaPlayerControl(self, playAt: indexPath, error: error)
+        DispatchQueue.main.async {
+            self.delegate?.mediaPlayerControl(self, playAt: indexPath, error: error)
         }
     }
 }

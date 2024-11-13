@@ -7,33 +7,33 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "65F3B8CB-1906-4D81-BC19-8EA3BD12FD18"
+            uuid = "200C8EAE-5DBD-42AD-BB2B-D8C155F3D792"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Sample/iOS Sample/Classes/OOG200/OOG200AudioPlayerViewController.swift"
+            filePath = "OOGMediaPlayer/Sources/Core/MediaPlayerControl.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "324"
-            endingLineNumber = "324"
-            landmarkName = "setVolumn(_:)"
+            startingLineNumber = "207"
+            endingLineNumber = "207"
+            landmarkName = "resetCurrentIndexBy(_:playFirstIfNotCatch:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "70E68F85-99DF-4336-BF5B-338D04B1F0E7"
+            uuid = "61E43F2E-8BF7-4573-A787-6326D6243A2E"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "OOGMediaPlayer/Sources/Core/LocalAudioPlayerProvider.swift"
+            filePath = "OOGMediaPlayer/Sources/Core/MediaPlayerControl.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
-            landmarkName = "volume"
-            landmarkType = "24">
+            startingLineNumber = "249"
+            endingLineNumber = "249"
+            landmarkName = "reloadData(_:playAutomatically:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

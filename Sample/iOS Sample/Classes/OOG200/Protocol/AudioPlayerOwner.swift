@@ -12,10 +12,14 @@ import OOGMediaPlayer
 private let favoriteAlbumID = -1
 
 protocol AudioPlayerOwner {
-    associatedtype T: BGMAlbum
-    
-    var playerProvider: OOGAudioPlayerProvider<T> { get }
+    var playerProvider: OOGAudioPlayerProvider<AudioAlbumModel> { get }
     var settings: OOGAudioPlayerSettings { get }
+}
+
+extension AudioAlbumModel {
+    var isFavoriteAlbum: Bool {
+        return id == favoriteAlbumID
+    }
 }
 
 extension AudioPlayerOwner {
@@ -101,5 +105,59 @@ extension AudioPlayerOwner {
         
         return nil
     }
+    
+    private func geneateDefaultFavoriteAlbum() -> AudioAlbumModel {
+        let album = AudioAlbumModel()
+        album.playlistName = "我最喜欢的"
+        album.id = favoriteAlbumID
+        return album
+    }
+    
+    // 根据当前播放列表与喜欢的音频ID，刷新喜爱专辑
+    func reloadFavoriteAlbum() {
+        // 获得实例
+        let album = playerProvider.albumList.first(where: { $0.isFavoriteAlbum }) ?? geneateDefaultFavoriteAlbum()
+        // 将非《喜欢》专辑的歌曲集合
+        let songs = playerProvider.albumList.filter({ !$0.isFavoriteAlbum }).flatMap({ $0.mediaList })
+        
+        // 筛选处喜欢的歌曲
+        let favSongs: [AudioModel] = settings.selectFavoriteSongs(by: songs)
 
+        guard favSongs.count > 0 else {
+            return
+        }
+        // 更新列表
+        album.mediaList = favSongs
+        
+        if let index = playerProvider.albumList.firstIndex(where: { $0.isFavoriteAlbum }) {
+            playerProvider.albumList[index] = album
+        } else {
+            var list = playerProvider.albumList
+            list.insert(album, at: 0)
+            playerProvider.reloadData(list)
+        }
+    }
+
+}
+
+extension AudioPlayerOwner {
+    func playAudioIfDataSourceExists() {
+        if playerProvider.isExistsValidMedia() {
+            switch playerProvider.playerStatus {
+            case .finished, .error, .stoped:
+                if let previousAudioID = settings.currentAudioID, let indexPath = playerProvider.indexPathOf(mediaID: previousAudioID) {
+                    // 播放之前
+                    playerProvider.play(indexPath: indexPath)
+                } else {
+                    playerProvider.playNext()
+                }
+            case .paused:
+                playerProvider.play()
+            case .prepareToPlay, .playing:
+                break
+            @unknown default:
+                break
+            }
+        }
+    }
 }

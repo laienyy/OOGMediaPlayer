@@ -12,7 +12,6 @@ import SDWebImage
 private let favoriteAlbumID = -1
 
 class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
-
     typealias Album = AudioAlbumModel
     
     var playerProvider: OOGAudioPlayerProvider<Album>
@@ -24,7 +23,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         return album
     }()
     
-    var settings = OOGAudioPlayerSettings.loadScheme(.bgm)
+    var settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
     
     let tableView = UITableView(frame: UIScreen.main.bounds, style: .grouped)
     let tableHeaderView = BGMAlbumTableHeaderView()

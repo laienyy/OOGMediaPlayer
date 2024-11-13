@@ -19,15 +19,19 @@ public extension OOGAudioPlayerProvider {
         loopMode = settings.loopMode
     }
     
-    // 根据设置播放歌曲
-    func resumePlayAudioBySetting(_ settings: OOGAudioPlayerSettings) {
+    // 根据设置播放歌曲, 返回是否有会播放
+    @discardableResult
+    func resumePlay(by settings: OOGAudioPlayerSettings) -> Bool {
+        
+        var specificIndexPath: IndexPath?
+        
         // 恢复单曲循环播放
         if settings.loopMode == .single,
            let id = settings.loopDesignatedSongID,
            let indexPath = indexPathOf(mediaID: id) {
             
             // 播放指定的单曲循环曲目
-            play(indexPath: indexPath)
+            specificIndexPath = indexPath
         }
         // 恢复专辑循环播放
         else if settings.loopMode == .album,
@@ -38,19 +42,25 @@ public extension OOGAudioPlayerProvider {
                let indexPath = indexPathOf(mediaID: songId),
                index == indexPath.section {
                 // 如果此前最后播放的曲目在指定专辑，播放上次之前播放的曲目
-                play(indexPath: indexPath)
+                specificIndexPath = indexPath
             } else {
                 // 播放指定专辑首曲
                 let indexPath = IndexPath(row: 0, section: index)
-                play(indexPath: indexPath)
+                specificIndexPath = indexPath
             }
         }
         // 恢复常规播放
         else if let id = settings.currentAudioID,
-           currentSong()?.resId != id,
-           let indexPath = indexPathOf(mediaID: id) {
+                currentSong()?.resId != id,
+                let indexPath = indexPathOf(mediaID: id) {
+            specificIndexPath = indexPath
+        }
+        
+        if let indexPath = specificIndexPath {
             play(indexPath: indexPath)
         }
+        
+        return specificIndexPath != nil
     }
     
     @discardableResult

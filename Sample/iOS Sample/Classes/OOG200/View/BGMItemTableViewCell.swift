@@ -111,7 +111,7 @@ class BGMItemTableViewCell: UITableViewCell {
             guard let `self` = self, let currentModel = self.model, currentModel.resId == item.resId else {
                 return false
             }
-            print("Status changed", status, item.fileName)
+            print("Status changed - [\(status)] for 《 \(item.fileName) 》")
             self.updateStatusByModel()
             return true
         }

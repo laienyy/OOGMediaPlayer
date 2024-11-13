@@ -9,7 +9,7 @@ import UIKit
 import OOGMediaPlayer
 
 
-class LocalAudioPlayerViewController: UIViewController {
+class LocalAudioPlayerViewController: UIViewController, AudioPlayerOwner {
 
     
     @IBOutlet weak var nameLabel: UILabel!
@@ -42,7 +42,7 @@ class LocalAudioPlayerViewController: UIViewController {
     var listViewController: MediaListViewController?
     
     
-    var settings = OOGAudioPlayerSettings.loadScheme(.bgm)
+    var settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,7 +63,10 @@ class LocalAudioPlayerViewController: UIViewController {
         Task {
             do {
                 let info = GetBGMListApiInfo(scheme: .dev, project: .oog200, type: .animation, language: "en")
-                try await playerProvider.addMusicsFromServer(info: info)
+                let models = try await playerProvider.getMusicFromServer(info, updateToCache: true)
+                playerProvider.reloadData(models)
+                playAudioIfDataSourceExists()
+                
             } catch let error {
 //                self.statusLabel.text = ""
                 print("Get media list failed:", error.localizedDescription)

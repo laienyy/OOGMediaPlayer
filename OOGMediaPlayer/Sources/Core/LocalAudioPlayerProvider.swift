@@ -8,6 +8,11 @@
 import UIKit
 import AVFoundation
 
+public enum LocalAudioPlayer: Error {
+    case fileUrlInvalid
+    case operationExpired
+}
+
 public enum LocalMediaStatus: Int, Codable {
     case idle
     case downloading
@@ -157,16 +162,16 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         setItemStatus(item, status: .prepareToPlay)
         
         
-        if let current = currentIndexPath, current != indexPath {
+        if currentItem()?.resId != media(at: indexPath)?.resId {
             // 不是当前需要播放的顺序，终止播放流程
             setItemStatus(item, status: .stoped)
-            return
+            throw LocalAudioPlayer.operationExpired
         }
         
         guard fileUrl.isFileURL else {
             setItemStatus(item, status: .error)
             log(prefix: .mediaPlayer, "Play item \(indexPath.descriptionForPlayer) failed, The url is not FileURL")
-            return
+            throw LocalAudioPlayer.fileUrlInvalid
         }
         
         let data = try Data(contentsOf: fileUrl)
@@ -192,15 +197,17 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     /// 播放
     override open func play() {
-        super.play()
         
-        guard let playing = audioPlayer?.isPlaying, !playing else {
+        let playing = audioPlayer?.isPlaying ?? false
+        guard !playing else {
             log(prefix: .mediaPlayer, "Ignore play for this time, the player is playing")
             setCurrentItemStatus(.error)
             return
         }
         
+        super.play()
         setCurrentItemStatus(.playing)
+        
         
         switch playFadeMode {
         case .none:
@@ -232,13 +239,17 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
             log(prefix: .mediaPlayer, "ERROR, Can not to post `DidStartPlayingAudio` Notification and call delegate, because currentIndexPath is nil")
             return
         }
-        var userInfo = ["indexPath" : indexPath] as [String : Any]
-        userInfo["album"] = album(at: indexPath.section)
-        userInfo["audio"] = media(at: indexPath)
-        NotificationCenter.default.post(name: .oogAudioPlayerDidStartPlayAudioNotification, object: self, userInfo: userInfo)
-        delegate?.mediaPlayerControl(self, startPlaying: indexPath)
+        
+        DispatchQueue.main.async {
+            var userInfo = ["indexPath" : indexPath] as [String : Any]
+            userInfo["album"] = self.album(at: indexPath.section)
+            userInfo["audio"] = self.media(at: indexPath)
+            NotificationCenter.default.post(name: .oogAudioPlayerDidStartPlayAudioNotification, object: self, userInfo: userInfo)
+            self.delegate?.mediaPlayerControl(self, startPlaying: indexPath)
+        }
+        
     }
-    
+
     /// 停止播放
     override open func stop() {
         super.stop()
@@ -254,12 +265,21 @@ extension LocalAudioPlayerProvider {
         guard let item = currentItem() as? LocalMediaPlayable else {
             return
         }
-        setItemStatus(item, status: status)
+        // 选出所有id相同的多媒体
+        
+        let items = items.flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
+        for item in items ?? [] {
+            setItemStatus(item, status: status)
+        }
     }
     
     func setItemStatus(_ item: LocalMediaPlayable, status: LocalMediaStatus) {
-        let sameItems = self.items.flatMap({ $0.mediaList }).compactMap({ $0 as? LocalMediaPlayable }) .filter { $0.resId == item.resId }
+        let sameItems = items.flatMap({ $0.mediaList })
+                             .compactMap({ $0 as? LocalMediaPlayable })
+                             .filter { $0.resId == item.resId }
         
+        let itemsDescription = sameItems.map({ "\($0)" }).joined(separator: "\n\t")
+        log(prefix: .mediaPlayer, "Set status \(status) to: [\n\t\(itemsDescription)\n]")
         DispatchQueue.main.async {
             sameItems.forEach {
                 $0.setNewPlayerStatus(status)

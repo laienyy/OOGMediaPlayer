@@ -21,7 +21,15 @@ let scheme = ProjectScheme.distribution
 #endif
 
 
+extension AudioModel {
+    public override var description: String {
+        let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
+        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
+    }
+}
+
 class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
+    
     typealias Album = AudioAlbumModel
     
     // 当前播放音乐信息部分
@@ -54,7 +62,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     
     
     var updateTimeTimer: Timer?
-    var settings = OOGAudioPlayerSettings.loadScheme(.bgm)
+    var settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
     let playerProvider = OOGAudioPlayerProvider<Album>()
     
     deinit {
@@ -102,21 +110,28 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
             do {
                 hud.show(animated: true)
                 // 加载歌曲
-                try await playerProvider.addMusicsFromServer(scheme, .oog200, types: [.animation], playAutomatically: false)
+                let info: GetBGMListApiInfo = .init(scheme: scheme, project: .oog200, type: .animation, language: "en")
+                let models = try await playerProvider.getMusicFromServer(info, updateToCache: true)
+                
+                playerProvider.reloadData(models)
+                
+                // 刷新《我的喜欢》列表
+                reloadFavoriteAlbum()
                 // 设置淡进模式 （）
                 playerProvider.playFadeMode = .once(8.0)
-                hud.hide(animated: true, afterDelay: 0.5)
                 // 根据设置，同步播放器
                 playerProvider.syncSettings(settings)
-                playerProvider.resumePlayAudioBySetting(settings)
                 
-                if playerProvider.currentIndexPath == nil {
-                    // 当根据设置未开始自动播放时，此处开始自动播放第一首
+                if !playerProvider.resumePlay(by: settings) {
+                    // 根据设置未回复播放（大概率是未曾开始播放过），此处开始自动播放第一首
                     playerProvider.playNext()
                 }
                 
+                hud.hide(animated: true, afterDelay: 0.5)
+                
             } catch let error {
                 statusLabel.text = "获取歌曲列表失败，错误：\(error.localizedDescription)"
+                hud.hide(animated: true, afterDelay: 0.5)
             }
         }
         
@@ -125,7 +140,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     // 根据播放器当前状态，更新视图显示
     func syncSubsubviewsContentWithSettings() {
         
-        settings = OOGAudioPlayerSettings.loadScheme(.bgm)
+        settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
         
         if !settings.isEnablePlayer {
             playerProvider.pause()
