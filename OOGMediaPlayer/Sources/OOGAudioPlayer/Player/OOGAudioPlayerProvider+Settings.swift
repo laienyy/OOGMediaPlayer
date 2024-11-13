@@ -17,6 +17,10 @@ public extension OOGAudioPlayerProvider {
         isUseCache = settings.isEnableCache
         volume = settings.volumn
         loopMode = settings.loopMode
+        
+        if let id = settings.currentAudioID, let indexPath = indexPathOf(mediaID: id) {
+            currentIndexPath = indexPath
+        }
     }
     
     // 根据设置播放歌曲, 返回是否有会播放

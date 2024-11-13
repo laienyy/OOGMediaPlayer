@@ -21,13 +21,6 @@ let scheme = ProjectScheme.distribution
 #endif
 
 
-extension AudioModel {
-    public override var description: String {
-        let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
-        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
-    }
-}
-
 class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     
     typealias Album = AudioAlbumModel
@@ -117,10 +110,10 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                 
                 // 刷新《我的喜欢》列表
                 reloadFavoriteAlbum()
+                // 根据设置，同步播放器
+                updatePlayerWithSettings()
                 // 设置淡进模式 （）
                 playerProvider.playFadeMode = .once(8.0)
-                // 根据设置，同步播放器
-                playerProvider.syncSettings(settings)
                 
                 if !playerProvider.resumePlay(by: settings) {
                     // 根据设置未回复播放（大概率是未曾开始播放过），此处开始自动播放第一首

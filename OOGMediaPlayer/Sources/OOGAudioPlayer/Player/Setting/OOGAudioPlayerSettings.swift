@@ -64,7 +64,11 @@ public class OOGAudioPlayerSettings: Codable {
     public var loopDesignateAlbumID: Int?
     
     
-    public init(scheme: AudioPlayerSettingScheme, isEnablePlayer: Bool, isEnableCache: Bool, playerVolumn: Float = 0.3, currentAudioID: Int? = nil) {
+    public init(scheme: AudioPlayerSettingScheme,
+                isEnablePlayer: Bool = true,
+                isEnableCache: Bool = true,
+                playerVolumn: Float = 0.3,
+                currentAudioID: Int? = nil) {
         self.scheme = scheme
         self.isEnablePlayer = isEnablePlayer
         self.isEnableCache = isEnableCache

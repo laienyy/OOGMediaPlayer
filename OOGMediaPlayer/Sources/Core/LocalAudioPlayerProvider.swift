@@ -209,31 +209,26 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         setCurrentItemStatus(.playing)
         
         
+        audioPlayer?.volume = 0
+        audioPlayer?.play()
+        
         switch playFadeMode {
         case .none:
             audioPlayer?.volume = volume
         case .once(let duration):
-            guard !isFaded else {
+            guard !self.isFaded else {
                 audioPlayer?.volume = volume
                 break
             }
-            self.audioPlayer?.setVolume(0, fadeDuration: 0)
-            DispatchQueue.main.async {
-                // 淡入需要延时
-                self.audioPlayer?.setVolume(self.volume, fadeDuration: duration)
-            }
+            audioPlayer?.setVolume(volume, fadeDuration: duration)
             
         case .each(let duration):
-            self.audioPlayer?.setVolume(0, fadeDuration: 0)
-            DispatchQueue.main.async {
-                // 淡入需要延时
-                self.audioPlayer?.setVolume(self.volume, fadeDuration: duration)
-            }
+            audioPlayer?.setVolume(volume, fadeDuration: duration)
         }
         
-        audioPlayer?.play()
-        
         isFaded = true
+        
+        
         
         guard let indexPath = currentIndexPath else {
             log(prefix: .mediaPlayer, "ERROR, Can not to post `DidStartPlayingAudio` Notification and call delegate, because currentIndexPath is nil")

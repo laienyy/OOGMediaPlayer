@@ -141,6 +141,15 @@ extension AudioPlayerOwner {
 }
 
 extension AudioPlayerOwner {
+    
+    func updatePlayerWithSettings() {
+        playerProvider.syncSettings(settings)
+    }
+    
+    func resumePlayAudioBySettings() {
+        playerProvider.resumePlay(by: settings)
+    }
+    
     func playAudioIfDataSourceExists() {
         if playerProvider.isExistsValidMedia() {
             switch playerProvider.playerStatus {
