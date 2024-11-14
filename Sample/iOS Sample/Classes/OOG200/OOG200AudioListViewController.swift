@@ -11,6 +11,13 @@ import SDWebImage
 
 private let favoriteAlbumID = -1
 
+extension AudioModel {
+    public override var description: String {
+        let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
+        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
+    }
+}
+
 class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     typealias Album = AudioAlbumModel
     
@@ -426,7 +433,8 @@ extension OOG200AudioListViewController: MediaPlayerProviderDelegate {
     }
     
     func mediaPlayerControl(_ provider: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
-        print("[ERR] Play \(indexPath?.descriptionForPlayer ?? "-") failed, response", error.localizedDescription)
+//        let message = indexPath == nil ? nil : ("For: \(provider.media(at: indexPath!))")
+//        print("[ERR] Play failed, Reason:", error.localizedDescription, message ?? "")
     }
     
     func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl) {
