@@ -69,10 +69,10 @@ public class DownloadRequest {
                 preProgress = Int(data.count)
                 progress.completedUnitCount = Int64(data.count)
                 
-                log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(url.relativePath))",
-                             progress.completedUnitCount,
-                             progress.totalUnitCount,
-                             progress.percentComplete * 100))
+//                log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(url.relativePath))",
+//                             progress.completedUnitCount,
+//                             progress.totalUnitCount,
+//                             progress.percentComplete * 100))
                 
                 handler.queue.async { progressHandler?.callback(progress) }
             }
@@ -108,7 +108,7 @@ extension URLSession {
     func fetchDataInProgress(url: URL, progress: ProgressHandler? = nil) async throws -> Data {
         let progressHandler = progress
         
-        log(prefix: .mediaPlayer, "Start downloading - \(url.relativePath)")
+        log(prefix: .mediaPlayer, "[Download] Start downloading - \(url.relativePath)")
         let (asyncBytes, urlResponse) = try await URLSession.shared.bytes(from: url)
         
         let length = (urlResponse.expectedContentLength)
@@ -139,11 +139,11 @@ extension URLSession {
                 preProgress = Int(data.count)
                 progress.completedUnitCount = Int64(data.count)
                 
-                log(prefix: .mediaPlayer, String(format: "[Download] Progress: %ld / %ld - %.1f%%",
-                                         progress.completedUnitCount,
-                                         progress.totalUnitCount,
-                                         progress.percentComplete * 100))
-                
+//                log(prefix: .mediaPlayer, String(format: "[Download] Progress: %ld / %ld - %.1f%%",
+//                                         progress.completedUnitCount,
+//                                         progress.totalUnitCount,
+//                                         progress.percentComplete * 100))
+//                
                 handler.queue.async { progressHandler?.callback(progress) }
             }
         }

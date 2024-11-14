@@ -55,7 +55,7 @@ public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     
     func updateSongsUseCacheState(_ isUseCache: Bool) {
         for album in albumList {
-            for var media in album.mediaList {
+            for media in album.mediaList {
                 media.useCache = isUseCache
             }
         }

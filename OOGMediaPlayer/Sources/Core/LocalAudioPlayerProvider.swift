@@ -8,9 +8,20 @@
 import UIKit
 import AVFoundation
 
-public enum LocalAudioPlayer: Error {
+public enum LocalAudioPlayerError: Error, LocalizedError {
+    /// 本地文件URL错误
     case fileUrlInvalid
+    /// 操作已经过期，在等待文件数据的时候，外部有新的操作
     case operationExpired
+    
+    public var errorDescription: String? {
+        switch self {
+        case .fileUrlInvalid:
+            return "File url is invalid"
+        case .operationExpired:
+            return "Operation is expired"
+        }
+    }
 }
 
 public enum LocalMediaStatus: Int, Codable {
@@ -125,15 +136,18 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         guard let item = media(at: indexPath) else {
             return false
         }
+        log(prefix: .mediaPlayer, "Check ID [\(item.resId)], have [\(preparingItems.count)] items in preparing queue")
         return preparingItems.contains(where: { $0.resId == item.resId })
     }
     
     func appendToPreparingQueue(_ item: LocalMediaPlayable) {
         preparingItems.append(item)
+        log(prefix: .mediaPlayer, "Remove \(item.resId) from preparing queue")
     }
     
     func removeFromPreparingQueue(_ item: LocalMediaPlayable) {
         preparingItems.removeAll(where: { $0.resId == item.resId } )
+        log(prefix: .mediaPlayer, "Remove \(item.resId) from preparing queue")
     }
     
     override func toPlay(indexPath: IndexPath) {
@@ -152,9 +166,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         guard !isIndexPathInPreparingQueue(indexPath) else {
             // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
             log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
-            await MainActor.run {
-                setItemStatus(item, status: .stoped)
-            }
+            setItemStatus(item, status: .downloading)
             throw MediaPlayerControlError.alreadyBeenPreparing
         }
         
@@ -173,43 +185,47 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         if currentItem()?.resId != media(at: indexPath)?.resId {
             // 不是当前需要播放的顺序，终止播放流程
             setItemStatus(item, status: .stoped)
-            throw LocalAudioPlayer.operationExpired
+            throw LocalAudioPlayerError.operationExpired
         }
         
         guard fileUrl.isFileURL else {
             setItemStatus(item, status: .error)
             log(prefix: .mediaPlayer, "Play item \(indexPath.descriptionForPlayer) failed, The url is not FileURL")
-            throw LocalAudioPlayer.fileUrlInvalid
+            throw LocalAudioPlayerError.fileUrlInvalid
         }
         
         let data = try Data(contentsOf: fileUrl)
-        audioPlayer = try AVAudioPlayer(data: data)
-        audioPlayer?.delegate = self
+        let audioPlayer = try AVAudioPlayer(data: data)
+        audioPlayer.delegate = self
         
-        guard let player = self.audioPlayer else {
+        guard audioPlayer.prepareToPlay() else {
             setItemStatus(item, status: .error)
             throw LocalMediaPlayerError.prepareToPlayFailed
         }
         
-        guard player.prepareToPlay() else {
-            setItemStatus(item, status: .error)
-            throw LocalMediaPlayerError.prepareToPlayFailed
-        }
+        self.audioPlayer = audioPlayer
     }
     
     open override func pause() {
-        super.pause()
-        audioPlayer?.pause()
-        setCurrentItemStatus(.paused)
+        if playerStatus == .playing {
+            super.pause()
+            audioPlayer?.pause()
+            setCurrentItemStatus(.paused)
+        }
     }
     
     /// 播放
     override open func play() {
         
-        let playing = audioPlayer?.isPlaying ?? false
-        guard !playing else {
-            log(prefix: .mediaPlayer, "Ignore play for this time, the player is playing")
-            setCurrentItemStatus(.error)
+        guard let audioPlayer = audioPlayer else {
+            log(prefix: .mediaPlayer, "Ignore play for this time, the `AVAudioPlayer` is nil")
+            return
+        }
+        
+        guard !audioPlayer.isPlaying else {
+            log(prefix: .mediaPlayer, "Ignore play for this time, the `AVAudioPlayer` is playing")
+            super.setStatus(.playing)
+            setCurrentItemStatus(.playing)
             return
         }
         
@@ -217,21 +233,27 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         setCurrentItemStatus(.playing)
         
         
-        audioPlayer?.volume = 0
-        audioPlayer?.play()
+        audioPlayer.volume = 0
+        let didPlaying = audioPlayer.play()
+        
+        log(prefix: .mediaPlayer, didPlaying ? "Did playing \(currentItem())" : "Playing failed \(currentItem())")
+        
+//        guard playing else {
+//            return
+//        }
         
         switch playFadeMode {
         case .none:
-            audioPlayer?.volume = volume
+            audioPlayer.volume = volume
         case .once(let duration):
             guard !self.isFaded else {
-                audioPlayer?.volume = volume
+                audioPlayer.volume = volume
                 break
             }
-            audioPlayer?.setVolume(volume, fadeDuration: duration)
+            audioPlayer.setVolume(volume, fadeDuration: duration)
             
         case .each(let duration):
-            audioPlayer?.setVolume(volume, fadeDuration: duration)
+            audioPlayer.setVolume(volume, fadeDuration: duration)
         }
         
         isFaded = true
@@ -257,6 +279,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     override open func stop() {
         super.stop()
         audioPlayer?.stop()
+        audioPlayer = nil
         setCurrentItemStatus(.stoped)
         currentIndexPath = nil
     }

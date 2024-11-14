@@ -147,7 +147,7 @@ public enum MediaPlayerControlError: Error, LocalizedError {
         case .sourceTypeInvalid:
             return "Source type is wrong"
         case .alreadyBeenPreparing:
-            return "File already been preparing (Downloading or some another reason)"
+            return "File already been preparing, Now is during `Downloading` or during `prepareToPlay` step)"
         }
     }
 }
@@ -291,7 +291,7 @@ open class MediaPlayerControl: NSObject {
             return
         }
         
-        log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath))
+        log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath).debugDescription)
         
         // 暂停当前播放
         if currentIndexPath != nil {
