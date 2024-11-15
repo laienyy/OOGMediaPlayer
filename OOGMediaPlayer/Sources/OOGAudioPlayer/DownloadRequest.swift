@@ -41,13 +41,11 @@ public class DownloadRequest {
         task = asyncBytes.task
         
         // 增加超时
-//        let response: Data = try await excute(timeout: timeoutInterval) { [weak self] in
-//            
-//            
-//            
-//            guard let `self` = self else {
-//                throw OOGMediaPlayerError.DownloadError.requestRelease
-//            }
+        let response =  try await excute(timeout: timeoutInterval) { [weak self] in
+            
+            guard let `self` = self else {
+                throw OOGMediaPlayerError.DownloadError.requestRelease
+            }
             
             let length = (urlResponse.expectedContentLength)
             var data = Data()
@@ -57,15 +55,19 @@ public class DownloadRequest {
             // 有必要回调的进度最小变化
             let callbackGranularity = Int(Double(length) * 0.002)
             
+            // 记录已经完成的进度
             var preProgress: Int = 0
+            
+//                log(prefix: .mediaPlayer, "Start Sleep")
+//                try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
+//                log(prefix: .mediaPlayer, "End Sleep")
             
             for try await byte in asyncBytes {
                 data.append(byte)
                 
-//                log(prefix: .mediaPlayer, "Start Sleep 1 S")
-                
                 if let handler = progressHandler {
                     
+                    // 计算下载进度
                     let diff = data.count - preProgress
                     // 降低回调频率，过滤回调次数过多的问题
                     let isNesessaryToCallback = diff > callbackGranularity || data.count == length
@@ -83,15 +85,15 @@ public class DownloadRequest {
                     
                     handler.queue.async { progressHandler?.callback(progress) }
                 }
-                
             }
-//        log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(response.count / 1024) KB)")
+            
+            log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(data.count / 1024) KB)")
             return data
-//        }
+        }
         
-//        log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(response.count / 1024) KB)")
+        log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(response.count / 1024) KB)")
         
-//        return response
+        return response
     }
     
     public func cancel() {

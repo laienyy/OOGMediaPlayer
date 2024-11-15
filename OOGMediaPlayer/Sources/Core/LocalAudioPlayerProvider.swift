@@ -126,12 +126,12 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     func appendToPreparingQueue(_ item: LocalMediaPlayable) {
         preparingItems.append(item)
-        log(prefix: .mediaPlayer, "Remove \(item.resId) from preparing queue")
+        log(prefix: .mediaPlayer, "Add Meida ID ( \(item.resId) ) to preparing queue")
     }
     
     func removeFromPreparingQueue(_ item: LocalMediaPlayable) {
         preparingItems.removeAll(where: { $0.resId == item.resId } )
-        log(prefix: .mediaPlayer, "Remove \(item.resId) from preparing queue")
+        log(prefix: .mediaPlayer, "Remove Meida ID [ \(item.resId) ] from preparing queue")
     }
     
     override func toPlay(indexPath: IndexPath) {
@@ -334,18 +334,20 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
     }
 }
 
+
 func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) async throws -> T {
     
     let fetchTask = Task {
-        let taskResult = try await task()
+        let result = try await task()
         try Task.checkCancellation()
-        // without the above line, search() kept going until server responded long after deadline.
-        return taskResult
+        return result
     }
         
     let timeoutTask = Task {
         try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
+        // 取消正常流程需执行的Task
         fetchTask.cancel()
+        // 返回超时Error
         throw OOGMediaPlayerError.TaskError.timeout
     }
     
@@ -356,18 +358,4 @@ func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) asyn
     } catch let error {
         throw fetchTask.isCancelled ? OOGMediaPlayerError.TaskError.timeout : error
     }
-//    
-//    let task = Task {
-//        try await task()
-//    }
-//    
-//    Task {
-//        try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-//        task.cancel()
-//    }
-//    do {
-//        return try await task.value
-//    } catch let error {
-//        throw task.isCancelled ? OOGMediaPlayerError.TaskError.timeout : error
-//    }
 }
