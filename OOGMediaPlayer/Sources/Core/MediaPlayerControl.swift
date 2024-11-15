@@ -100,56 +100,32 @@ extension MediaPlayerControl {
 }
 
 
-public protocol MediaPlayerProviderDelegate: AnyObject {
+public protocol MediaPlayerControlDelegate: AnyObject {
     
     /// 将要播放，返回`false`跳过播放
-    func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath?
+    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath?
     /// 即将播放
-    func mediaPlayerControl(_ provider: MediaPlayerControl, willPlay indexPath: IndexPath)
+    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath)
     /// 已经播放
-    func mediaPlayerControl(_ provider: MediaPlayerControl, startPlaying indexPath: IndexPath)
+    func mediaPlayerControl(_ control: MediaPlayerControl, startPlaying indexPath: IndexPath)
   
     /// 播放器状态改变
-    func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl)
+    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl)
     /// 播放错误
-    func mediaPlayerControl(_ provider: MediaPlayerControl, playAt indexPath: IndexPath?, error: Error)
+    func mediaPlayerControl(_ control: MediaPlayerControl, playAt indexPath: IndexPath?, error: Error)
 }
 
-public extension MediaPlayerProviderDelegate {
+public extension MediaPlayerControlDelegate {
     
     /**
      * 将协议可选化
      */
-    func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl) { }
-    func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
+    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl) { }
+    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
         return indexPath
     }
-    func mediaPlayerControl(_ provider: MediaPlayerControl, willPlay indexPath: IndexPath) { }
-    func mediaPlayerControl(_ provider: MediaPlayerControl, startPlaying indexPath: IndexPath) { }
-}
-
-public enum MediaPlayerControlError: Error, LocalizedError {
-    case isNotEnable
-    case noInvalidItem
-    case currentItemIsNil
-    case sourceTypeInvalid
-    // 文件已经在准备播放期间
-    case alreadyBeenPreparing
-    
-    public var errorDescription: String? {
-        switch self {
-        case .isNotEnable:
-            return "Player is not enable"
-        case .noInvalidItem:
-            return "No valid playable item for now"
-        case .currentItemIsNil:
-            return "Player current item indexPath is none or the indexPath is valid (at indexPath can not found media item)"
-        case .sourceTypeInvalid:
-            return "Source type is wrong"
-        case .alreadyBeenPreparing:
-            return "File already been preparing, Now is during `Downloading` or during `prepareToPlay` step)"
-        }
-    }
+    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath) { }
+    func mediaPlayerControl(_ control: MediaPlayerControl, startPlaying indexPath: IndexPath) { }
 }
 
 open class MediaPlayerControl: NSObject {
@@ -157,6 +133,7 @@ open class MediaPlayerControl: NSObject {
     public struct HistoryItem {
         public var media: any MediaPlayable
         public var indexPath: IndexPath
+        public var time = Date()
     }
     
     public enum PlayDirection {
@@ -168,7 +145,7 @@ open class MediaPlayerControl: NSObject {
         case previous
     }
     
-    public weak var delegate: MediaPlayerProviderDelegate?
+    public weak var delegate: MediaPlayerControlDelegate?
     
     public var isEnable: Bool = true
     
@@ -259,7 +236,7 @@ open class MediaPlayerControl: NSObject {
         lastPlayDirection = .next
         guard let indexPath = getNextMediaIndexPath() else {
             log(prefix: .mediaPlayer, "Play forward failed, there is no `indexPath` specified")
-            playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
+            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
         toPlay(indexPath: indexPath)
@@ -270,7 +247,7 @@ open class MediaPlayerControl: NSObject {
         lastPlayDirection = .previous
         guard let indexPath = getBackwardIndexPath() else {
             log(prefix: .mediaPlayer, "Play backward failed, there is no `indexPath` specified")
-            playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
+            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
         toPlay(indexPath: indexPath)
@@ -287,7 +264,7 @@ open class MediaPlayerControl: NSObject {
         
         guard isEnable else  {
             log(prefix: .mediaPlayer, "Try to play failed, enable is false")
-            playError(at: indexPath, error: MediaPlayerControlError.isNotEnable)
+            playError(at: indexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
             return
         }
         
@@ -305,7 +282,7 @@ open class MediaPlayerControl: NSObject {
         
         guard let next = next else {
             log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
-            playError(at: nil, error: MediaPlayerControlError.noInvalidItem)
+            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
         currentIndexPath = next

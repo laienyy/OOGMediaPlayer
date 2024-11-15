@@ -23,6 +23,7 @@ func log(prefix: LogPrefix?, _ args: Any..., file: String = #file, line: Int = #
 class Logger {
     
     static let share = Logger()
+    
     var isEnable: Bool = true
     
     func log(prefix: LogPrefix?, _ args: Any..., file: String = #file, line: Int = #line) {

@@ -111,7 +111,9 @@ extension AudioModel: BGMSong {
     }
     /// 是否有效
     public var isValid: Bool {
-        return !subscription
+        // 无需订阅 或者 已订阅 = 可以正常使用
+        let isValid = !subscription || OOGAudioGlobalEnviroment.share.isIAPIActive
+        return isValid
     }
     
     /// 取消下载
@@ -122,7 +124,7 @@ extension AudioModel: BGMSong {
     }
     
     /// 获取本地文件URL
-    public func getLocalFileUrl() async throws -> URL {    
+    public func getLocalFileUrl(timeoutInterval: TimeInterval = 60) async throws -> URL {
         guard let urlString = audio else {
             throw NSError(domain: "Media Url is nil", code: -1)
         }
@@ -151,24 +153,29 @@ extension AudioModel: BGMSong {
          * 有进度下载方式
          */
         
-        let request = DownloadRequest(url: url)
+        let request = DownloadRequest(url: url, timeoutInterval: timeoutInterval)
         downloadRequest = request
         
-        let data = try await request.fetchDataInProgress(progress: .init(queue: .main, callback: { [weak self] progress in
-            self?.updateFileProgress(.downloading(progress.percentComplete))
-            if progress.isFinished {
-                self?.updateFileProgress(.downloaded)
-            }
-        }))
-        
-        let filePath = FileItem.bgm(fileName)
-        try filePath.write(data: data)
-        // 根据网络链接存储缓存文件路径
-        filePath.storeFilePath(key: urlString)
-        
-        print("Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")" )
-        
-        return filePath.asFilePathUrl()
+        do {
+            let data = try await request.fetchDataInProgress(progress: .init(queue: .main, callback: { [weak self] progress in
+                self?.updateFileProgress(.downloading(progress.percentComplete))
+                if progress.isFinished {
+                    self?.updateFileProgress(.downloaded)
+                }
+            }))
+            
+            let filePath = FileItem.bgm(fileName)
+            try filePath.write(data: data)
+            // 根据网络链接存储缓存文件路径
+            filePath.storeFilePath(key: urlString)
+            
+            print("Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")" )
+            
+            return filePath.asFilePathUrl()
+        } catch let error {
+            updateFileProgress(.failed(error))
+            throw error
+        }
     }
     
 }

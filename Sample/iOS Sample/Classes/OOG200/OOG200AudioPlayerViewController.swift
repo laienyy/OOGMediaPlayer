@@ -341,7 +341,7 @@ extension OOG200AudioPlayerViewController {
     }
 }
 
-extension OOG200AudioPlayerViewController: MediaPlayerProviderDelegate {
+extension OOG200AudioPlayerViewController: MediaPlayerControlDelegate {
     
     func mediaPlayerControl(_ provider: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
         

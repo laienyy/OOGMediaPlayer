@@ -173,15 +173,15 @@ extension LocalAudioPlayerViewController {
 }
 
 
-extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
+extension LocalAudioPlayerViewController: MediaPlayerControlDelegate {
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, willStopAt indexPath: IndexPath, error: any Error) {
+    func mediaPlayerControl(_ control: MediaPlayerControl, willStopAt indexPath: IndexPath, error: any Error) {
         
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath) -> IndexPath? {
-        if let currentIndexPath = provider.currentIndexPath,
-           provider.isLastIndexPathInItems(currentIndexPath),
+    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath) -> IndexPath? {
+        if let currentIndexPath = control.currentIndexPath,
+           control.isLastIndexPathInItems(currentIndexPath),
            indexPath.section == 0,
            indexPath.row == 0 {
             
@@ -219,7 +219,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         return indexPath
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
+    func mediaPlayerControl(_ control: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
         
         if indexPath != nil, playerProvider.currentIndexPath != indexPath {
             return
@@ -237,7 +237,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         }
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, at indexPath: IndexPath?, playBackwardError error: any Error) {
+    func mediaPlayerControl(_ control: MediaPlayerControl, at indexPath: IndexPath?, playBackwardError error: any Error) {
         
         if indexPath != nil, playerProvider.currentIndexPath != indexPath {
             return
@@ -254,7 +254,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         }
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, willPlay indexPath: IndexPath) {
+    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath) {
         guard let media = playerProvider.getSong(at: indexPath) else {
             return
         }
@@ -268,7 +268,7 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         listViewController?.setCurrentIndexPath(indexPath)
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, startPlaying indexPath: IndexPath) {
+    func mediaPlayerControl(_ control: MediaPlayerControl, startPlaying indexPath: IndexPath) {
         
         
         guard let media = playerProvider.getSong(at: indexPath) else {
@@ -281,8 +281,8 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
         statusLabel.text = "[\(indexPath.section) - \(indexPath.row)]\n\n正在播放\n\n\(media.fileName)"
     }
     
-    func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl) {
-        let status = provider.playerStatus
+    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl) {
+        let status = control.playerStatus
         if status == .playing {
             // 添加刷新当前时间的timer
             playingTimer = .scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { [weak self] timer in
@@ -311,6 +311,6 @@ extension LocalAudioPlayerViewController: MediaPlayerProviderDelegate {
             }
         }
         
-        playButton.isSelected = provider.playerStatus == .playing
+        playButton.isSelected = control.playerStatus == .playing
     }
 }

@@ -46,6 +46,15 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         super.init(nibName: nil, bundle: nil)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let indexPath = playerProvider.currentIndexPath {
+            tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+        }
+    }
+    
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
@@ -274,7 +283,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         cell.updateCorner(isFirst: isFirst, isLast: isLast)
         cell.isFavorite = isFavorite(song: song)
         cell.isLoop = isLoop(song: song)
-        cell.isLock = song.subscription
+        cell.isLock = song.isValid
         cell.loopAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
@@ -405,7 +414,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
     
 }
 
-extension OOG200AudioListViewController: MediaPlayerProviderDelegate {
+extension OOG200AudioListViewController: MediaPlayerControlDelegate {
     
     
     func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {

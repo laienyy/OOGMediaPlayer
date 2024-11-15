@@ -8,22 +8,6 @@
 import UIKit
 import AVFoundation
 
-public enum LocalAudioPlayerError: Error, LocalizedError {
-    /// 本地文件URL错误
-    case fileUrlInvalid
-    /// 操作已经过期，在等待文件数据的时候，外部有新的操作
-    case operationExpired
-    
-    public var errorDescription: String? {
-        switch self {
-        case .fileUrlInvalid:
-            return "File url is invalid"
-        case .operationExpired:
-            return "Operation is expired"
-        }
-    }
-}
-
 public enum LocalMediaStatus: Int, Codable {
     case idle
     case downloading
@@ -54,7 +38,7 @@ public protocol LocalMediaPlayable: MediaPlayable, Downloadable {
     func setNewPlayerStatus(_ status: LocalMediaStatus)
     
     // 获取多媒体本地文件URL
-    func getLocalFileUrl() async throws -> URL
+    func getLocalFileUrl(timeoutInterval: TimeInterval) async throws -> URL
 }
 
 /// 本地音频淡出淡入模式
@@ -160,38 +144,43 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         guard let item = currentItem() as? LocalMediaPlayable else {
             log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
-            throw MediaPlayerControlError.currentItemIsNil
+            throw OOGMediaPlayerError.MediaPlayerControlError.currentItemIsNil
         }
         
         guard !isIndexPathInPreparingQueue(indexPath) else {
             // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
             log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
             setItemStatus(item, status: .downloading)
-            throw MediaPlayerControlError.alreadyBeenPreparing
+            throw OOGMediaPlayerError.MediaPlayerControlError.alreadyBeenPreparing
         }
         
         // 加入等待队列
         appendToPreparingQueue(item)
         setItemStatus(item, status: .downloading)
         
-        // *** 等待外部返回文件URL
-        let fileUrl = try await item.getLocalFileUrl()
+        var fileUrl: URL
+        do {
+            // *** 等待外部返回文件URL
+            fileUrl = try await item.getLocalFileUrl(timeoutInterval: 1)
+        } catch let error {
+            removeFromPreparingQueue(item)
+            throw error
+        }
         
         // 移出等待队列
         removeFromPreparingQueue(item)
         setItemStatus(item, status: .prepareToPlay)
         
-        
         if currentItem()?.resId != media(at: indexPath)?.resId {
             // 不是当前需要播放的顺序，终止播放流程
             setItemStatus(item, status: .stoped)
-            throw LocalAudioPlayerError.operationExpired
+            throw OOGMediaPlayerError.LocalAudioPlayerError.operationExpired
         }
         
         guard fileUrl.isFileURL else {
             setItemStatus(item, status: .error)
             log(prefix: .mediaPlayer, "Play item \(indexPath.descriptionForPlayer) failed, The url is not FileURL")
-            throw LocalAudioPlayerError.fileUrlInvalid
+            throw OOGMediaPlayerError.LocalAudioPlayerError.fileUrlInvalid
         }
         
         let data = try Data(contentsOf: fileUrl)
@@ -204,6 +193,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         }
         
         self.audioPlayer = audioPlayer
+        
     }
     
     open override func pause() {
@@ -288,6 +278,13 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         setCurrentItemStatus(.stoped)
         currentIndexPath = nil
     }
+    
+    override func playError(at indexPath: IndexPath?, error: any Error) {
+        super.playError(at: indexPath, error: error)
+        if let indexPath = indexPath, let item = media(at: indexPath) as? LocalMediaPlayable {
+            setItemStatus(item, status: .error)
+        }
+    }
 
 }
 
@@ -330,25 +327,47 @@ extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
     public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
         setStatus(.error)
         log(prefix: .mediaPlayer, "Decode error", error as Any)
+        
+        if let error = error {
+            playError(at: currentIndexPath, error: error)
+        }
     }
-}
-
-enum TaskError: Error {
-    case timeout
 }
 
 func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) async throws -> T {
-    let task = Task {
-        try await task()
+    
+    let fetchTask = Task {
+        let taskResult = try await task()
+        try Task.checkCancellation()
+        // without the above line, search() kept going until server responded long after deadline.
+        return taskResult
+    }
+        
+    let timeoutTask = Task {
+        try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
+        fetchTask.cancel()
+        throw OOGMediaPlayerError.TaskError.timeout
     }
     
-    Task {
-        try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-        task.cancel()
-    }
     do {
-        return try await task.value
+        let result = try await fetchTask.value
+        timeoutTask.cancel()
+        return result
     } catch let error {
-        throw task.isCancelled ? TaskError.timeout : error
+        throw fetchTask.isCancelled ? OOGMediaPlayerError.TaskError.timeout : error
     }
+//    
+//    let task = Task {
+//        try await task()
+//    }
+//    
+//    Task {
+//        try? await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+//        task.cancel()
+//    }
+//    do {
+//        return try await task.value
+//    } catch let error {
+//        throw task.isCancelled ? OOGMediaPlayerError.TaskError.timeout : error
+//    }
 }
