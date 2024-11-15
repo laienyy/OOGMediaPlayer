@@ -286,7 +286,7 @@ open class MediaPlayerControl: NSObject {
     func toPlay(indexPath: IndexPath) {
         
         guard isEnable else  {
-            log(prefix: .mediaPlayer, "Play error, enable is false")
+            log(prefix: .mediaPlayer, "Try to play failed, enable is false")
             playError(at: indexPath, error: MediaPlayerControlError.isNotEnable)
             return
         }

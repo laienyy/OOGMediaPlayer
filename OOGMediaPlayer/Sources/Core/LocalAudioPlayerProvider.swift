@@ -217,6 +217,11 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     /// 播放
     override open func play() {
         
+        guard isEnable else {
+            log(prefix: .mediaPlayer, "Try to play failed, the `isEnable` is false")
+            return
+        }
+        
         guard let audioPlayer = audioPlayer else {
             log(prefix: .mediaPlayer, "Ignore play for this time, the `AVAudioPlayer` is nil")
             return
@@ -236,7 +241,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer.volume = 0
         let didPlaying = audioPlayer.play()
         
-        log(prefix: .mediaPlayer, didPlaying ? "Did playing \(currentItem())" : "Playing failed \(currentItem())")
+        log(prefix: .mediaPlayer, didPlaying ? "Did playing \(String(describing: currentItem()))" : "Playing failed \(String(describing: currentItem()))")
         
 //        guard playing else {
 //            return
