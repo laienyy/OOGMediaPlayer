@@ -337,7 +337,7 @@ extension OOG200AudioPlayerViewController {
     }
     
     func showAlbumList() {
-        let vc = OOG200AudioListViewController(playerProvider: playerProvider)
+        let vc = OOG200AudioListViewController(playerProvider, settings: settings, type: .planClassicAndChair)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

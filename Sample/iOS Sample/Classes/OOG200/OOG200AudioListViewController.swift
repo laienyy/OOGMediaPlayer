@@ -19,18 +19,12 @@ extension AudioModel {
 }
 
 class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
+
     typealias Album = AudioAlbumModel
     
     var playerProvider: OOGAudioPlayerProvider<Album>
-    
-    lazy var favAlbum: AudioAlbumModel = {
-        var album = AudioAlbumModel()
-        album.playlistName = "我最喜欢的"
-        album.id = favoriteAlbumID
-        return album
-    }()
-    
-    var settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
+    var settings: OOGAudioPlayerSettings
+    var type: BgmPlayType
     
     let tableView = UITableView(frame: UIScreen.main.bounds, style: .grouped)
     let tableHeaderView = BGMAlbumTableHeaderView()
@@ -39,11 +33,28 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     
     let lock = NSLock()
     
+    deinit {
+        // 移除OB，释放资源
+        tableView.visibleCells.compactMap({ $0 as? BGMItemTableViewCell }).forEach({ $0.removeObservers() })
+        try? settings.save()
+    }
     
-    init(playerProvider: OOGAudioPlayerProvider<Album>) {
+    init(_ playerProvider: OOGAudioPlayerProvider<Album>, settings: OOGAudioPlayerSettings, type: BgmPlayType) {
         self.playerProvider = playerProvider
+        self.settings = settings
+        self.type = type
         
         super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        playerProvider.playDesignatedLoopSongIfNeeds(settings: settings)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -54,26 +65,15 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         }
     }
     
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
-        playerProvider.playDesignatedLoopSongIfNeeds(settings: settings)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        playerProvider.delegate = self
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
-//        if albums.count > 0 {
-//            self.albums = [albums[0]]
-//        }
-
-        playerProvider.delegate = self
+        title = "BGM"
         
 //        tableView.registerHeaderFooterFromClass(AudioAlbumTableHeaderFooterView.self)
         tableView.registerHeaderFooterFromClass(BGMAlbumTableSectionHeaderView.self)
@@ -88,7 +88,6 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         view.addSubview(tableView)
         
         tableHeaderView.shuffleSwitch.isOn = settings.loopMode == .shuffle
-        tableHeaderView.titleLabel.text = "全部随机播放"
         tableHeaderView.shuffleSwitch.addTarget(self, action: #selector(shuffleSwitchValueChanged), for: .touchUpInside)
         let screenSize = UIScreen.main.bounds.size
         var size = tableHeaderView.systemLayoutSizeFitting(screenSize)
@@ -96,35 +95,14 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         tableHeaderView.frame = .init(origin: .zero, size: size)
         tableView.tableHeaderView = tableHeaderView
         
-        loadFavoriteAlbum()
+        loadPlayer()
     }
     
-    func loadFavoriteAlbum() {
-    
-        if let favAlbum = playerProvider.albumList.first(where: { $0.id == favoriteAlbumID }) {
-            self.favAlbum = favAlbum
+    func loadPlayer() {
+        reloadFavoriteAlbum()
+        if isViewLoaded {
+            tableView.reloadData()
         }
-        
-        let songs = playerProvider.albumList.flatMap({ $0.mediaList })
-        let favSongs: [AudioModel] =  settings.selectFavoriteSongs(by: songs)
-
-        guard favSongs.count > 0 else {
-            return
-        }
-        
-        favAlbum.mediaList = favSongs
-        
-        if let index = playerProvider.albumList.firstIndex(where: { $0.id == favoriteAlbumID }) {
-            playerProvider.albumList[index] = favAlbum
-        } else {
-            playerProvider.albumList.insert(favAlbum, at: 0)
-        }
-        
-        guard isViewLoaded else {
-            return
-        }
-    
-        tableView.reloadData()
     }
     
     @objc func shuffleSwitchValueChanged(_ sender: UISwitch) {
@@ -149,11 +127,23 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     }
     
     // album - 传入点击所属的album对象
-    func favAlbumAddItem(_ item: AudioModel, album: AudioAlbumModel) {
+    func favAlbumAddItem(_ audio: AudioModel, album: AudioAlbumModel) {
         
-        settings.setFavorite(for: item, true)
+        settings.setFavorite(for: audio, true)
         
-        guard !favAlbum.mediaList.contains(where: { $0.resId == item.resId }) else {
+        var album = getFavoriteAlbum()
+        if album == nil {
+            // 当前数据源中不存在喜欢列表，新创建
+            album = AudioAlbumModel()
+            album?.playlistName = "我喜欢"
+            album?.id = favoriteAlbumID
+        }
+        
+        guard let favAlbum = album else {
+            return
+        }
+        
+        guard !favAlbum.mediaList.contains(where: { $0.resId == audio.resId }) else {
             return
         }
         
@@ -164,42 +154,34 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
          */
         let currentSong = self.playerProvider.currentSong()
         
-        let insertIndex = self.favAlbum.mediaList.count
-        favAlbum.mediaList.append(item)
+        let insertIndex = favAlbum.mediaList.count
+        favAlbum.mediaList.append(audio)
         
         tableView.performBatchUpdates { [weak self] in
             
             guard let `self` = self else { return }
-            // 添加到喜欢列表
-            
-//            self.playerProvider.reloadData(albums)
-            
-            guard self.playerProvider.albumList.first?.id == favoriteAlbumID else {
+            guard self.playerProvider.albumList.first?.isFavoriteAlbum ?? false else {
                 // 插入喜欢section
                 self.playerProvider.albumList.insert(favAlbum, at: 0)
-                print("[TableView] Insert section -", self.playerProvider.albumList.count)
-                self.tableView.insertSections([0], with: .top)
+                self.tableView.insertSections([0], with: .automatic)
                 return
             }
             
             guard !self.isFold(section: 0) else {
                 // 刷新Header
-                print("[TableView] Reload section -", self.playerProvider.albumList.count)
                 self.tableView.reloadSections([0], with: .none)
                 return
             }
             
+            // 插入Row
             let indexPath = IndexPath(row: insertIndex, section: 0)
-            print("[TableView] Insert row -", insertIndex, 0)
             self.tableView.insertRows(at: [indexPath], with: .bottom)
             
-        } completion: { [weak self] finished in
-            guard let `self` = self else {return}
-            self.playerProvider.albumList = self.playerProvider.albumList
+        } completion: { finished in
+            self.playerProvider.reloadData(self.playerProvider.albumList)
             self.tableView.reloadData()
             if let song = currentSong {
-                
-                if song.resId == item.resId {
+                if song.resId == audio.resId {
                     /**
                      在添加当前播放歌曲到《我喜欢》的位置之前，该歌曲在《我喜欢》是不存在的，所以正确的`currentIndexPath`只会是其他专辑中的那个位置
                      
@@ -221,11 +203,15 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     }
     
     // album - 传入点击所属的album对象
-    func favAlbumRemoveItem(_ item: AudioModel, album: AudioAlbumModel) {
+    func favAlbumRemoveItem(_ audio: AudioModel, album: AudioAlbumModel) {
         
-        settings.setFavorite(for: item, false)
+        settings.setFavorite(for: audio, false)
         
-        guard let index = favAlbum.mediaList.firstIndex(where: { $0.resId == item.resId }) else {
+        guard let favAlbum = getFavoriteAlbum() else {
+            return
+        }
+        
+        guard let index = favAlbum.mediaList.firstIndex(where: { $0.resId == audio.resId }) else {
             return
         }
 
@@ -235,34 +221,29 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
          */
         let currentSong = self.playerProvider.currentSong()
         
-        self.favAlbum.mediaList.remove(at: index)
+        favAlbum.mediaList.remove(at: index)
         
         tableView.performBatchUpdates { [weak self] in
             guard let `self` = self else { return }
 //            self.playerProvider.reloadData(self.albums)
             
-            guard self.favAlbum.mediaList.count > 0 else {
+            guard favAlbum.mediaList.count > 0 else {
                 // 歌曲数量为0，删除section
-                self.playerProvider.albumList.removeAll(where: { $0.id == self.favAlbum.id })
-//                print("[TableView] Delete section -", self.playerProvider.albumList.count)
+                self.playerProvider.albumList.removeAll(where: { $0.isFavoriteAlbum })
                 self.tableView.deleteSections([0], with: .automatic)
                 return
             }
             
             guard !self.isFold(section: 0) else {
                 // 被折叠，刷新整个section
-//                print("[TableView] Reload section -", self.playerProvider.albumList.count)
                 self.tableView.reloadSections([0], with: .automatic)
                 return
             }
             
             let indexPath = IndexPath(row: index, section: 0)
-//            print("[TableView] Delete row -", index, 0)
             self.tableView.deleteRows(at: [indexPath], with: .bottom)
             
-        } completion: { [weak self] finished in
-            guard let `self` = self else {return}
-            
+        } completion: { finished in
             self.playerProvider.albumList = self.playerProvider.albumList
             self.tableView.reloadData()
             if let song = currentSong {
@@ -277,14 +258,12 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
 extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-//        print("[TableView] Album count:", playerProvider.albumList.count)
         return playerProvider.albumList.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let fold = isFold(section: section)
         let number = fold ? 0 : playerProvider.albumList[section].mediaList.count
-//        print("[TableView] Section \(section) count:", number)
         return number
     }
     
@@ -299,10 +278,16 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         let isLast = indexPath.row + 1 == playerProvider.albumList[indexPath.section].mediaList.count
         
         cell.load(song)
+        // 更新边角
         cell.updateCorner(isFirst: isFirst, isLast: isLast)
+        // 是否喜欢
         cell.isFavorite = isFavorite(song: song)
+        // 循环模式
         cell.isLoop = isLoop(song: song)
-        cell.isLock = !song.isValid
+        // 订阅锁
+        cell.isLock = song.subscription
+        
+        // 循环点击回调
         cell.loopAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
@@ -318,11 +303,13 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
             // 刷新循环选中按钮状态
             self.tableView.reloadData()
         }
+        
+        // 喜欢点击回调
         cell.favoriteAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
             let isFavorite = self.settings.isFavorite(song)
-            if album.id != favoriteAlbumID {
+            if album.isFavoriteAlbum {
                 cell.isFavorite = !isFavorite
             }
             if !isFavorite == true {
@@ -337,10 +324,15 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let song = playerProvider.getSong(at: indexPath)
+        
+        guard song?.subscription == false else {
+            return
+        }
         
         guard indexPath != playerProvider.currentIndexPath else {
             
-//            print("Current ID \(playerProvider.currentItem()?.id ?? -10), selected ID \(playerProvider.getSong(at: indexPath)?.id ?? -11)")
+            print("Current ID \(playerProvider.currentItem()?.resId ?? -10), selected ID \(playerProvider.getSong(at: indexPath)?.resId ?? -11)")
             
             if playerProvider.playerStatus == .playing {
                 playerProvider.pause()
@@ -365,9 +357,11 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         let isLast = section + 1 == playerProvider.albumList.count
         let isFold = isFold(section: section)
         
-        if album.id == favoriteAlbumID {
+        if album.isFavoriteAlbum {
+            // 《喜欢的》专辑 icon
             header.specIconImage = UIImage(named: "bgm_my_fav")
         } else {
+            // 其他专辑 icon
             header.specIconImage = nil
             if let str = album.phoneCoverImgUrl, let url = URL(string: str) {
                 header.coverImageView.sd_setImage(with: url)
@@ -375,10 +369,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
                 header.coverImageView.image = nil
             }
         }
-        
-
-        header.titleLabel.text = album.name
-        header.subtitleLabel.text = "\(album.mediaList.count) 歌曲"
+        // 圆角处理
         header.updateCorner(isFirst: isFirst, isLast: isLast, isFold: isFold)
         
         header.isLoop = isLoop
@@ -399,6 +390,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         header.isFold = isFold
         header.foldAction = { [weak self] header in
             guard let `self` = self else { return }
+            
             let isFold = header.isFold
             if isFold {
                 // 展开
@@ -436,21 +428,12 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
 extension OOG200AudioListViewController: MediaPlayerControlDelegate {
     
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
-        
-        if let current = current,
-           let cell = tableView.cellForRow(at: current) as? AudioTableViewCell {
-            // 即将播放其他曲目时，将正在播放的 cell 置为当前未播放
-            cell.setIsCurrentPlay(false)
-        }
+    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
         return indexPath
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, willPlay indexPath: IndexPath) {
-        if let cell = tableView.cellForRow(at: indexPath) as? AudioTableViewCell {
-            // 将正在 cell 置为正在播放
-            cell.setIsCurrentPlay(true)
-        }
+    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath) {
+
         let albums = playerProvider.albumList
         guard albums.count > indexPath.section, albums[indexPath.section].mediaList.count > indexPath.row else {
             return
@@ -460,13 +443,12 @@ extension OOG200AudioListViewController: MediaPlayerControlDelegate {
         try? settings.save()
     }
     
-    func mediaPlayerControl(_ provider: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
-//        let message = indexPath == nil ? nil : ("For: \(provider.media(at: indexPath!))")
-//        print("[ERR] Play failed, Reason:", error.localizedDescription, message ?? "")
+    func mediaPlayerControl(_ control: MediaPlayerControl, playAt indexPath: IndexPath?, error: any Error) {
+        print("[ERR] Play \(indexPath?.descriptionForPlayer ?? "-") failed, response", error.localizedDescription)
     }
     
-    func mediaPlayerControlStatusDidChanged(_ provider: MediaPlayerControl) {
-        let status = provider.playerStatus
+    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl) {
+        let status = control.playerStatus
         print("Player status -", status.userInterfaceDisplay())
     }
     

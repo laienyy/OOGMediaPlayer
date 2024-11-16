@@ -78,6 +78,11 @@ class BGMItemTableViewCell: UITableViewCell {
     
     var model: (any BGMSong)?
     
+    func removeObservers() {
+        model?.removeStatusObserver(self)
+        model?.removeDownloadProgressObserver(self)
+    }
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         

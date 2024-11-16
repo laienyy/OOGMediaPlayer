@@ -24,6 +24,10 @@ extension AudioAlbumModel {
 
 extension AudioPlayerOwner {
     
+    func getFavoriteAlbum() -> AudioAlbumModel? {
+        return playerProvider.albumList.first(where: { $0.isFavoriteAlbum })
+    }
+    
     // 设置循环播放 (非单曲、专辑循环使用)
     func setPlayerLoop(mode: MediaPlayerControl.LoopMode) {
         playerProvider.loopMode = mode
