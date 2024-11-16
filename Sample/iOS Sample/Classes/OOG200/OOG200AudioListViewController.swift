@@ -193,12 +193,29 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             print("[TableView] Insert row -", insertIndex, 0)
             self.tableView.insertRows(at: [indexPath], with: .bottom)
             
-        } completion: { finished in
+        } completion: { [weak self] finished in
+            guard let `self` = self else {return}
             self.playerProvider.albumList = self.playerProvider.albumList
             self.tableView.reloadData()
             if let song = currentSong {
-                // 重设当前播放歌曲下标，从喜爱列表移除正在播放的歌曲，可能会导致currentIndexPath错误，并导致播放状态等出现未正常变化的问题
-                self.playerProvider.resetCurrentIndexBy(song, playFirstIfNotCatch: false)
+                
+                if song.resId == item.resId {
+                    /**
+                     在添加当前播放歌曲到《我喜欢》的位置之前，该歌曲在《我喜欢》是不存在的，所以正确的`currentIndexPath`只会是其他专辑中的那个位置
+                     
+                     （预期所有列表，最多只会存在两个相同resId的歌曲，即《我喜欢》和原所在的专辑）
+                     */
+                    let list = self.playerProvider.indexPathListOf(mediaId: song.resId)
+                    if let indexPath = list.filter({ $0.section != 0 }).first {
+                        self.playerProvider.currentIndexPath = indexPath
+                    } else {
+                        // 超出预期，根据默认规则重设 `currentIndexPath` 即可
+                        self.playerProvider.resetCurrentIndexBy(song)
+                    }
+                } else {
+                    // 添加到《我喜欢》的歌曲不是当前歌曲，不作特殊处理（预期状态，所有专辑的所有歌曲的resId是唯一的）
+                    self.playerProvider.resetCurrentIndexBy(song)
+                }
             }
         }
     }
@@ -224,7 +241,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             guard let `self` = self else { return }
 //            self.playerProvider.reloadData(self.albums)
             
-            guard favAlbum.mediaList.count > 0 else {
+            guard self.favAlbum.mediaList.count > 0 else {
                 // 歌曲数量为0，删除section
                 self.playerProvider.albumList.removeAll(where: { $0.id == self.favAlbum.id })
 //                print("[TableView] Delete section -", self.playerProvider.albumList.count)
@@ -243,12 +260,14 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
 //            print("[TableView] Delete row -", index, 0)
             self.tableView.deleteRows(at: [indexPath], with: .bottom)
             
-        } completion: { finished in
+        } completion: { [weak self] finished in
+            guard let `self` = self else {return}
+            
             self.playerProvider.albumList = self.playerProvider.albumList
             self.tableView.reloadData()
             if let song = currentSong {
                 // 重设当前播放歌曲下标，从喜爱列表移除正在播放的歌曲，可能会导致currentIndexPath错误，并导致播放状态等出现未正常变化的问题
-                self.playerProvider.resetCurrentIndexBy(song, playFirstIfNotCatch: true)
+                self.playerProvider.resetCurrentIndexBy(song)
             }
         }
     }
@@ -283,7 +302,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         cell.updateCorner(isFirst: isFirst, isLast: isLast)
         cell.isFavorite = isFavorite(song: song)
         cell.isLoop = isLoop(song: song)
-        cell.isLock = song.isValid
+        cell.isLock = !song.isValid
         cell.loopAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
