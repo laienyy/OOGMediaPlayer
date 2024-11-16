@@ -24,7 +24,18 @@ public extension OOGAudioPlayerProvider {
         }
     }
     
-    // 根据设置播放歌曲, 返回是否有会播放
+    /**
+     
+     根据设置播放歌曲, 返回否则为未根据设置找到合适的曲目
+     
+     优先级如下：
+     1. 根据单曲循环模式找到曲目位置，并播放 （如果歌曲无效，取消播放）
+     2. 根据专辑循环模式找到专辑的播放位置
+        a. 当`currentIndex` 在目标专辑内，则播放`currentIndex`
+        b. 当`currentIndex` 不在目标专辑内，播放专辑的第一首有效（若整个专辑都为无效，则不播放任何歌曲）
+     3. 根据`currentIndex`恢复播放 （如果歌曲无效，取消播放）
+     
+     */
     @discardableResult
     func resumePlay(by settings: OOGAudioPlayerSettings) -> Bool {
         
@@ -35,7 +46,10 @@ public extension OOGAudioPlayerProvider {
            let id = settings.loopDesignatedSongID,
            let indexPath = indexPathOf(mediaID: id) {
             
-            // 播放指定的单曲循环曲目
+            guard media(at: indexPath)?.isValid ?? false else {
+                // 歌曲无效，直接取消恢复播放
+                return false
+            }
             specificIndexPath = indexPath
         }
         // 恢复专辑循环播放
@@ -48,16 +62,19 @@ public extension OOGAudioPlayerProvider {
                index == indexPath.section {
                 // 如果此前最后播放的曲目在指定专辑，播放上次之前播放的曲目
                 specificIndexPath = indexPath
-            } else {
+            }
+            // 查询专辑第一个有效的多歌曲
+            else if let validElement = album(at: index)?.mediaList.enumerated().first(where: { $0.element.isValid }) {
                 // 播放指定专辑首曲
-                let indexPath = IndexPath(row: 0, section: index)
+                let indexPath = IndexPath(row: validElement.offset, section: index)
                 specificIndexPath = indexPath
             }
         }
-        // 恢复常规播放
+        // 恢复上次播放的歌曲 (如果无效则不播放)
         else if let id = settings.currentAudioID,
-                currentSong()?.resId != id,
-                let indexPath = indexPathOf(mediaID: id) {
+                let indexPath = indexPathOf(mediaID: id),
+                media(at: indexPath)?.isValid == true {
+            
             specificIndexPath = indexPath
         }
         

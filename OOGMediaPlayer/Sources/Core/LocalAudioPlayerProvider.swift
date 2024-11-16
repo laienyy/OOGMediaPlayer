@@ -137,10 +137,6 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         log(prefix: .mediaPlayer, "Remove Meida ID [ \(item.resId) ] from preparing queue")
     }
     
-    override func toPlay(indexPath: IndexPath) {
-        super.toPlay(indexPath: indexPath)
-    }
-    
     /// 准备播放
     open override func prepareToPlayItem(at indexPath: IndexPath) async throws {
         try await super.prepareToPlayItem(at: indexPath)
@@ -216,7 +212,11 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         }
         
         guard let audioPlayer = audioPlayer else {
-            log(prefix: .mediaPlayer, "Ignore play for this time, the `AVAudioPlayer` is nil")
+            if isExistsValidMedia() {
+                playNext()
+            } else {
+                log(prefix: .mediaPlayer, "Ignore play for this time, there have no valid media to play")
+            }
             return
         }
         
@@ -311,12 +311,18 @@ extension LocalAudioPlayerProvider {
         
         let itemsDescription = sameItems.map({ "\($0)" }).joined(separator: "\n\t")
         log(prefix: .mediaPlayer, "Set status \(status) to: [\n\t\(itemsDescription)\n]")
-        DispatchQueue.main.async {
+        
+        if Thread.isMainThread {
             sameItems.forEach {
                 $0.setNewPlayerStatus(status)
             }
+        } else {
+            DispatchQueue.main.sync {
+                sameItems.forEach {
+                    $0.setNewPlayerStatus(status)
+                }
+            }
         }
-
     }
 }
 

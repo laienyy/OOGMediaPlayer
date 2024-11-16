@@ -112,8 +112,11 @@ extension AudioModel: BGMSong {
     /// 是否有效
     public var isValid: Bool {
         // 无需订阅 或者 已订阅 = 可以正常使用
-        let isValid = !subscription || OOGAudioGlobalEnviroment.share.isIAPIActive
-        return isValid
+        guard subscription else {
+            // 无需订阅
+            return true
+        }
+        return OOGAudioGlobalEnviroment.share.isIAPIActive
     }
     
     /// 取消下载

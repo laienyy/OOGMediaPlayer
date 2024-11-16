@@ -12,16 +12,6 @@ extension LogPrefix {
     static let mediaPlayer = "MediaPlayer"
 }
 
-func performOnMainThread(_ block: @escaping () -> Void) {
-    if Thread.isMainThread {
-        block()
-    } else {
-        DispatchQueue.main.async {
-            block()
-        }
-    }
-}
-
 public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
 
 extension MediaPlayerControl {
@@ -100,36 +90,10 @@ extension MediaPlayerControl {
 }
 
 
-public protocol MediaPlayerControlDelegate: AnyObject {
-    
-    /// 将要播放，返回`false`跳过播放
-    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath?
-    /// 即将播放
-    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath)
-    /// 已经播放
-    func mediaPlayerControl(_ control: MediaPlayerControl, startPlaying indexPath: IndexPath)
-  
-    /// 播放器状态改变
-    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl)
-    /// 播放错误
-    func mediaPlayerControl(_ control: MediaPlayerControl, playAt indexPath: IndexPath?, error: Error)
-}
-
-public extension MediaPlayerControlDelegate {
-    
-    /**
-     * 将协议可选化
-     */
-    func mediaPlayerControlStatusDidChanged(_ control: MediaPlayerControl) { }
-    func mediaPlayerControl(_ control: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
-        return indexPath
-    }
-    func mediaPlayerControl(_ control: MediaPlayerControl, willPlay indexPath: IndexPath) { }
-    func mediaPlayerControl(_ control: MediaPlayerControl, startPlaying indexPath: IndexPath) { }
-}
 
 open class MediaPlayerControl: NSObject {
     
+    // 播放历史
     public struct HistoryItem {
         public var media: any MediaPlayable
         public var indexPath: IndexPath
@@ -149,8 +113,6 @@ open class MediaPlayerControl: NSObject {
     
     public var isEnable: Bool = true
     
-    /// 自动播放
-    public var playAutomatically: Bool = false
     /// 播放器状态
     public var playerStatus: PlayerStatus = .stoped
     /// 循环模式
@@ -172,9 +134,6 @@ open class MediaPlayerControl: NSObject {
     /// 多媒体条目
     var items: [any MediaAlbum] = .init()
     
-    func getItems() -> [any MediaAlbum] {
-        return items
-    }
     
     /**
      根据 Media 重置 `CurrentIndexPath`，
@@ -183,12 +142,8 @@ open class MediaPlayerControl: NSObject {
             - media: 目标
             - playFirstIfNotCatch: 未找到当前播放的时候是否自动播放
      */
-    open func resetCurrentIndexBy(_ media: MediaPlayable, playFirstIfNotCatch: Bool = false) {
+    open func resetCurrentIndexBy(_ media: MediaPlayable) {
         currentIndexPath = indexPathOf(mediaID: media.resId)
-        
-        if currentIndexPath == nil, playFirstIfNotCatch, let indexPath = getValidMediaIndexPaths().first {
-            play(indexPath: indexPath)
-        }
     }
     
     /// 获取上一条数据
@@ -208,34 +163,28 @@ open class MediaPlayerControl: NSObject {
     /**
      *  刷新播放列表
      *
-     *  调用这个函数会重新定位 `currentIndexPath`，未定位到并`playAutomatically` = `true` 时，会重新从首歌有效多媒体开始播放
+     *  调用这个函数会重新定位 `currentIndexPath`
      */
-    open func reloadData(_ items: [any MediaAlbum], playAutomatically: Bool = false) {
+    open func reloadData(_ items: [any MediaAlbum]) {
         // 删除历史记录
         history.removeAll()
         
         let playingMedia = currentItem()
         
         self.items = items
-        self.playAutomatically = playAutomatically
         
         if let media = playingMedia {
             // 重新定位正在播放的歌曲的下标
-            resetCurrentIndexBy(media, playFirstIfNotCatch: playAutomatically)
+            resetCurrentIndexBy(media)
         }
         
-        guard playAutomatically, currentIndexPath == nil else {
-            return
-        }
-        
-        playNext()
     }
     
     /// 播放下一条
     open func playNext() {
         lastPlayDirection = .next
         guard let indexPath = getNextMediaIndexPath() else {
-            log(prefix: .mediaPlayer, "Play forward failed, there is no `indexPath` specified")
+            log(prefix: .mediaPlayer, "Play next failed, not found invalid `indexPath`")
             playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
@@ -245,8 +194,8 @@ open class MediaPlayerControl: NSObject {
     /// 播放上一条
     open func playPrevious() {
         lastPlayDirection = .previous
-        guard let indexPath = getBackwardIndexPath() else {
-            log(prefix: .mediaPlayer, "Play backward failed, there is no `indexPath` specified")
+        guard let indexPath = getPreviousIndexPath() else {
+            log(prefix: .mediaPlayer, "Play previous failed, not found invalid `indexPath`")
             playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
@@ -260,9 +209,9 @@ open class MediaPlayerControl: NSObject {
     }
     
     /// 根据索引播放
-    func toPlay(indexPath: IndexPath) {
+    private func toPlay(indexPath: IndexPath) {
         
-        guard isEnable else  {
+        guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, enable is false")
             playError(at: indexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
             return
@@ -361,16 +310,7 @@ public extension MediaPlayerControl {
 }
 
 public extension MediaPlayerControl {
-    
-    func indexPathOf(mediaID: Int) -> IndexPath? {
-        for section in items.enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
-                return .init(row: index, section: section.offset)
-            }
-        }
-        return nil
-    }
-    
+
     func album(at section: Int) -> (any MediaAlbum)? {
         guard items.count > section else {
             return nil
@@ -387,11 +327,67 @@ public extension MediaPlayerControl {
         return media
     }
     
+    /// Index是否有效（是否越界、是否有数据）
+    func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
+        guard indexPath.section < items.count else {
+            return false
+        }
+        guard indexPath.row < items[indexPath.section].mediaList.count else {
+            return false
+        }
+        return true
+    }
+    
+    // 获取有效的
+    func isExistsValidMedia() -> Bool {
+        return items.contains(where: { $0.mediaList.contains(where: { $0.isValid }) })
+    }
+    
+    ///  IndexPath 是否是当前二维列表的最后一个
+    func isLastIndexPathInItems(_ indexPath: IndexPath) -> Bool {
+        guard let indexPath = currentIndexPath else {
+            return false
+        }
+        guard indexPath.section == items.count - 1 else {
+            return false
+        }
+        guard indexPath.row == items[indexPath.section].mediaList.count - 1 else {
+            return false
+        }
+        return true
+    }
+}
+
+//MARK: - IndexPath 相关
+
+public extension MediaPlayerControl {
+    
+    /// 获取歌曲在所有专辑中的首个位置（允许存在多个相同ID的多媒体）
+    func indexPathOf(mediaID: Int) -> IndexPath? {
+        for section in items.enumerated() {
+            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
+                return .init(row: index, section: section.offset)
+            }
+        }
+        return nil
+    }
+    
+    /// 获取歌曲在所有专辑中的所有位置（允许存在多个相同ID的多媒体）
+    func indexPathListOf(mediaId: Int) -> [IndexPath] {
+        var result = [IndexPath]()
+        for section in items.enumerated() {
+            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaId }) {
+                result.append(.init(row: index, section: section.offset))
+            }
+        }
+        return result
+    }
+    
     /// 获取基于当前索引的前一个索引，返回`none` =  需停止播放
-    func getBackwardIndexPath() -> IndexPath? {
+    func getPreviousIndexPath() -> IndexPath? {
         guard isExistsValidMedia() else {
             // 当前无有效多媒体，停止播放
-            log(prefix: .mediaPlayer, "Items is none")
+            log(prefix: .mediaPlayer, "Not found valid item")
             return nil
         }
         
@@ -445,43 +441,12 @@ public extension MediaPlayerControl {
             return list[index - 1]
         }
     }
-    
-    
-    /// Index是否有效（是否越界、是否有数据）
-    func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
-        guard indexPath.section < items.count else {
-            return false
-        }
-        guard indexPath.row < items[indexPath.section].mediaList.count else {
-            return false
-        }
-        return true
-    }
-    
-    ///  IndexPath 是否是当前二维列表的最后一个
-    func isLastIndexPathInItems(_ indexPath: IndexPath) -> Bool {
-        guard let indexPath = currentIndexPath else {
-            return false
-        }
-        guard indexPath.section == items.count - 1 else {
-            return false
-        }
-        guard indexPath.row == items[indexPath.section].mediaList.count - 1 else {
-            return false
-        }
-        return true
-    }
-}
-
-//MARK: - IndexPath 相关
-
-public extension MediaPlayerControl {
     /// 获取基于当前索引的`下一个`索引，返回`none` =  需停止播放
     func getNextMediaIndexPath() -> IndexPath? {
         
         guard isExistsValidMedia() else {
             // 当前无有效多媒体，停止播放
-            log(prefix: .mediaPlayer, "Items is none")
+            log(prefix: .mediaPlayer, "Not found valid item")
             return nil
         }
         
@@ -535,11 +500,6 @@ public extension MediaPlayerControl {
             return list[index + 1]
         }
         
-    }
-    
-    // 获取有效的
-    func isExistsValidMedia() -> Bool {
-        return items.contains(where: { $0.mediaList.contains(where: { $0.isValid }) })
     }
     
     /// 获取随机一个有效多媒体下标

@@ -57,7 +57,7 @@ public class OOGAudioPlayerSettings: Codable {
     public var currentAudioID: Int?
     
     /// 循环模式
-    public var loopMode: MediaPlayerControl.LoopMode = .none
+    public var loopMode: MediaPlayerControl.LoopMode = .order
     /// 单曲循环ID，用于记录单曲循环指定的音乐ID
     public var loopDesignatedSongID: Int?
     /// 列表循环ID，记录专辑循环指定的专辑ID

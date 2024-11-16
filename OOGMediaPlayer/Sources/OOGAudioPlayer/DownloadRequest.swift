@@ -20,7 +20,7 @@ extension Progress {
     }
 }
 
-public class DownloadRequest {
+public class DownloadRequest: NSObject {
     
     public var task: URLSessionDataTask?
     
@@ -48,8 +48,7 @@ public class DownloadRequest {
             }
             
             let length = (urlResponse.expectedContentLength)
-            var data = Data()
-            data.reserveCapacity(Int(length))
+            var data = Data.init(capacity: Int(length))
             
             let progress = Progress(totalUnitCount: length)
             // 有必要回调的进度最小变化
