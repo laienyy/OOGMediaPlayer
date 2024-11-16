@@ -81,6 +81,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     open var playFadeMode: LocalAudioVolumeFadeMode = .none
     open var isFaded: Bool = false
     
+    // 获取文件Data的超时时间
+    open var getFileTimeoutInterval: TimeInterval = 60
+    
     public override var isEnable: Bool {
         didSet {
             if !isEnable, audioPlayer?.isPlaying ?? false {
@@ -161,7 +164,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         var fileUrl: URL
         do {
             // *** 等待外部返回文件URL
-            fileUrl = try await item.getLocalFileUrl(timeoutInterval: 1)
+            fileUrl = try await item.getLocalFileUrl(timeoutInterval: getFileTimeoutInterval)
         } catch let error {
             removeFromPreparingQueue(item)
             throw error

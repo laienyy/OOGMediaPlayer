@@ -118,9 +118,8 @@ extension AudioModel: BGMSong {
     
     /// 取消下载
     public func cancelFileDownload() {
-        print("Download Request Status: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")" )
         downloadRequest?.task?.cancel()
-        print("Download Request Status: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")" )
+        log(prefix: .mediaPlayer, "Download Request Canceled")
     }
     
     /// 获取本地文件URL
@@ -134,7 +133,7 @@ extension AudioModel: BGMSong {
            fileInfo.isDataValid() { 
             // 返回缓存
             updateFileProgress(.downloaded)
-            print("Find cache for: 《 \(fileInfo.fileName) 》")
+            log(prefix: .mediaPlayer, "Find cache for: 《 \(fileInfo.fileName) 》")
             return fileInfo.asFilePathUrl()
         }
         
@@ -169,7 +168,7 @@ extension AudioModel: BGMSong {
             // 根据网络链接存储缓存文件路径
             filePath.storeFilePath(key: urlString)
             
-            print("Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")" )
+            log(prefix: .mediaPlayer, "Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")")
             
             return filePath.asFilePathUrl()
         } catch let error {

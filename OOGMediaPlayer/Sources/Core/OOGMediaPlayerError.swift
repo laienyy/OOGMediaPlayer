@@ -81,14 +81,18 @@ enum OOGMediaPlayerError {
         }
     }
     
-    
+    // 下载错误
     enum DownloadError: Error, LocalizedError {
+        case requestUrlInvalid
         // 请求已经释放
         case requestRelease
         
         public var errorDescription: String? {
             switch self {
-            case .requestRelease: return "Request memory was released"
+            case .requestUrlInvalid:
+                return "Request url is invalid"
+            case .requestRelease: 
+                return "Request memory was released"
             }
         }
     }
