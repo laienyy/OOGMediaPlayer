@@ -65,7 +65,7 @@ public extension FileItem {
     
     /// 是否存在文件，以及文件大小是否不为 0
     func isDataValid() -> Bool {
-        let isValid = FileManager.default.fileExists(atPath: asFilePathString()) && fileSize > 0
+        let isValid = fileSize > 0
         return isValid
     }
     

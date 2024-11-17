@@ -82,7 +82,7 @@ enum OOGMediaPlayerError {
     }
     
     // 下载错误
-    enum DownloadError: Error, LocalizedError {
+    public enum DownloadError: Error, LocalizedError {
         case requestUrlInvalid
         // 请求已经释放
         case requestRelease

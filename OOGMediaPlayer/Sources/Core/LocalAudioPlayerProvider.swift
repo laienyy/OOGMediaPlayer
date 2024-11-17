@@ -78,7 +78,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     
     public var audioPlayer: AVAudioPlayer?
     
+    // 淡入模式
     open var playFadeMode: LocalAudioVolumeFadeMode = .none
+    // 是否已淡入，可通过 resetFadedFlag 重置（ 为 LocalAudioVolumeFadeMode.once 时所使用 ）
     open var isFaded: Bool = false
     
     // 获取文件Data的超时时间
@@ -298,14 +300,14 @@ extension LocalAudioPlayerProvider {
         }
         // 选出所有id相同的多媒体
         
-        let items = items.flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
+        let items = getItems().flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
         for item in items ?? [] {
             setItemStatus(item, status: status)
         }
     }
     
     func setItemStatus(_ item: LocalMediaPlayable, status: LocalMediaStatus) {
-        let sameItems = items.flatMap({ $0.mediaList })
+        let sameItems = getItems().flatMap({ $0.mediaList })
                              .compactMap({ $0 as? LocalMediaPlayable })
                              .filter { $0.resId == item.resId }
         

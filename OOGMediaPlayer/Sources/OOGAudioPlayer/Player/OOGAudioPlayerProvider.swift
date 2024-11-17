@@ -10,8 +10,7 @@ import Foundation
 public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     
     public var albumList: [Album] {
-        get { (self.items as? [Album]) ?? [] }
-        set { self.items = newValue }
+        get { (self.getItems() as? [Album]) ?? [] }
     }
     
     /// 是否使用缓存

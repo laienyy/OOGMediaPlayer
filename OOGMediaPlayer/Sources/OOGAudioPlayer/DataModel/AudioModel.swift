@@ -125,23 +125,37 @@ extension AudioModel: BGMSong {
         log(prefix: .mediaPlayer, "Download Request Canceled")
     }
     
+    public func getFileItem() -> FileItem {
+        return FileItem.bgm("resID_\(resId).mp3")
+    }
+    
+    public func hasCache() -> Bool {
+        return getFileItem().isDataValid()
+    }
+    
     /// 获取本地文件URL
     public func getLocalFileUrl(timeoutInterval: TimeInterval = 60) async throws -> URL {
-        guard let urlString = audio else {
-            throw NSError(domain: "Media Url is nil", code: -1)
-        }
-        
-        if useCache,
-           let fileInfo = FileItem.getCache(key: urlString),
-           fileInfo.isDataValid() { 
+        let fileInfo = getFileItem()
+        if useCache, fileInfo.isDataValid() {
             // 返回缓存
             updateFileProgress(.downloaded)
             log(prefix: .mediaPlayer, "Find cache for: 《 \(fileInfo.fileName) 》")
             return fileInfo.asFilePathUrl()
         }
         
+        return try await downloadFileData(timeoutInterval: timeoutInterval).asFilePathUrl()
+    }
+    
+    /// 下载文件，下载完成保存至本地，并返回文件信息
+    @discardableResult
+    public func downloadFileData(timeoutInterval: TimeInterval) async throws -> FileItem {
+        
+        guard let urlString = audio else {
+            throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
+        }
+        
         guard let url = URL(string: urlString) else {
-            throw NSError(domain: "Media Url invalid", code: -1)
+            throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
         }
         
         updateFileProgress(.downloading(0.0))
@@ -149,7 +163,6 @@ extension AudioModel: BGMSong {
          * 无进度下载方式
          */
 //        let data = try await URLSession.shared.download(url: url)
-        
         
         /**
          * 有进度下载方式
@@ -166,14 +179,14 @@ extension AudioModel: BGMSong {
                 }
             }))
             
-            let filePath = FileItem.bgm(fileName)
-            try filePath.write(data: data)
+            let fileItem = getFileItem()
+            try fileItem.write(data: data)
             // 根据网络链接存储缓存文件路径
-            filePath.storeFilePath(key: urlString)
+            fileItem.storeFilePath(key: urlString)
             
             log(prefix: .mediaPlayer, "Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")")
             
-            return filePath.asFilePathUrl()
+            return fileItem
         } catch let error {
             updateFileProgress(.failed(error))
             throw error

@@ -20,9 +20,8 @@ public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     
     
     func loadOrReloadDataFromServer(_ info: GetBGMListApiInfo) async throws {
-        let models = try await getMusicFromServer(info, updateToCache: true)
-        self.albumList = models
-        reloadData(self.albumList)
+        let albums = try await getMusicFromServer(info, updateToCache: true)
+        reloadData(albums)
     }
 
 }

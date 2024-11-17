@@ -24,7 +24,6 @@ public extension FileItem {
     static func bgm(_ fileName: String) -> FileItem {
         return FileItem(root: .cache, directory: .backgroundMedia, fileName: fileName)
     }
-    
 }
 
 extension BgmPlayType {

@@ -12,6 +12,10 @@ extension LogPrefix {
     static let mediaPlayer = "MediaPlayer"
 }
 
+extension Notification.Name {
+    static let mediaPlayerControlDidChangedNextIndexPathForShuffleLoop = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didChangedNextIndexPathForShuffleLoop")
+}
+
 public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
 
 extension MediaPlayerControl {
@@ -118,6 +122,9 @@ open class MediaPlayerControl: NSObject {
     /// 循环模式
     public var loopMode: LoopMode = .order
     
+    /// 下一首多媒体的位置
+    private var nextIndexPathForShuffleLoop: IndexPath?
+    
     /// 播放历史
     public var history: [HistoryItem] = []
     /// 当前播放位置，停止时为`nil`
@@ -132,7 +139,7 @@ open class MediaPlayerControl: NSObject {
     public var lastPlayDirection = PlayDirection.next
     
     /// 多媒体条目
-    var items: [any MediaAlbum] = .init()
+    private var items: [any MediaAlbum] = .init()
     
     
     /**
@@ -160,8 +167,12 @@ open class MediaPlayerControl: NSObject {
         return media(at: indexPath)
     }
     
+    open func getItems() -> [any MediaAlbum] {
+        return items
+    }
+    
     /**
-     *  刷新播放列表
+     *  刷新播放列表（不支持自动纠正`currentIndexPath`）
      *
      *  调用这个函数会重新定位 `currentIndexPath`
      */
@@ -173,11 +184,105 @@ open class MediaPlayerControl: NSObject {
         
         self.items = items
         
+        
+        if let _ = nextIndexPathForShuffleLoop {
+            // 如果有预设，重设随机模式的下一曲index
+            nextIndexPathForShuffleLoop = getValidMediaRandomIndexPath()
+        }
+        
         if let media = playingMedia {
             // 重新定位正在播放的歌曲的下标
             resetCurrentIndexBy(media)
         }
         
+    }
+    
+    /// 刷新专辑（不支持自动纠正`currentIndexPath`）
+    open func reload(section: Int, _ album: any MediaAlbum) {
+        guard items.count > section else {
+            return
+        }
+        
+        if let next = nextIndexPathForShuffleLoop, next.section >= section {
+            // 纠正随机播放下一首歌曲的位置
+            if next.section == section {
+                nextIndexPathForShuffleLoop = nil
+            } else if next.section > section {
+                nextIndexPathForShuffleLoop = getValidMediaRandomIndexPath()
+            }
+        }
+        
+        items[section] = album
+    }
+    
+    /// 插入专辑（支持自动纠正`currentIndexPath`）
+    open func insert(section: Int, _ album: any MediaAlbum) {
+        guard items.count >= section else {
+            return
+        }
+        
+        if let current = currentIndexPath {
+            // 纠正当前播放多媒体的位置
+            if current.section > section {
+                let new = IndexPath(row: current.row, section: current.section + 1)
+                currentIndexPath = new
+                log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(new) to \(new)")
+            }
+        }
+        
+        if let next = nextIndexPathForShuffleLoop, next.section >= section {
+            // 纠正随机播放下一首歌曲的位置
+            updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section + 1))
+        }
+        
+        items.insert(album, at: section)
+    }
+    
+    /// 移除专辑（支持自动纠正`currentIndexPath`）
+    open func remove(section: Int) {
+        guard items.count > section else {
+            return
+        }
+        
+        if let current = currentIndexPath {
+            // 纠正当前播放多媒体的位置
+            if current.section > section {
+                let new = IndexPath(row: current.row, section: current.section - 1)
+                currentIndexPath = new
+                log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(current) to \(new)")
+            }
+        }
+        
+        if let next = nextIndexPathForShuffleLoop, next.section >= section {
+            // 纠正随机播放下一首歌曲的位置
+            if next.section == section {
+                nextIndexPathForShuffleLoop = nil
+                updateNextIndexPathForShuffleLoop(nil)
+            } else if next.section > section {
+                updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section - 1))
+            }
+        }
+        
+        items.remove(at: section)
+    }
+    
+    /// 预设随机模式下的下一个播放条目位置（自己指定）
+    open func presetNextIndexPathForShuffleLoop(_ indexPath: IndexPath) {
+        updateNextIndexPathForShuffleLoop(indexPath)
+    }
+    
+    /// 预设随机模式下的下一个播放条目位置（内部获取随机一个有效的条目）
+    open func presetNextIndexPathForShuffleLoop() -> IndexPath? {
+        updateNextIndexPathForShuffleLoop(getValidMediaRandomIndexPath())
+        return nextIndexPathForShuffleLoop
+    }
+    
+    /// 更新随机模式的下一个播放条目
+    func updateNextIndexPathForShuffleLoop(_ indexPath: IndexPath?) {
+        nextIndexPathForShuffleLoop = indexPath
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .mediaPlayerControlDidChangedNextIndexPathForShuffleLoop, object: self)
+        }
     }
     
     /// 播放下一条
@@ -188,6 +293,8 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
+        // 删除随机播放模式下的指定位置
+        nextIndexPathForShuffleLoop = nil
         toPlay(indexPath: indexPath)
     }
     
@@ -461,8 +568,8 @@ public extension MediaPlayerControl {
             return currentIndexPath
             
         case .shuffle:
-            // 随机循环
-            return getValidMediaRandomIndexPath()
+            // 随机循环 （已有指定的播放位置则返回指定的位置）
+            return nextIndexPathForShuffleLoop ?? getValidMediaRandomIndexPath()
             
         case .album:
             // 歌单、专辑循环
