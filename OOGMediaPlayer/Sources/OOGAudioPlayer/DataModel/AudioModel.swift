@@ -107,7 +107,7 @@ extension AudioModel: BGMSong {
     }
     /// 文件名
     public var fileName: String {
-        return musicName ?? ""
+        return displayName ?? ""
     }
     /// 是否有效
     public var isValid: Bool {
