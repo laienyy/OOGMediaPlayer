@@ -134,7 +134,7 @@ extension AudioPlayerOwner {
         album.mediaList = favSongs
         
         if let index = playerProvider.albumList.firstIndex(where: { $0.isFavoriteAlbum }) {
-            playerProvider.albumList[index] = album
+            playerProvider.reload(section: index, album)
         } else {
             var list = playerProvider.albumList
             list.insert(album, at: 0)

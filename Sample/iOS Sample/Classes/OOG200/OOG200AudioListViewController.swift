@@ -127,7 +127,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     }
     
     // album - 传入点击所属的album对象
-    func favAlbumAddItem(_ audio: AudioModel, album: AudioAlbumModel) {
+    func addFaviteAudio(_ audio: AudioModel, album: AudioAlbumModel) {
         
         settings.setFavorite(for: audio, true)
         
@@ -162,7 +162,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             guard let `self` = self else { return }
             guard self.playerProvider.albumList.first?.isFavoriteAlbum ?? false else {
                 // 插入喜欢section
-                self.playerProvider.albumList.insert(favAlbum, at: 0)
+                self.playerProvider.insert(section: 0, favAlbum)
                 self.tableView.insertSections([0], with: .automatic)
                 return
             }
@@ -203,7 +203,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     }
     
     // album - 传入点击所属的album对象
-    func favAlbumRemoveItem(_ audio: AudioModel, album: AudioAlbumModel) {
+    func removeFaviteAudio(_ audio: AudioModel, album: AudioAlbumModel) {
         
         settings.setFavorite(for: audio, false)
         
@@ -229,8 +229,10 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             
             guard favAlbum.mediaList.count > 0 else {
                 // 歌曲数量为0，删除section
-                self.playerProvider.albumList.removeAll(where: { $0.isFavoriteAlbum })
-                self.tableView.deleteSections([0], with: .automatic)
+                if self.playerProvider.albumList.first?.isFavoriteAlbum ?? false {
+                    self.playerProvider.remove(section: 0)
+                    self.tableView.deleteSections([0], with: .automatic)
+                }
                 return
             }
             
@@ -244,8 +246,10 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             self.tableView.deleteRows(at: [indexPath], with: .bottom)
             
         } completion: { finished in
-            self.playerProvider.albumList = self.playerProvider.albumList
+            // 刷新整个列表是为了刷新`红心`的现实状态状态
+            self.playerProvider.reloadData(self.playerProvider.albumList)
             self.tableView.reloadData()
+            
             if let song = currentSong {
                 // 重设当前播放歌曲下标，从喜爱列表移除正在播放的歌曲，可能会导致currentIndexPath错误，并导致播放状态等出现未正常变化的问题
                 self.playerProvider.resetCurrentIndexBy(song)
@@ -308,14 +312,13 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         cell.favoriteAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
+            cell.isFavorite = !cell.isFavorite
+            
             let isFavorite = self.settings.isFavorite(song)
-            if album.isFavoriteAlbum {
-                cell.isFavorite = !isFavorite
-            }
             if !isFavorite == true {
-                favAlbumAddItem(song, album: album)
+                addFaviteAudio(song, album: album)
             } else {
-                favAlbumRemoveItem(song, album: album)
+                removeFaviteAudio(song, album: album)
             }
         }
         

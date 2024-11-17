@@ -95,7 +95,56 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
         playerProvider.delegate = self
         syncSubsubviewsContentWithSettings()
         
+        loadNotifications()
         loadPlayer()
+    }
+    
+    func loadNotifications() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(didStartPlay),
+                                               name: .oogAudioPlayerDidStartPlayAudioNotification,
+                                               object: playerProvider)
+    }
+    
+    @objc func didStartPlay(_ notification: Notification) {
+        
+        /* * * * * * * 处理预下载 * * * * * */
+        
+        var preDownloadAudio: AudioModel?
+        if playerProvider.loopMode == .shuffle {
+            // 随机播放模式下特殊处理
+            if let indexPath = playerProvider.presetNextIndexPathForShuffleLoop() {
+                preDownloadAudio = playerProvider.media(at: indexPath) as? AudioModel
+            }
+        } else {
+            // 其他播放模式
+            if let indexPath = playerProvider.getNextMediaIndexPath() {
+                preDownloadAudio = playerProvider.media(at: indexPath) as? AudioModel
+            }
+        }
+        
+        if let audio = preDownloadAudio {
+            
+            guard !audio.hasCache() else {
+                print("下一首歌曲已有缓存 - 《 \(audio.fileName) 》")
+                return
+            }
+            
+            guard audio.isDownloading == false else {
+                print("下一首歌曲已在下载中 - 《 \(audio.fileName) 》")
+                return
+            }
+            
+            Task {
+                do {
+                    print("开始预下载下一首歌曲 - 《 \(audio.fileName) 》")
+                    try await audio.downloadFileData(timeoutInterval: 60)
+                    print("预下载下一首歌曲完成 - 《 \(audio.fileName) 》")
+                } catch let error {
+                    print("预下载下一首歌曲出错 - 《 \(audio.fileName) 》，原因：", error)
+                }
+            }
+        }
     }
     
     func loadPlayer() {
