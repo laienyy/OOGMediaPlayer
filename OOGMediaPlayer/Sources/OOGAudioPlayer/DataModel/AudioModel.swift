@@ -107,7 +107,7 @@ extension AudioModel: BGMSong {
     }
     /// 文件名
     public var fileName: String {
-        return musicName ?? ""
+        return displayName ?? ""
     }
     /// 是否有效
     public var isValid: Bool {
@@ -149,6 +149,10 @@ extension AudioModel: BGMSong {
     /// 下载文件，下载完成保存至本地，并返回文件信息
     @discardableResult
     public func downloadFileData(timeoutInterval: TimeInterval) async throws -> FileItem {
+        
+        guard !downloadProgress.isDownloading else {
+            throw OOGMediaPlayerError.DownloadError.hasBeenDownloading
+        }
         
         guard let urlString = audio else {
             throw OOGMediaPlayerError.DownloadError.requestUrlInvalid

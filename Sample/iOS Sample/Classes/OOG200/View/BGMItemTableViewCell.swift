@@ -11,7 +11,7 @@ import OOGMediaPlayer
 
 class BGMItemTableViewCell: UITableViewCell {
 
-    enum Status {
+    enum Status: String {
         case idle
         case downloading
         case playing
@@ -116,7 +116,6 @@ class BGMItemTableViewCell: UITableViewCell {
             guard let `self` = self, let currentModel = self.model, currentModel.resId == item.resId else {
                 return false
             }
-            print("Status changed - [\(status)] for 《 \(item.fileName) 》")
             self.updateStatusByModel()
             return true
         }

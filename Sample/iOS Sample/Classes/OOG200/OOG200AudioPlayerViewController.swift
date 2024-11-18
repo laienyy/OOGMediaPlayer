@@ -415,11 +415,6 @@ extension OOG200AudioPlayerViewController: MediaPlayerControlDelegate {
     
     func mediaPlayerControl(_ provider: MediaPlayerControl, shouldPlay indexPath: IndexPath, current: IndexPath?) -> IndexPath? {
         
-        guard let item = playerProvider.getSong(at: indexPath), !item.subscription else {
-            let next = nextPlayableIndexPath(from: indexPath)
-            return next
-        }
-        
         guard let media = playerProvider.getSong(at: indexPath) else {
             playerWidgetView.audioNameLabel.text = "无"
             return indexPath
