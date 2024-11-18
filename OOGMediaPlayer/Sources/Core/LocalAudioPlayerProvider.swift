@@ -151,14 +151,18 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         guard !isIndexPathInPreparingQueue(indexPath) else {
             // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
             log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
-            setItemStatus(item, status: .downloading)
+            await MainActor.run {
+                setItemStatus(item, status: .downloading)
+            }
 //            throw OOGMediaPlayerError.MediaPlayerControlError.alreadyBeenPreparing
             return
         }
         
         // 加入等待队列
         appendToPreparingQueue(item)
-        setItemStatus(item, status: .downloading)
+        await MainActor.run {
+            setItemStatus(item, status: .downloading)
+        }
         
         var fileUrl: URL
         do {
@@ -171,16 +175,22 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         // 移出等待队列
         removeFromPreparingQueue(item)
-        setItemStatus(item, status: .prepareToPlay)
+        await MainActor.run {
+            setItemStatus(item, status: .prepareToPlay)
+        }
         
         if currentItem()?.resId != media(at: indexPath)?.resId {
             // 不是当前需要播放的顺序，终止播放流程
-            setItemStatus(item, status: .stoped)
+            await MainActor.run {
+                setItemStatus(item, status: .stoped)
+            }
             throw OOGMediaPlayerError.LocalAudioPlayerError.operationExpired
         }
         
         guard fileUrl.isFileURL else {
-            setItemStatus(item, status: .error)
+            await MainActor.run {
+                setItemStatus(item, status: .error)
+            }
             log(prefix: .mediaPlayer, "Play item \(indexPath.descriptionForPlayer) failed, The url is not FileURL")
             throw OOGMediaPlayerError.LocalAudioPlayerError.fileUrlInvalid
         }
@@ -190,7 +200,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer.delegate = self
         
         guard audioPlayer.prepareToPlay() else {
-            setItemStatus(item, status: .error)
+            await MainActor.run {
+                setItemStatus(item, status: .error)
+            }
             throw LocalMediaPlayerError.prepareToPlayFailed
         }
         

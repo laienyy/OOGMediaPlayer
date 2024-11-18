@@ -350,7 +350,9 @@ open class MediaPlayerControl: NSObject {
             do {
                 // 准备开始播放
                 try await prepareToPlayItem(at: next)
-                alreadyToPlay(next)
+                await MainActor.run {
+                    alreadyToPlay(next)
+                }
             } catch let error {
                 log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
                 playError(at: next, error: error)
