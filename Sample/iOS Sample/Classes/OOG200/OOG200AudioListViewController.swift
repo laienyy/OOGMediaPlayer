@@ -346,7 +346,9 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
             return
         }
         
-        playerProvider.play(indexPath: indexPath)
+        Task {
+            try await playerProvider.play(indexPath: indexPath)
+        }
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
