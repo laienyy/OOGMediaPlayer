@@ -83,9 +83,12 @@ enum OOGMediaPlayerError {
     
     // 下载错误
     public enum DownloadError: Error, LocalizedError {
+        // 下载的 URL 无效
         case requestUrlInvalid
         // 请求已经释放
         case requestRelease
+        // 正在下载
+        case hasBeenDownloading
         
         public var errorDescription: String? {
             switch self {
@@ -93,6 +96,8 @@ enum OOGMediaPlayerError {
                 return "Request url is invalid"
             case .requestRelease: 
                 return "Request memory was released"
+            case .hasBeenDownloading:
+                return "Request has been downloading"
             }
         }
     }

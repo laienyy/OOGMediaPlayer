@@ -152,7 +152,8 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
             // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
             log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
             setItemStatus(item, status: .downloading)
-            throw OOGMediaPlayerError.MediaPlayerControlError.alreadyBeenPreparing
+//            throw OOGMediaPlayerError.MediaPlayerControlError.alreadyBeenPreparing
+            return
         }
         
         // 加入等待队列
@@ -214,11 +215,18 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         }
         
         guard let audioPlayer = audioPlayer else {
+
+            if playerStatus == .prepareToPlay {
+                log(prefix: .mediaPlayer, "Ignore play for this time, the `AVAudioPlayer` is preparing")
+                return
+            }
+            
             if isExistsValidMedia() {
                 playNext()
             } else {
                 log(prefix: .mediaPlayer, "Ignore play for this time, there have no valid media to play")
             }
+            
             return
         }
         
@@ -312,7 +320,8 @@ extension LocalAudioPlayerProvider {
                              .filter { $0.resId == item.resId }
         
         let itemsDescription = sameItems.map({ "\($0)" }).joined(separator: "\n\t")
-        log(prefix: .mediaPlayer, "Set status \(status) to: [\n\t\(itemsDescription)\n]")
+
+        log(prefix: .mediaPlayer, "Set status \(status) to: \(item)")
         
         if Thread.isMainThread {
             sameItems.forEach {

@@ -3,4 +3,23 @@
    uuid = "394F557A-8C5C-4F02-A7F4-99D5C80A5FE3"
    type = "0"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9F105EF6-FCE2-4E8D-B06B-90AA5DC34E52"
+            shouldBeEnabled = "Yes"
+            condition = "Thread.isMainThread == false"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Sample/iOS Sample/Classes/OOG200/View/AudioPlayerWidgetView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "82"
+            endingLineNumber = "82"
+            landmarkName = "setAudioName(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

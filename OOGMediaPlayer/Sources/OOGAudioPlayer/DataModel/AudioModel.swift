@@ -150,6 +150,10 @@ extension AudioModel: BGMSong {
     @discardableResult
     public func downloadFileData(timeoutInterval: TimeInterval) async throws -> FileItem {
         
+        guard !downloadProgress.isDownloading else {
+            throw OOGMediaPlayerError.DownloadError.hasBeenDownloading
+        }
+        
         guard let urlString = audio else {
             throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
         }

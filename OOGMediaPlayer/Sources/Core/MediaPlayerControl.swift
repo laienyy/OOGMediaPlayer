@@ -338,18 +338,18 @@ open class MediaPlayerControl: NSObject {
         
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath).debugDescription)
         
-        // 暂停当前播放
-        if currentIndexPath != nil {
-            stop()
-        }
-        
-        
         let delegateResponseIndexPath = await MainActor.run {
             return delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
         }
         
+        // 暂停当前播放
+        if currentIndexPath != nil {
+            stop()
+        }
+
         // 如果 delegate == nil，直接使用 currentIndexPath，不能够直接使用 ?? 添加默认indexPath
         let next = delegate == nil ? indexPath : delegateResponseIndexPath
+        currentIndexPath = next
         
         guard let next = next else {
             log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
@@ -358,7 +358,6 @@ open class MediaPlayerControl: NSObject {
             }
             throw OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem
         }
-        currentIndexPath = next
         
         // 更新`indexPath` 可能由delegate返回一个新的
         await MainActor.run {
