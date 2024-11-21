@@ -343,7 +343,7 @@ open class MediaPlayerControl: NSObject {
         }
         
         // 暂停当前播放
-        if currentIndexPath != nil {
+        if currentIndexPath != nil, currentIndexPath != indexPath {
             stop()
         }
 
