@@ -165,7 +165,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                 playerProvider.playFadeMode = .once(8.0)
                 
                 // 根据设置恢复播放
-                if !playerProvider.resumePlay(by: settings) {
+                if !playerProvider.resumePlay(by: settings, playAutomatically: true) {
                     // 根据设置未回复播放（大概率是未曾开始播放过），此处开始自动播放第一首
                     playerProvider.playNext()
                 }

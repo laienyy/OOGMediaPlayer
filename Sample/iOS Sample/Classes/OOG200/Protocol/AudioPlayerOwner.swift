@@ -151,7 +151,7 @@ extension AudioPlayerOwner {
     }
     
     func resumePlayAudioBySettings() {
-        playerProvider.resumePlay(by: settings)
+        playerProvider.resumePlay(by: settings, playAutomatically: false)
     }
     
     func playAudioIfDataSourceExists() {
