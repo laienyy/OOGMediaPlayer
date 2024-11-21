@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum OOGMediaPlayerError {
+public enum OOGMediaPlayerError {
     
     public enum MediaPlayerControlError: Error, LocalizedError {
         // MediaPlayerControl.isEnable 是 FALSE

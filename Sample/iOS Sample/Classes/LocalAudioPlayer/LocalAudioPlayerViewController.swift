@@ -149,7 +149,7 @@ extension LocalAudioPlayerViewController {
         vc.list = playerProvider.albumList
         vc.playerProvider = playerProvider
         vc.selectAction = { [weak self] vc, indexPath in
-            self?.playerProvider.play(indexPath: indexPath)
+            self?.playerProvider.playSimple(indexPath: indexPath)
         }
         listViewController = vc
         navigationController?.pushViewController(vc, animated: true)

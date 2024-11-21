@@ -295,7 +295,9 @@ open class MediaPlayerControl: NSObject {
         }
         // 删除随机播放模式下的指定位置
         nextIndexPathForShuffleLoop = nil
-        toPlay(indexPath: indexPath)
+        Task {
+            try await toPlay(indexPath: indexPath)
+        }
     }
     
     /// 播放上一条
@@ -306,63 +308,76 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
-        toPlay(indexPath: indexPath)
+        Task {
+            try await toPlay(indexPath: indexPath)
+        }
+    }
+    
+    open func playSimple(indexPath: IndexPath) {
+        Task {
+            try await play(indexPath: indexPath)
+        }
     }
     
     /// 播放指定索引 （不受`loopModel`影响）
-    open func play(indexPath: IndexPath) {
+    open func play(indexPath: IndexPath) async throws {
         lastPlayDirection = .specified
-        toPlay(indexPath: indexPath)
+        try await toPlay(indexPath: indexPath)
     }
     
     /// 根据索引播放
-    private func toPlay(indexPath: IndexPath) {
+    open func toPlay(indexPath: IndexPath) async throws {
         
         guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, enable is false")
-            playError(at: indexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
-            return
+            await MainActor.run {
+                playError(at: indexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
+            }
+            throw OOGMediaPlayerError.MediaPlayerControlError.isNotEnable
         }
         
         log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath).debugDescription)
         
-        let delegateResponseIndexPath = delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
+        let delegateResponseIndexPath = await MainActor.run {
+            return delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
+        }
         
         // 暂停当前播放
         if currentIndexPath != nil {
             stop()
         }
-        
+
         // 如果 delegate == nil，直接使用 currentIndexPath，不能够直接使用 ?? 添加默认indexPath
         let next = delegate == nil ? indexPath : delegateResponseIndexPath
         currentIndexPath = next
         
         guard let next = next else {
             log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
-            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
-            return
+            await MainActor.run {
+                playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
+            }
+            throw OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem
         }
         
         // 更新`indexPath` 可能由delegate返回一个新的
-        delegate?.mediaPlayerControl(self, willPlay: next)
-        
-        Task {
-            do {
-                // 准备开始播放
-                try await prepareToPlayItem(at: next)
-                await MainActor.run {
-                    alreadyToPlay(next)
-                }
-            } catch let error {
-                log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
-                playError(at: next, error: error)
-            }
+        await MainActor.run {
+            delegate?.mediaPlayerControl(self, willPlay: next)
+        }
+
+        do {
+            // 准备开始播放
+            try await prepareToPlayItem(at: next)
+            try await alreadyToPlay(next)
+        } catch let error {
+            log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
+            playError(at: next, error: error)
+            throw error
         }
         
     }
     
     /// 已经准备好播放，需要判断
-    private func alreadyToPlay(_ indexPath: IndexPath) {
+    open func alreadyToPlay(_ indexPath: IndexPath) async throws {
 
         let next = indexPath
         guard currentItem()?.resId == media(at: next)?.resId else {
@@ -378,7 +393,9 @@ open class MediaPlayerControl: NSObject {
             history.append(.init(media: item, indexPath: next))
         }
         // 播放
-        play()
+        await MainActor.run {
+            play()
+        }
     }
     
     
