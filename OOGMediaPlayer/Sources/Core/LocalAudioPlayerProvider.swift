@@ -211,11 +211,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
     
     open override func pause() {
-        if playerStatus == .playing {
-            super.pause()
-            audioPlayer?.pause()
-            setCurrentItemStatus(.paused)
-        }
+        super.pause()
+        audioPlayer?.pause()
+        setCurrentItemStatus(.paused)
     }
     
     /// 播放
