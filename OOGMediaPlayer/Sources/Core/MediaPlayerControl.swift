@@ -326,7 +326,7 @@ open class MediaPlayerControl: NSObject {
     }
     
     /// 根据索引播放
-    open func toPlay(indexPath: IndexPath) async throws {
+    open func toPlay(indexPath: IndexPath, playAutomaticly: Bool = true) async throws {
         
         guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, enable is false")
@@ -367,7 +367,19 @@ open class MediaPlayerControl: NSObject {
         do {
             // 准备开始播放
             try await prepareToPlayItem(at: next)
-            try await alreadyToPlay(next)
+            
+            // 自动开始播放
+            await MainActor.run {
+                alreadyToPlay(next)
+                
+                /**
+                 * playerStatus != .prepareToPlay：说明有其他操作，或者在等待加载资源的过程中取消了播放状态，所以所以将不做自动播放处理
+                 */
+                if playAutomaticly, playerStatus != .prepareToPlay {
+                    play()
+                }
+            }
+            
         } catch let error {
             log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
             playError(at: next, error: error)
@@ -377,7 +389,7 @@ open class MediaPlayerControl: NSObject {
     }
     
     /// 已经准备好播放，需要判断
-    open func alreadyToPlay(_ indexPath: IndexPath) async throws {
+    open func alreadyToPlay(_ indexPath: IndexPath) {
 
         let next = indexPath
         guard currentItem()?.resId == media(at: next)?.resId else {
@@ -391,10 +403,6 @@ open class MediaPlayerControl: NSObject {
         
         if let item = media(at: next) {
             history.append(.init(media: item, indexPath: next))
-        }
-        // 播放
-        await MainActor.run {
-            play()
         }
     }
     

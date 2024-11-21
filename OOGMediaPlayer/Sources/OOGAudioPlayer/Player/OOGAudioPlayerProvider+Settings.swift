@@ -37,7 +37,7 @@ public extension OOGAudioPlayerProvider {
      
      */
     @discardableResult
-    func resumePlay(by settings: OOGAudioPlayerSettings) -> Bool {
+    func resumePlay(by settings: OOGAudioPlayerSettings, playAutomatically: Bool) -> Bool {
         
         var specificIndexPath: IndexPath?
         
@@ -79,7 +79,9 @@ public extension OOGAudioPlayerProvider {
         }
         
         if let indexPath = specificIndexPath {
-            playSimple(indexPath: indexPath)
+            Task {
+                try await toPlay(indexPath: indexPath, playAutomaticly: playAutomatically)
+            }
         }
         
         return specificIndexPath != nil
