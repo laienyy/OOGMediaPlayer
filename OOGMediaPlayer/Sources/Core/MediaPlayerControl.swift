@@ -12,7 +12,7 @@ extension LogPrefix {
     static let mediaPlayer = "MediaPlayer"
 }
 
-extension Notification.Name {
+public extension Notification.Name {
     
     /// 通知 - 多媒体播放器随机循环模式下的下一条目发生变化
     static let mediaPlayerControlDidChangedNextIndexPathForShuffleLoop = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didChangedNextIndexPathForShuffleLoop")
