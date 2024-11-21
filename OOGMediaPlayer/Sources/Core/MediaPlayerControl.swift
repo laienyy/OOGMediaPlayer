@@ -13,7 +13,12 @@ extension LogPrefix {
 }
 
 extension Notification.Name {
+    
+    /// 通知 - 多媒体播放器随机循环模式下的下一条目发生变化
     static let mediaPlayerControlDidChangedNextIndexPathForShuffleLoop = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didChangedNextIndexPathForShuffleLoop")
+    
+    /// 通知 - 已经准备好开始播放音频
+    static let mediaPlayerControlAlreadyToPlayAudio = Notification.Name("com.oog.localAudioPlayerProvider.notification.alreadyToPlayAudio")
 }
 
 public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
@@ -358,11 +363,6 @@ open class MediaPlayerControl: NSObject {
             }
             throw OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem
         }
-        
-        // 更新`indexPath` 可能由delegate返回一个新的
-        await MainActor.run {
-            delegate?.mediaPlayerControl(self, willPlay: next)
-        }
 
         do {
             // 准备开始播放
@@ -370,6 +370,7 @@ open class MediaPlayerControl: NSObject {
             
             // 自动开始播放
             await MainActor.run {
+                
                 alreadyToPlay(next)
                 
                 /**
@@ -381,7 +382,12 @@ open class MediaPlayerControl: NSObject {
                  *      所以状态不是`prepareToPlay`时，打断自动播放处理流程
                  */
                 if playAutomaticly, playerStatus == .prepareToPlay {
+                    
+                    // 更新`indexPath` 可能由delegate返回一个新的
+                    delegate?.mediaPlayerControl(self, willPlay: next)
+                    
                     play()
+                    
                 }
             }
             
@@ -393,22 +399,21 @@ open class MediaPlayerControl: NSObject {
         
     }
     
-    /// 已经准备好播放，需要判断
+    /// 已经准备好播放，返回释放有效
     open func alreadyToPlay(_ indexPath: IndexPath) {
 
         let next = indexPath
-        guard currentItem()?.resId == media(at: next)?.resId else {
-            // 全局当前索引 != 本次流程需执行索引
-            let msg = "Play next item failed, the `currentIndexPath` is changed, Should play: \(self.currentIndexPath?.descriptionForPlayer ?? "Nil"), Now: \(next.descriptionForPlayer)"
-            log(prefix: .mediaPlayer, msg)
-            return
-        }
-        
-        log(prefix: .mediaPlayer, "Play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.resId ?? -1))")
+        log(prefix: .mediaPlayer, "Has already to play item at \(next.descriptionForPlayer) - \(currentItem()?.fileName ?? "unknown") (ID:\(currentItem()?.resId ?? -1))")
         
         if let item = media(at: next) {
             history.append(.init(media: item, indexPath: next))
         }
+        
+        var userInfo = ["indexPath" : indexPath] as [String : Any]
+        userInfo["album"] = self.album(at: indexPath.section)
+        userInfo["audio"] = self.media(at: indexPath)
+        
+        NotificationCenter.default.post(name: .mediaPlayerControlAlreadyToPlayAudio, object: self, userInfo: userInfo)
     }
     
     

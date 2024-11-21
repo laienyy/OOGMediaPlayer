@@ -221,6 +221,11 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     /// 播放
     override open func play() {
         
+        guard let indexPath = currentIndexPath else {
+            log(prefix: .mediaPlayer, "[ERR] Try to play failed, the `currentIndexPath` is nil")
+            return
+        }
+        
         guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, the `isEnable` is false")
             return
@@ -252,6 +257,8 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         super.play()
         setCurrentItemStatus(.playing)
         
+        // 更新`indexPath` 可能由delegate返回一个新的
+        delegate?.mediaPlayerControl(self, willPlay: indexPath)
         
         audioPlayer.volume = 0
         let didPlaying = audioPlayer.play()
