@@ -373,9 +373,14 @@ open class MediaPlayerControl: NSObject {
                 alreadyToPlay(next)
                 
                 /**
-                 * playerStatus != .prepareToPlay：说明有其他操作，或者在等待加载资源的过程中取消了播放状态，所以所以将不做自动播放处理
+                 * playerStatus != .prepareToPlay
+                 *     说明：
+                 *      1. 在等待`prepareToPlayItem`的时候，外部有其他操作
+                 *      2. 或者在等待加载资源的过程中取消了播放状态
+                 *
+                 *      所以状态不是`prepareToPlay`时，打断自动播放处理流程
                  */
-                if playAutomaticly, playerStatus != .prepareToPlay {
+                if playAutomaticly, playerStatus == .prepareToPlay {
                     play()
                 }
             }
