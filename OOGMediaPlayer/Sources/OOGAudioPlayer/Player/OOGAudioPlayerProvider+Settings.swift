@@ -18,10 +18,7 @@ public extension OOGAudioPlayerProvider {
         volume = settings.volumn
         loopMode = settings.loopMode
         isEnable = settings.isEnablePlayer
-
-        if let id = settings.currentAudioID, let indexPath = indexPathOf(mediaID: id) {
-            currentIndexPath = indexPath
-        }
+        
     }
     
     /**
