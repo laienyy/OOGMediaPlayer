@@ -399,6 +399,10 @@ open class MediaPlayerControl: NSObject {
                     
                     play()
                     
+                } else {
+                    
+                    pause()
+                    
                 }
             }
             
