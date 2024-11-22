@@ -298,8 +298,6 @@ open class MediaPlayerControl: NSObject {
             playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
-        // 删除随机播放模式下的指定位置
-        nextIndexPathForShuffleLoop = nil
         Task {
             try await toPlay(indexPath: indexPath)
         }
@@ -332,6 +330,9 @@ open class MediaPlayerControl: NSObject {
     
     /// 根据索引播放
     open func toPlay(indexPath: IndexPath, playAutomaticly: Bool = true) async throws {
+        
+        // 删除随机播放模式下的指定位置
+        nextIndexPathForShuffleLoop = nil
         
         guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, enable is false")

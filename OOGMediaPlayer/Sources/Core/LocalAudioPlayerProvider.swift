@@ -238,12 +238,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
                 return
             }
             
-            if isExistsValidMedia() {
-                playNext()
-            } else {
-                log(prefix: .mediaPlayer, "Ignore play for this time, there have no valid media to play")
-            }
-            
+            log(prefix: .mediaPlayer, "Ignore play for this time, there have no valid media to play")
             return
         }
         
