@@ -92,7 +92,7 @@ public extension OOGAudioPlayerProvider {
         guard let indexPath = indexPathOf(mediaID: id) else {
             return false
         }
-        playSimple(indexPath: indexPath)
+        load(indexPath: indexPath, autoPlay: true)
         return true
     }
     
@@ -117,7 +117,7 @@ public extension OOGAudioPlayerProvider {
                 return
             }
             let indexPath = IndexPath(row: 0, section: albumIndex)
-            playSimple(indexPath: indexPath)
+            load(indexPath: indexPath, autoPlay: true)
         }
         
     }

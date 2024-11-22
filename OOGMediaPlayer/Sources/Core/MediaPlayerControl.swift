@@ -318,16 +318,16 @@ open class MediaPlayerControl: NSObject {
         }
     }
     
-    open func playSimple(indexPath: IndexPath) {
+    open func load(indexPath: IndexPath, autoPlay: Bool = true) {
         Task {
-            try await play(indexPath: indexPath)
+            try await load(indexPath: indexPath, autoPlay: autoPlay)
         }
     }
     
     /// 播放指定索引 （不受`loopModel`影响）
-    open func play(indexPath: IndexPath) async throws {
+    open func load(indexPath: IndexPath, autoPlay: Bool) async throws {
         lastPlayDirection = .specified
-        try await toPlay(indexPath: indexPath)
+        try await toPlay(indexPath: indexPath, playAutomaticly: autoPlay)
     }
     
     /// 根据索引播放

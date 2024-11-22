@@ -161,7 +161,7 @@ extension AudioPlayerOwner {
                 if let previousAudioID = settings.currentAudioID, let indexPath = playerProvider.indexPathOf(mediaID: previousAudioID) {
                     // 播放之前
                     Task {
-                        try await playerProvider.play(indexPath: indexPath)
+                        try await playerProvider.load(indexPath: indexPath)
                     }
                 } else {
                     playerProvider.playNext()

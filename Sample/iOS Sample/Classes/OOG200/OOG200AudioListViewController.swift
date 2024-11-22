@@ -347,7 +347,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         }
         
         Task {
-            try await playerProvider.play(indexPath: indexPath)
+            try await playerProvider.load(indexPath: indexPath)
         }
     }
     
