@@ -350,14 +350,13 @@ open class MediaPlayerControl: NSObject {
         
         // 暂停当前播放
         
-        if let indexPathNow = currentIndexPath, let audio = media(at: indexPathNow) {
-            if audio.resId == media(at: indexPath)?.resId {
-                // 音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
-                currentIndexPath = indexPath
-                return
-            } else {
-                stop()
-            }
+        if let indexPathNow = currentIndexPath,
+           let audio = media(at: indexPathNow),
+           audio.resId == media(at: indexPath)?.resId {
+            // 音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
+            currentIndexPath = indexPath
+        } else {
+            stop()
         }
         
         if currentIndexPath != nil, currentIndexPath != indexPath {
