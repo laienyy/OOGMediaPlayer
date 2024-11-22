@@ -354,13 +354,6 @@ open class MediaPlayerControl: NSObject {
             if audio.resId == media(at: indexPath)?.resId {
                 // 音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
                 currentIndexPath = indexPath
-                
-                if playerStatus == .playing {
-                    pause()
-                } else {
-                    play()
-                }
-                
                 return
             } else {
                 stop()
