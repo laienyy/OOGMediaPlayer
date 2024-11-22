@@ -135,7 +135,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
     
     func removeFromPreparingQueue(_ item: LocalMediaPlayable) {
-        preparingItems.removeAll(where: { $0.resId == item.resId } )
+        if let index = preparingItems.firstIndex(where: { $0.resId == item.resId }) {
+            preparingItems.remove(at: index)
+        }
         log(prefix: .mediaPlayer, "Remove Meida ID [ \(item.resId) ] from preparing queue")
     }
     
