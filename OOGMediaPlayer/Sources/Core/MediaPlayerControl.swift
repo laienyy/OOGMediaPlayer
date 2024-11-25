@@ -8,98 +8,6 @@
 import UIKit
 import AVFoundation
 
-extension LogPrefix {
-    static let mediaPlayer = "MediaPlayer"
-}
-
-public extension Notification.Name {
-    
-    /// 通知 - 多媒体播放器随机循环模式下的下一条目发生变化
-    static let mediaPlayerControlDidChangedNextIndexPathForShuffleLoop = Notification.Name(rawValue: "com.oog.localAudioPlayerProvider.notification.didChangedNextIndexPathForShuffleLoop")
-    
-    /// 通知 - 已经准备好开始播放音频
-    static let mediaPlayerControlAlreadyToPlayAudio = Notification.Name("com.oog.localAudioPlayerProvider.notification.alreadyToPlayAudio")
-}
-
-public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
-
-extension MediaPlayerControl {
-    
-    public enum LoopMode: String, Codable {
-        /// 无循环
-        case none
-        /// 顺序循环
-        case order
-        ///  专辑或歌单内循环
-        case album
-        /// 单曲循环
-        case single
-        /// 随机循环
-        case shuffle
-        
-        public var userInterfaceDisplay: String {
-            switch self {
-            case .none: return "无循环"
-            case .order: return "顺序循环"
-            case .album: return "专辑循环"
-            case .single: return "单曲循环"
-            case .shuffle: return "随机循环"
-            }
-        }
-    }
-    
-    public enum PlayerStatus: Int, Codable {
-        /// 停止
-        case stoped = 0
-        /// 准备播放
-        case prepareToPlay
-        /// 播放
-        case playing
-        /// 暂停
-        case paused
-        /// 播放完成
-        case finished
-        /// 播放错误
-        case error
-        
-        public func description() -> String {
-            switch self {
-            case .stoped:
-                return "Stop"
-            case .prepareToPlay:
-                return "Prepare to play next"
-            case .playing:
-                return "Playing"
-            case .paused:
-                return "Pause"
-            case .finished:
-                return "Finished"
-            case .error:
-                return "Error"
-            }
-        }
-        
-        public func userInterfaceDisplay() -> String {
-            switch self {
-            case .stoped:
-                return "停止"
-            case .prepareToPlay:
-                return "准备播放"
-            case .playing:
-                return "正在播放"
-            case .paused:
-                return "暂停播放"
-            case .finished:
-                return "播放完成"
-            case .error:
-                return "播放错误"
-            }
-        }
-    }
-}
-
-
-
 open class MediaPlayerControl: NSObject {
     
     // 播放历史
@@ -128,7 +36,7 @@ open class MediaPlayerControl: NSObject {
     public var loopMode: LoopMode = .order
     
     /// 下一首多媒体的位置
-    private var nextIndexPathForShuffleLoop: IndexPath?
+    public var nextIndexPathForShuffleLoop: IndexPath?
     
     /// 播放历史
     public var history: [HistoryItem] = []
@@ -144,33 +52,7 @@ open class MediaPlayerControl: NSObject {
     public var lastPlayDirection = PlayDirection.next
     
     /// 多媒体条目
-    private var items: [any MediaAlbum] = .init()
-    
-    
-    /**
-     根据 Media 重置 `CurrentIndexPath`，
-     
-        - Parameters:
-            - media: 目标
-            - playFirstIfNotCatch: 未找到当前播放的时候是否自动播放
-     */
-    open func resetCurrentIndexBy(_ media: MediaPlayable) {
-        currentIndexPath = indexPathOf(mediaID: media.resId)
-    }
-    
-    /// 获取上一条数据
-    open  func getHistoryLastItem() -> MediaPlayable? {
-        return history.last?.media
-    }
-    
-    /// 获取当前播放音频
-    open func currentItem() -> MediaPlayable? {
-        guard let indexPath = currentIndexPath else {
-            return nil
-        }
-        
-        return media(at: indexPath)
-    }
+    fileprivate var items: [any MediaAlbum] = .init()
     
     open func getItems() -> [any MediaAlbum] {
         return items
@@ -188,7 +70,6 @@ open class MediaPlayerControl: NSObject {
         let playingMedia = currentItem()
         
         self.items = items
-        
         
         if let _ = nextIndexPathForShuffleLoop {
             // 如果有预设，重设随机模式的下一曲index
@@ -272,6 +153,29 @@ open class MediaPlayerControl: NSObject {
         items.remove(at: section)
     }
     
+    
+    /**
+     根据 Media 重置 `CurrentIndexPath`，
+     
+        - Parameters:
+            - media: 目标
+            - playFirstIfNotCatch: 未找到当前播放的时候是否自动播放
+     */
+    open func resetCurrentIndexBy(_ media: MediaPlayable) {
+        currentIndexPath = indexPathOf(mediaID: media.resId)
+    }
+    
+    /// 获取上一条数据
+    open  func getHistoryLastItem() -> MediaPlayable? {
+        return history.last?.media
+    }
+    
+    /// 获取当前播放音频
+    open func currentItem() -> MediaPlayable? {
+        return currentIndexPath == nil ? nil : media(at: currentIndexPath!)
+    }
+    
+    
     /// 预设随机模式下的下一个播放条目位置（自己指定）
     open func presetNextIndexPathForShuffleLoop(_ indexPath: IndexPath) {
         updateNextIndexPathForShuffleLoop(indexPath)
@@ -291,30 +195,35 @@ open class MediaPlayerControl: NSObject {
         }
     }
     
+    
     /// 播放下一条
     open func playNext() {
+        Task {
+            try await playNext()
+        }
+    }
+    open func playNext() async throws {
         lastPlayDirection = .next
         guard let indexPath = getNextMediaIndexPath() else {
             log(prefix: .mediaPlayer, "Play next failed, not found invalid `indexPath`")
-            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
+            await playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
-        Task {
-            try await toPlay(indexPath: indexPath)
-        }
+        try await loadMedia(indexPath: indexPath, playDirection: lastPlayDirection)
     }
     
     /// 播放上一条
     open func playPrevious() {
+        Task { try await playPrevious() }
+    }
+    open func playPrevious() async throws {
         lastPlayDirection = .previous
         guard let indexPath = getPreviousIndexPath() else {
             log(prefix: .mediaPlayer, "Play previous failed, not found invalid `indexPath`")
-            playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
+            await playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             return
         }
-        Task {
-            try await toPlay(indexPath: indexPath)
-        }
+        try await loadMedia(indexPath: indexPath, playDirection: .previous)
     }
     
     open func load(indexPath: IndexPath, autoPlay: Bool = true) {
@@ -326,50 +235,57 @@ open class MediaPlayerControl: NSObject {
     /// 播放指定索引 （不受`loopModel`影响）
     open func load(indexPath: IndexPath, autoPlay: Bool) async throws {
         lastPlayDirection = .specified
-        try await toPlay(indexPath: indexPath, playAutomaticly: autoPlay)
+        try await loadMedia(indexPath: indexPath, playAutomaticly: autoPlay, playDirection: lastPlayDirection)
     }
     
     /// 根据索引播放
-    open func toPlay(indexPath: IndexPath, playAutomaticly: Bool = true) async throws {
+    open func loadMedia(indexPath next: IndexPath, playAutomaticly: Bool = true, playDirection: PlayDirection) async throws {
+        
+        lastPlayDirection = playDirection
         
         // 删除随机播放模式下的指定位置
         nextIndexPathForShuffleLoop = nil
         
         guard isEnable else {
-            log(prefix: .mediaPlayer, "Try to play failed, enable is false")
-            await MainActor.run {
-                playError(at: indexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
-            }
+            log(prefix: .mediaPlayer, "Try to load failed, `enable` is false")
+            await playError(at: next, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
             throw OOGMediaPlayerError.MediaPlayerControlError.isNotEnable
         }
         
-        log(prefix: .mediaPlayer, "Should play item at - (\(indexPath.section), \(indexPath.row))", media(at: indexPath).debugDescription)
-        
-        let delegateResponseIndexPath = await MainActor.run {
-            return delegate?.mediaPlayerControl(self, shouldPlay: indexPath, current: currentIndexPath)
-        }
+        log(prefix: .mediaPlayer, "Should load item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
         
         // 暂停当前播放
-        
         if let indexPathNow = currentIndexPath,
            let audio = media(at: indexPathNow),
-           audio.resId == media(at: indexPath)?.resId {
-            // 音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
-            currentIndexPath = indexPath
+           audio.resId == media(at: next)?.resId {
+            /**
+             *  音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
+             *
+             *  正常情况此处不应该有重复的`Media`出现，需要 play/pause 切换，在外部自行判断，此处只为避免重复加载一首歌，而出现超出预期的情况
+             */
+            log(prefix: .mediaPlayer, "Try load same one, ignore load this item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
+            currentIndexPath = next
+            return
         } else {
-            stop()
+            await stop()
         }
+
         
-        if currentIndexPath != nil, currentIndexPath != indexPath {
-            stop()
+        let delegateResponseIndexPath = await MainActor.run {
+            return delegate?.mediaPlayerControl(self, shouldPlay: next, current: currentIndexPath)
+        }
+
+        
+        if currentIndexPath != nil, currentIndexPath != next {
+            await stop()
         }
 
         // 如果 delegate == nil，直接使用 currentIndexPath，不能够直接使用 ?? 添加默认indexPath
-        let next = delegate == nil ? indexPath : delegateResponseIndexPath
+        let next = delegate == nil ? next : delegateResponseIndexPath
         currentIndexPath = next
         
         guard let next = next else {
-            log(prefix: .mediaPlayer, "Play next item failed, there is no `indexPath` specified")
+            log(prefix: .mediaPlayer, "Load next item failed, there is no `indexPath` specified")
             await MainActor.run {
                 playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             }
@@ -394,28 +310,24 @@ open class MediaPlayerControl: NSObject {
                  *      所以状态不是`prepareToPlay`时，打断自动播放处理流程
                  */
                 if playAutomaticly, playerStatus == .prepareToPlay {
-                    
                     // 更新`indexPath` 可能由delegate返回一个新的
                     delegate?.mediaPlayerControl(self, willPlay: next)
-                    
                     play()
-                    
                 } else {
-                    
                     pause()
-                    
                 }
             }
             
         } catch let error {
-            log(prefix: .mediaPlayer, "Play next item failed, error: \(error)")
-            playError(at: next, error: error)
+            log(prefix: .mediaPlayer, "Load next item failed, error: \(error)")
+            await playError(at: next, error: error)
             throw error
         }
         
     }
     
     /// 已经准备好播放，返回释放有效
+    @MainActor
     open func alreadyToPlay(_ indexPath: IndexPath) {
 
         let next = indexPath
@@ -432,24 +344,29 @@ open class MediaPlayerControl: NSObject {
         NotificationCenter.default.post(name: .mediaPlayerControlAlreadyToPlayAudio, object: self, userInfo: userInfo)
     }
     
-    
     /// 准备播放
+    @MainActor
     open func prepareToPlayItem(at indexPath: IndexPath) async throws {
         setStatus(.prepareToPlay)
     }
     
+    @MainActor
     open func play() {
         setStatus(.playing)
     }
     
+    @MainActor
     open func pause() {
         setStatus(.paused)
     }
     
+    @MainActor
     open func stop() {
         setStatus(.stoped)
     }
 
+    // 负责处理加载或播放多媒体的过程中的错误，并更新播放器状态
+    @MainActor
     func playError(at indexPath: IndexPath?, error: any Error) {
         if indexPath != nil, indexPath == currentIndexPath {
             setStatus(.error)
@@ -458,14 +375,12 @@ open class MediaPlayerControl: NSObject {
             self.delegate?.mediaPlayerControl(self, playAt: indexPath, error: error)
         }
     }
-}
-
-public extension MediaPlayerControl {
+ 
+    // 负责更新播放器状态以及`delegate`
+    @MainActor
     func setStatus(_ status: PlayerStatus) {
-        DispatchQueue.main.async {
-            self.playerStatus = status
-            self.delegate?.mediaPlayerControlStatusDidChanged(self)
-        }
+        self.playerStatus = status
+        self.delegate?.mediaPlayerControlStatusDidChanged(self)
     }
 }
 
@@ -487,218 +402,10 @@ public extension MediaPlayerControl {
         return media
     }
     
-    /// Index是否有效（是否越界、是否有数据）
-    func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
-        guard indexPath.section < items.count else {
-            return false
-        }
-        guard indexPath.row < items[indexPath.section].mediaList.count else {
-            return false
-        }
-        return true
-    }
-    
     // 获取有效的
     func isExistsValidMedia() -> Bool {
         return items.contains(where: { $0.mediaList.contains(where: { $0.isValid }) })
     }
     
-    ///  IndexPath 是否是当前二维列表的最后一个
-    func isLastIndexPathInItems(_ indexPath: IndexPath) -> Bool {
-        guard let indexPath = currentIndexPath else {
-            return false
-        }
-        guard indexPath.section == items.count - 1 else {
-            return false
-        }
-        guard indexPath.row == items[indexPath.section].mediaList.count - 1 else {
-            return false
-        }
-        return true
-    }
-}
 
-//MARK: - IndexPath 相关
-
-public extension MediaPlayerControl {
-    
-    /// 获取歌曲在所有专辑中的首个位置（允许存在多个相同ID的多媒体）
-    func indexPathOf(mediaID: Int) -> IndexPath? {
-        for section in items.enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
-                return .init(row: index, section: section.offset)
-            }
-        }
-        return nil
-    }
-    
-    /// 获取歌曲在所有专辑中的所有位置（允许存在多个相同ID的多媒体）
-    func indexPathListOf(mediaId: Int) -> [IndexPath] {
-        var result = [IndexPath]()
-        for section in items.enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaId }) {
-                result.append(.init(row: index, section: section.offset))
-            }
-        }
-        return result
-    }
-    
-    /// 获取基于当前索引的前一个索引，返回`none` =  需停止播放
-    func getPreviousIndexPath() -> IndexPath? {
-        guard isExistsValidMedia() else {
-            // 当前无有效多媒体，停止播放
-            log(prefix: .mediaPlayer, "Not found valid item")
-            return nil
-        }
-        
-        guard let indexPath = currentIndexPath else {
-            // 当前无有效下标，返回首个播放顺序
-            return getValidMediaIndexPaths().first
-        }
-
-        switch loopMode {
-        case .single:
-            // 单曲循环
-            return currentIndexPath
-            
-        case .shuffle:
-            // 随机循环
-            return getValidMediaRandomIndexPath()
-            
-        case .album:
-            // 歌单、专辑循环
-            
-            guard isExistsValidMedia() else {
-                return nil
-            }
-
-            let list = getValidMediaIndexPaths(at: indexPath.section)
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index > 0 else {
-                return list.last // 当前是一个，返回歌单最后一个
-            }
-            return list[index - 1]
-            
-        case .order:
-            // 顺序循环
-            
-            let list = getValidMediaIndexPaths()
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index > 0 else {
-                return list.last // 当前是一个，返回歌单最后一个
-            }
-            
-            return list[index - 1]
-            
-        case .none:
-            // 不循环
-            
-            let list = getValidMediaIndexPaths()
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index > 0 else {
-                return list.last // 当前是一个，返回歌单最后一个
-            }
-            return list[index - 1]
-        }
-    }
-    /// 获取基于当前索引的`下一个`索引，返回`none` =  需停止播放
-    func getNextMediaIndexPath() -> IndexPath? {
-        
-        guard isExistsValidMedia() else {
-            // 当前无有效多媒体，停止播放
-            log(prefix: .mediaPlayer, "Not found valid item")
-            return nil
-        }
-        
-        guard let indexPath = currentIndexPath else {
-            // 当前无有效下标，返回首个播放顺序
-            return getValidMediaIndexPaths().first
-        }
-
-        switch loopMode {
-        case .single:
-            // 单曲循环
-            return currentIndexPath
-            
-        case .shuffle:
-            // 随机循环 （已有指定的播放位置则返回指定的位置）
-            return nextIndexPathForShuffleLoop ?? getValidMediaRandomIndexPath()
-            
-        case .album:
-            // 歌单、专辑循环
-            
-            guard isExistsValidMedia() else {
-                return nil
-            }
-
-            let list = getValidMediaIndexPaths(at: indexPath.section)
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index < list.count - 1 else {
-                return list.first // 最后一个，返回歌单第一个
-            }
-            return list[index + 1]
-            
-        case .order:
-            // 顺序循环
-            
-            let list = getValidMediaIndexPaths()
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index < list.count - 1 else {
-                return list.first // 最后一个，返回第一个
-            }
-            
-            return list[index + 1]
-            
-        case .none:
-            // 不循环
-            
-            let list = getValidMediaIndexPaths()
-            let index = list.firstIndex(of: indexPath) ?? 0
-            guard index < list.count - 1 else {
-                return nil // 最后一个，不再继续播放
-            }
-            return list[index + 1]
-        }
-        
-    }
-    
-    /// 获取随机一个有效多媒体下标
-    func getValidMediaRandomIndexPath() -> IndexPath? {
-        let list = getValidMediaIndexPaths()
-        guard list.count > 0 else {
-            return nil
-        }
-        var randomGenerator = SystemRandomNumberGenerator()
-        let randomInt = Int.random(in: 0..<list.count, using: &randomGenerator)
-        let indexPath = list[randomInt]
-        return indexPath
-    }
-    
-    /// 获取有效多媒体的下标列表
-    func getValidMediaIndexPaths() -> [IndexPath] {
-        // 便利并返回有效的多媒体的indexPath
-        let validIndexPaths = items.enumerated().map { getValidMediaIndexPaths(at: $0.offset) }
-        let indexPaths = validIndexPaths.flatMap({ $0 })
-        return indexPaths
-    }
-    
-    
-    /// 获取某`Section`有效多媒体的的下标列表
-    func getValidMediaIndexPaths(at section: Int) -> [IndexPath] {
-        guard items.count > section else {
-            return []
-        }
-        let indexPaths = items[section].mediaList.enumerated().compactMap { element in
-            // 有效则返回indexPath，否则返回nil
-            return element.element.isValid ? IndexPath(row: element.offset, section: section) : nil
-        }
-        return indexPaths
-    }
-    
-}
-
-public extension IndexPath {
-    var descriptionForPlayer: String {
-        return "[\(section) - \(row)]"
-    }
 }

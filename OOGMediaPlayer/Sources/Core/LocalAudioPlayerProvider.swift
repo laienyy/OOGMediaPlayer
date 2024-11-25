@@ -89,7 +89,9 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     public override var isEnable: Bool {
         didSet {
             if !isEnable, audioPlayer?.isPlaying ?? false {
-                pause()
+                Task {
+                    await pause()
+                }
             }
         }
     }
@@ -298,6 +300,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
 
     /// 停止播放
+    @MainActor
     override open func stop() {
         super.stop()
         audioPlayer?.stop()
@@ -320,11 +323,13 @@ extension LocalAudioPlayerProvider {
         guard let item = currentItem() as? LocalMediaPlayable else {
             return
         }
-        // 选出所有id相同的多媒体
         
+        // 选出所有id相同的多媒体
         let items = getItems().flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
-        for item in items ?? [] {
-            setItemStatus(item, status: status)
+        DispatchQueue.main.async {
+            for item in items ?? [] {
+                self.setItemStatus(item, status: status)
+            }
         }
     }
     
@@ -354,42 +359,19 @@ extension LocalAudioPlayerProvider {
 extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
 
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        setStatus(.finished)
-        playNext()
+        Task {
+            await setStatus(.finished)
+            try await playNext()
+        }
     }
     
     public func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: (any Error)?) {
-        setStatus(.error)
-        log(prefix: .mediaPlayer, "Decode error", error as Any)
-        
         if let error = error {
-            playError(at: currentIndexPath, error: error)
+            Task {
+                log(prefix: .mediaPlayer, "Decode error", error as Any)
+                await playError(at: currentIndexPath, error: error)
+            }
         }
     }
 }
 
-
-func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) async throws -> T {
-    
-    let fetchTask = Task {
-        let result = try await task()
-        try Task.checkCancellation()
-        return result
-    }
-        
-    let timeoutTask = Task {
-        try await Task.sleep(nanoseconds: UInt64(timeout) * NSEC_PER_SEC)
-        // 取消正常流程需执行的Task
-        fetchTask.cancel()
-        // 返回超时Error
-        throw OOGMediaPlayerError.TaskError.timeout
-    }
-    
-    do {
-        let result = try await fetchTask.value
-        timeoutTask.cancel()
-        return result
-    } catch let error {
-        throw fetchTask.isCancelled ? OOGMediaPlayerError.TaskError.timeout : error
-    }
-}

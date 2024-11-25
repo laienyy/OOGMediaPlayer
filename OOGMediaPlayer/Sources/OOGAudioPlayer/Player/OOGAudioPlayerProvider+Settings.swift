@@ -34,7 +34,7 @@ public extension OOGAudioPlayerProvider {
      
      */
     @discardableResult
-    func resumePlay(by settings: OOGAudioPlayerSettings, playAutomatically: Bool) -> Bool {
+    func resumePlay(by settings: OOGAudioPlayerSettings, playAutomatically: Bool) async throws {
         
         var specificIndexPath: IndexPath?
         
@@ -45,7 +45,7 @@ public extension OOGAudioPlayerProvider {
             
             guard media(at: indexPath)?.isValid ?? false else {
                 // 歌曲无效，直接取消恢复播放
-                return false
+                throw OOGMediaPlayerError.LocalAudioPlayerError.noPermissionToPlay
             }
             specificIndexPath = indexPath
         }
@@ -71,17 +71,14 @@ public extension OOGAudioPlayerProvider {
         else if let id = settings.currentAudioID,
                 let indexPath = indexPathOf(mediaID: id),
                 media(at: indexPath)?.isValid == true {
-            
             specificIndexPath = indexPath
         }
         
         if let indexPath = specificIndexPath {
-            Task {
-                try await toPlay(indexPath: indexPath, playAutomaticly: playAutomatically)
-            }
+            try await load(indexPath: indexPath, autoPlay: true)
+        } else {
+            throw OOGMediaPlayerError.LocalAudioPlayerError.notFoundValidIndexPathBySetting
         }
-        
-        return specificIndexPath != nil
     }
     
     @discardableResult

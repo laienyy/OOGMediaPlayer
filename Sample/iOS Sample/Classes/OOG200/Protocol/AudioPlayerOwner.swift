@@ -150,28 +150,31 @@ extension AudioPlayerOwner {
         playerProvider.syncSettings(settings)
     }
     
-    func resumePlayAudioBySettings() {
-        playerProvider.resumePlay(by: settings, playAutomatically: false)
+    func resumePlayAudioBySettings() async throws {
+        try await playerProvider.resumePlay(by: settings, playAutomatically: false)
     }
     
     func playAudioIfDataSourceExists() {
         if playerProvider.isExistsValidMedia() {
-            switch playerProvider.playerStatus {
-            case .finished, .error, .stoped:
-                if let previousAudioID = settings.currentAudioID, let indexPath = playerProvider.indexPathOf(mediaID: previousAudioID) {
-                    // 播放之前
-                    Task {
+            Task {
+                switch playerProvider.playerStatus {
+                case .finished, .error, .stoped:
+                    if let previousAudioID = settings.currentAudioID, let indexPath = playerProvider.indexPathOf(mediaID: previousAudioID) {
+                        // 播放之前
                         try await playerProvider.load(indexPath: indexPath, autoPlay: true)
+                    } else {
+                        try await playerProvider.playNext()
                     }
-                } else {
-                    playerProvider.playNext()
+                    
+                case .paused:
+                    await playerProvider.play()
+                    
+                case .prepareToPlay, .playing:
+                    break
+                    
+                @unknown default:
+                    break
                 }
-            case .paused:
-                playerProvider.play()
-            case .prepareToPlay, .playing:
-                break
-            @unknown default:
-                break
             }
         }
     }

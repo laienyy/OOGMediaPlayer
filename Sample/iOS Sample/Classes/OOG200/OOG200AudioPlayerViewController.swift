@@ -165,15 +165,20 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                 playerProvider.playFadeMode = .once(8.0)
                 
                 // 根据设置恢复播放
-                if !playerProvider.resumePlay(by: settings, playAutomatically: true) {
-                    // 根据设置未回复播放（大概率是未曾开始播放过），此处开始自动播放第一首
-                    playerProvider.playNext()
+                Task {
+                    do {
+                        // 根据设置恢复播放
+                        try await playerProvider.resumePlay(by: settings, playAutomatically: true)
+                    } catch let error {
+                        // 根据设置会找到合适的 Audio 进行播放，播放下一曲
+                        try await playerProvider.playNext()
+                    }
                 }
                 
                 hud.hide(animated: true, afterDelay: 0.5)
                 
             } catch let error {
-                statusLabel.text = "获取歌曲列表失败，错误：\(error.localizedDescription)"
+                statusLabel.text = "获取歌曲列表或加载音频失败，错误：\(error.localizedDescription)"
                 hud.hide(animated: true, afterDelay: 0.5)
             }
         }

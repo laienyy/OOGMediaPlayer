@@ -38,6 +38,10 @@ public enum OOGMediaPlayerError {
         case fileUrlInvalid
         /// 操作已经过期，在等待文件数据的时候，外部有新的操作
         case operationExpired
+        /// 音频文件无效 ( By - MediaPlayable.isValid )
+        case noPermissionToPlay
+        /// 没有合适的indexPath
+        case notFoundValidIndexPathBySetting
         
         public var errorDescription: String? {
             switch self {
@@ -45,6 +49,10 @@ public enum OOGMediaPlayerError {
                 return "File url is invalid"
             case .operationExpired:
                 return "Operation is expired"
+            case .noPermissionToPlay:
+                return "Audio no permission to play"
+            case .notFoundValidIndexPathBySetting:
+                return "Not found valid indexPath by setting"
             }
         }
     }
