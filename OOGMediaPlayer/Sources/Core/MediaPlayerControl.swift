@@ -196,7 +196,7 @@ open class MediaPlayerControl: NSObject {
         }
         
         if let media = playingMedia {
-            // 重新定位正在播放的歌曲的下标
+            // 重新定位正在播放的歌曲的位置
             resetCurrentIndexBy(media)
         }
         
@@ -226,18 +226,19 @@ open class MediaPlayerControl: NSObject {
             return
         }
         
-        if let current = currentIndexPath {
-            // 纠正当前播放多媒体的位置
-            if current.section > section {
-                let new = IndexPath(row: current.row, section: current.section + 1)
-                currentIndexPath = new
-                log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(new) to \(new)")
-            }
+        if let current = currentIndexPath, current.section >= section {
+            // 添加的 seciton 在 currentSection 前面，需要将 currentIndex.section 向后偏移进行纠正
+            let new = IndexPath(row: current.row, section: current.section + 1)
+            currentIndexPath = new
+            log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(new) to \(new)")
         }
         
-        if let next = nextIndexPathForShuffleLoop, next.section >= section {
-            // 纠正随机播放下一首歌曲的位置
-            updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section + 1))
+        if let next = nextIndexPathForShuffleLoop {
+            
+            if section <= next.section {
+                // 添加的 seciton 在 `nextIndexPathForShuffleLoop` 前面，需要将其后偏移进行纠正
+                updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section + 1))
+            }
         }
         
         items.insert(album, at: section)
@@ -249,21 +250,21 @@ open class MediaPlayerControl: NSObject {
             return
         }
         
-        if let current = currentIndexPath {
-            // 纠正当前播放多媒体的位置
-            if current.section > section {
-                let new = IndexPath(row: current.row, section: current.section - 1)
-                currentIndexPath = new
-                log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(current) to \(new)")
-            }
+        if let current = currentIndexPath, current.section >= section {
+            // 添加的 seciton 在 currentSection 前面，需要将 currentIndex.section 向后偏移进行纠正
+            let new = IndexPath(row: current.row, section: current.section - 1)
+            currentIndexPath = new
+            log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(current) to \(new)")
         }
         
-        if let next = nextIndexPathForShuffleLoop, next.section >= section {
-            // 纠正随机播放下一首歌曲的位置
+        if let next = nextIndexPathForShuffleLoop {
+            // 添加的 seciton 在 `nextIndexPathForShuffleLoop` 前面，需要进行纠正
             if next.section == section {
+                // 删除并重新生成
                 nextIndexPathForShuffleLoop = nil
                 updateNextIndexPathForShuffleLoop(nil)
-            } else if next.section > section {
+            } else if section < next.section  {
+                // 插入在了前方，需要向后偏移进行纠正
                 updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section - 1))
             }
         }
