@@ -9,7 +9,7 @@ import Foundation
 
 public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     
-    func getMusicFromServer(_ info: GetBGMListApiInfo, updateToCache: Bool = true)
+    func getMusicFromServer(_ info: GetBGMListApiInfo, updateToUseCache: Bool = true)
     async throws -> [AudioAlbumModel] {
         let info = GetBGMListApiInfo(scheme: info.scheme, project: info.project, type: info.type, language: "en")
         let models = try await [AudioAlbumModel].getListFromAPI(info)
@@ -20,7 +20,7 @@ public extension OOGAudioPlayerProvider where Album == AudioAlbumModel {
     
     
     func loadOrReloadDataFromServer(_ info: GetBGMListApiInfo) async throws {
-        let albums = try await getMusicFromServer(info, updateToCache: true)
+        let albums = try await getMusicFromServer(info, updateToUseCache: true)
         reloadData(albums)
     }
 

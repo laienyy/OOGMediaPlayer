@@ -153,7 +153,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
                 hud.show(animated: true)
                 // 加载歌曲
                 let info: GetBGMListApiInfo = .init(scheme: scheme, project: .oog200, type: .animation, language: "en")
-                let models = try await playerProvider.getMusicFromServer(info, updateToCache: true)
+                let models = try await playerProvider.getMusicFromServer(info, updateToUseCache: true)
                 
                 playerProvider.reloadData(models)
                 
