@@ -12,53 +12,11 @@ import Foundation
 
 public extension MediaPlayerControl {
     
-    /// Index是否有效（是否越界、是否有数据）
-    func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
-        guard indexPath.section < getItems().count else {
-            return false
-        }
-        guard indexPath.row < getItems()[indexPath.section].mediaList.count else {
-            return false
-        }
-        return true
-    }
-    
-    ///  IndexPath 是否是当前二维列表的最后一个
-    func isLastIndexPathInItems(_ indexPath: IndexPath) -> Bool {
-        guard let indexPath = currentIndexPath else {
-            return false
-        }
-        guard indexPath.section == getItems().count - 1 else {
-            return false
-        }
-        guard indexPath.row == getItems()[indexPath.section].mediaList.count - 1 else {
-            return false
-        }
-        return true
-    }
-    
-    /// 获取歌曲在所有专辑中的首个位置（允许存在多个相同ID的多媒体）
-    func indexPathOf(mediaID: Int) -> IndexPath? {
-        for section in getItems().enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
-                return .init(row: index, section: section.offset)
-            }
-        }
-        return nil
-    }
-    
-    /// 获取歌曲在所有专辑中的所有位置（允许存在多个相同ID的多媒体）
-    func indexPathListOf(mediaId: Int) -> [IndexPath] {
-        var result = [IndexPath]()
-        for section in getItems().enumerated() {
-            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaId }) {
-                result.append(.init(row: index, section: section.offset))
-            }
-        }
-        return result
-    }
-    
-    /// 获取基于当前索引的前一个索引，返回`none` =  需停止播放
+    /**
+     *  根据条件计算 `上一个` 播放位置
+     *
+     *  获取基于当前索引的前一个索引，返回`none` =  需停止播放
+     */
     func getPreviousIndexPath() -> IndexPath? {
         guard isExistsValidMedia() else {
             // 当前无有效多媒体，停止播放
@@ -116,7 +74,12 @@ public extension MediaPlayerControl {
             return list[index - 1]
         }
     }
-    /// 获取基于当前索引的`下一个`索引，返回`none` =  需停止播放
+    
+    /**
+     *  根据条件计算 `下一个` 播放的位置
+     *
+     *  获取基于当前索引的`下一个`索引，返回`none` =  需停止播放
+     */
     func getNextMediaIndexPath() -> IndexPath? {
         
         guard isExistsValidMedia() else {
@@ -175,6 +138,56 @@ public extension MediaPlayerControl {
             return list[index + 1]
         }
         
+    }
+    
+}
+
+public extension MediaPlayerControl {
+    
+    /// Index是否有效（是否越界、是否有数据）
+    func isValidIndexPath(_ indexPath: IndexPath) -> Bool {
+        guard indexPath.section < getItems().count else {
+            return false
+        }
+        guard indexPath.row < getItems()[indexPath.section].mediaList.count else {
+            return false
+        }
+        return true
+    }
+    
+    ///  IndexPath 是否是当前二维列表的最后一个
+    func isLastIndexPathInItems(_ indexPath: IndexPath) -> Bool {
+        guard let indexPath = currentIndexPath else {
+            return false
+        }
+        guard indexPath.section == getItems().count - 1 else {
+            return false
+        }
+        guard indexPath.row == getItems()[indexPath.section].mediaList.count - 1 else {
+            return false
+        }
+        return true
+    }
+    
+    /// 获取歌曲在所有专辑中的首个位置（允许存在多个相同ID的多媒体）
+    func indexPathOf(mediaID: Int) -> IndexPath? {
+        for section in getItems().enumerated() {
+            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaID }) {
+                return .init(row: index, section: section.offset)
+            }
+        }
+        return nil
+    }
+    
+    /// 获取歌曲在所有专辑中的所有位置（允许存在多个相同ID的多媒体）
+    func indexPathListOf(mediaId: Int) -> [IndexPath] {
+        var result = [IndexPath]()
+        for section in getItems().enumerated() {
+            if let index = section.element.mediaList.firstIndex(where: { $0.resId == mediaId }) {
+                result.append(.init(row: index, section: section.offset))
+            }
+        }
+        return result
     }
     
     /// 获取随机一个有效多媒体下标
