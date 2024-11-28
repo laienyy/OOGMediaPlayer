@@ -279,14 +279,7 @@ open class MediaPlayerControl: NSObject {
         }
 
         
-        let delegateResponseIndexPath = await MainActor.run {
-            return delegate?.mediaPlayerControl(self, shouldPlay: next, current: currentIndexPath)
-        }
-
-        
-        if currentIndexPath != nil, currentIndexPath != next {
-            await stop()
-        }
+        let delegateResponseIndexPath = await delegate?.mediaPlayerControl(self, shouldPlay: next, current: currentIndexPath)
 
         // 如果 delegate == nil，直接使用 currentIndexPath，不能够直接使用 ?? 添加默认indexPath
         let next = delegate == nil ? next : delegateResponseIndexPath
@@ -294,9 +287,7 @@ open class MediaPlayerControl: NSObject {
         
         guard let next = next else {
             log(prefix: .mediaPlayer, "Load next item failed, there is no `indexPath` specified")
-            await MainActor.run {
-                playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
-            }
+            await playError(at: nil, error: OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem)
             throw OOGMediaPlayerError.MediaPlayerControlError.noInvalidItem
         }
 
@@ -370,6 +361,7 @@ open class MediaPlayerControl: NSObject {
     
     @MainActor
     open func stop() {
+        log(prefix: .mediaPlayer, "Stop current play")
         setStatus(.stoped)
     }
 
@@ -379,9 +371,7 @@ open class MediaPlayerControl: NSObject {
         if indexPath != nil, indexPath == currentIndexPath {
             setStatus(.error)
         }
-        DispatchQueue.main.async {
-            self.delegate?.mediaPlayerControl(self, playAt: indexPath, error: error)
-        }
+        self.delegate?.mediaPlayerControl(self, playAt: indexPath, error: error)
     }
  
     // 负责更新播放器状态以及`delegate`

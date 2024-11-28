@@ -8,6 +8,7 @@
 import Foundation
 
 
+@MainActor
 public protocol MediaPlayerControlDelegate: AnyObject {
     
     /// 将要播放，返回`false`跳过播放

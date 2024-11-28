@@ -155,18 +155,13 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         guard !isIndexPathInPreparingQueue(indexPath) else {
             // 正在下载，本轮跳出播放流程（等待下载完，会继续执行播放）
             log(prefix: .mediaPlayer, "Prepare to play item (\(indexPath.descriptionForPlayer) failed, current item is during download")
-            await MainActor.run {
-                setItemStatus(item, status: .downloading)
-            }
+            setItemStatus(item, status: .downloading)
 //            throw OOGMediaPlayerError.MediaPlayerControlError.alreadyBeenPreparing
             return
         }
-        
         // 加入等待队列
         appendToPreparingQueue(item)
-        await MainActor.run {
-            setItemStatus(item, status: .downloading)
-        }
+        setItemStatus(item, status: .downloading)
         
         var fileUrl: URL
         do {
@@ -179,22 +174,16 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         // 移出等待队列
         removeFromPreparingQueue(item)
-        await MainActor.run {
-            setItemStatus(item, status: .prepareToPlay)
-        }
+        setItemStatus(item, status: .prepareToPlay)
         
         if currentItem()?.resId != media(at: indexPath)?.resId {
             // 不是当前需要播放的顺序，终止播放流程
-            await MainActor.run {
-                setItemStatus(item, status: .stoped)
-            }
+            setItemStatus(item, status: .stoped)
             throw OOGMediaPlayerError.LocalAudioPlayerError.operationExpired
         }
         
         guard fileUrl.isFileURL else {
-            await MainActor.run {
-                setItemStatus(item, status: .error)
-            }
+            setItemStatus(item, status: .error)
             log(prefix: .mediaPlayer, "Play item \(indexPath.descriptionForPlayer) failed, The url is not FileURL")
             throw OOGMediaPlayerError.LocalAudioPlayerError.fileUrlInvalid
         }
@@ -204,9 +193,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer.delegate = self
         
         guard audioPlayer.prepareToPlay() else {
-            await MainActor.run {
-                setItemStatus(item, status: .error)
-            }
+            setItemStatus(item, status: .error)
             throw LocalMediaPlayerError.prepareToPlayFailed
         }
         
@@ -305,7 +292,6 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
     }
 
     /// 停止播放
-    @MainActor
     override open func stop() {
         super.stop()
         audioPlayer?.stop()
@@ -324,6 +310,8 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
 }
 
 extension LocalAudioPlayerProvider {
+    
+    @MainActor
     func setCurrentItemStatus(_ status: LocalMediaStatus) {
         guard let item = currentItem() as? LocalMediaPlayable else {
             return
@@ -331,13 +319,14 @@ extension LocalAudioPlayerProvider {
         
         // 选出所有id相同的多媒体
         let items = getItems().flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
-        DispatchQueue.main.async {
+//        DispatchQueue.main.async {
             for item in items ?? [] {
                 self.setItemStatus(item, status: status)
             }
-        }
+//        }
     }
     
+    @MainActor
     func setItemStatus(_ item: LocalMediaPlayable, status: LocalMediaStatus) {
         let sameItems = getItems().flatMap({ $0.mediaList })
                              .compactMap({ $0 as? LocalMediaPlayable })
@@ -347,17 +336,17 @@ extension LocalAudioPlayerProvider {
 
         log(prefix: .mediaPlayer, "Set status [ \(status) ] - \(item)")
         
-        if Thread.isMainThread {
+//        if Thread.isMainThread {
             sameItems.forEach {
                 $0.setNewPlayerStatus(status)
             }
-        } else {
-            DispatchQueue.main.sync {
-                sameItems.forEach {
-                    $0.setNewPlayerStatus(status)
-                }
-            }
-        }
+//        } else {
+//            DispatchQueue.main.sync {
+//                sameItems.forEach {
+//                    $0.setNewPlayerStatus(status)
+//                }
+//            }
+//        }
     }
 }
 
