@@ -11,6 +11,7 @@ public protocol MediaAlbum: Equatable, Codable, AnyObject {
     associatedtype MediaType: MediaPlayable
     var id: Int { get }
     var mediaList: [MediaType] { get }
+    var albumNameForDebug: String { get }
 }
 
 public protocol MediaPlayable: Codable, AnyObject {

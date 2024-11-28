@@ -50,6 +50,10 @@ public class AudioAlbumModel: NSObject, BGMAlbum, Codable {
     public override var description: String {
         return "ID: \(id), name: \(playlistName ?? ""), medias: [\n\t\(mediaList.map({ $0.description }).joined(separator: "\n\t"))\n]"
     }
+    
+    public var albumNameForDebug: String {
+        return playlistName ?? "UNNAMED"
+    }
 }
 
 

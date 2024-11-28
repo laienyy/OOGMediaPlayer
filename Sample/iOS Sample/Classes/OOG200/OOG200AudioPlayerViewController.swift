@@ -30,6 +30,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     
     @IBOutlet weak var cacheEnableSwitch: UISwitch!
     @IBOutlet weak var mixOtherSwitch: UISwitch!
+    @IBOutlet weak var iapSwitch: UISwitch!
     
     @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var backwardButton: UIButton!
@@ -70,6 +71,7 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        iapSwitch.isOn = OOGAudioGlobalEnviroment.share.isIAPIActive
         syncSubsubviewsContentWithSettings()
     }
     
@@ -86,6 +88,8 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        iapSwitch.isOn = OOGAudioGlobalEnviroment.share.isIAPIActive
         
         playerWidgetView.soundSlider.setOog200SliderConfig()
         
@@ -299,11 +303,6 @@ class OOG200AudioPlayerViewController: UIViewController, AudioPlayerOwner {
         playerWidgetView.setVolumn(playerProvider.volume, animated: true)
     }
     
-}
-
-
-//MARK: - IBAction
-extension OOG200AudioPlayerViewController {
     
     @IBAction func popViewController(_ sender: Any) {
         navigationController?.popViewController(animated: true)
@@ -349,6 +348,16 @@ extension OOG200AudioPlayerViewController {
         }
         sender.isSelected = !sender.isSelected
     }
+    
+    @IBAction func iapSwitchValueChanged(_ sender: UISwitch) {
+        OOGAudioGlobalEnviroment.share.isIAPIActive = sender.isOn
+    }
+    
+}
+
+
+//MARK: - IBAction
+extension OOG200AudioPlayerViewController {
     
 }
 

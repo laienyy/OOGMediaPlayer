@@ -14,7 +14,13 @@ private let favoriteAlbumID = -1
 extension AudioModel {
     public override var description: String {
         let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
-        return "\(memeryAddress); #ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription)"
+        return "#ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription), \(memeryAddress)"
+    }
+}
+
+extension AudioModel {
+    var isPlayable: Bool {
+        return !subscription || OOGAudioGlobalEnviroment.share.isIAPIActive
     }
 }
 
@@ -177,28 +183,6 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             let indexPath = IndexPath(row: insertIndex, section: 0)
             self.tableView.insertRows(at: [indexPath], with: .bottom)
             
-        } completion: { finished in
-            self.playerProvider.reloadData(self.playerProvider.albumList)
-            self.tableView.reloadData()
-            if let song = currentSong {
-                if song.resId == audio.resId {
-                    /**
-                     在添加当前播放歌曲到《我喜欢》的位置之前，该歌曲在《我喜欢》是不存在的，所以正确的`currentIndexPath`只会是其他专辑中的那个位置
-                     
-                     （预期所有列表，最多只会存在两个相同resId的歌曲，即《我喜欢》和原所在的专辑）
-                     */
-                    let list = self.playerProvider.indexPathListOf(mediaId: song.resId)
-                    if let indexPath = list.filter({ $0.section != 0 }).first {
-                        self.playerProvider.currentIndexPath = indexPath
-                    } else {
-                        // 超出预期，根据默认规则重设 `currentIndexPath` 即可
-                        self.playerProvider.resetCurrentIndexBy(song)
-                    }
-                } else {
-                    // 添加到《我喜欢》的歌曲不是当前歌曲，不作特殊处理（预期状态，所有专辑的所有歌曲的resId是唯一的）
-                    self.playerProvider.resetCurrentIndexBy(song)
-                }
-            }
         }
     }
     
@@ -215,11 +199,9 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             return
         }
 
-        /**
-         *  取消喜欢，Favorite列表数量会受影响，播放器的当前播放的下标会出现偏差，导致播放下一曲时，当前歌曲的状态将无法正确更新
-         *  最终纠正`currentIndex`在下方`self.playerProvider.resetCurrentIndexBy(song)`
-         */
-        let currentSong = self.playerProvider.currentSong()
+
+        let currentSong = playerProvider.currentSong()
+        let currentIndexPath = playerProvider.currentIndexPath
         
         favAlbum.mediaList.remove(at: index)
         
@@ -227,34 +209,40 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             guard let `self` = self else { return }
 //            self.playerProvider.reloadData(self.albums)
             
-            guard favAlbum.mediaList.count > 0 else {
-                // 歌曲数量为0，删除section
+            let isNeedsRemoveAlbum = favAlbum.mediaList.count == 0
+            
+            if isNeedsRemoveAlbum {
+                // 需要移除专辑
                 if self.playerProvider.albumList.first?.isFavoriteAlbum ?? false {
                     self.playerProvider.remove(section: 0)
                     self.tableView.deleteSections([0], with: .automatic)
                 }
-                return
+            } else {
+                guard !self.isFold(section: 0) else {
+                    // 被折叠，刷新整个section
+                    self.tableView.reloadSections([0], with: .automatic)
+                    return
+                }
+                
+                let indexPath = IndexPath(row: index, section: 0)
+                self.tableView.deleteRows(at: [indexPath], with: .bottom)
             }
             
-            guard !self.isFold(section: 0) else {
-                // 被折叠，刷新整个section
-                self.tableView.reloadSections([0], with: .automatic)
-                return
-            }
             
-            let indexPath = IndexPath(row: index, section: 0)
-            self.tableView.deleteRows(at: [indexPath], with: .bottom)
-            
-        } completion: { finished in
-            // 刷新整个列表是为了刷新`红心`的现实状态状态
-            self.playerProvider.reloadData(self.playerProvider.albumList)
-            self.tableView.reloadData()
-            
-            if let song = currentSong {
-                // 重设当前播放歌曲下标，从喜爱列表移除正在播放的歌曲，可能会导致currentIndexPath错误，并导致播放状态等出现未正常变化的问题
+            if currentIndexPath?.section == 0, let song = currentSong {
+                // 移除了FavAlbum，并且正在播放的歌曲也在FavAlbum，重新定位歌曲位置，否则可能会引起一些问题
                 self.playerProvider.resetCurrentIndexBy(song)
             }
+            
+
+            
         }
+    }
+    
+    func cellsFor(audio: AudioModel) -> [BGMItemTableViewCell] {
+        let indexPaths = playerProvider.indexPathListOf(mediaId: audio.resId)
+        let cells = indexPaths.compactMap({ tableView.cellForRow(at: $0) as? BGMItemTableViewCell })
+        return cells
     }
     
 }
@@ -289,7 +277,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         // 循环模式
         cell.isLoop = isLoop(song: song)
         // 订阅锁
-        cell.isLock = song.subscription
+        cell.isLock = !song.isPlayable
         
         // 循环点击回调
         cell.loopAction = { [weak self] cell in
@@ -312,7 +300,9 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         cell.favoriteAction = { [weak self] cell in
             guard let `self` = self, cell.model?.resId == song.resId else { return }
             
-            cell.isFavorite = !cell.isFavorite
+            let newFavStatus = !cell.isFavorite
+            // 替换所有
+            cellsFor(audio: song).forEach({ $0.isFavorite = newFavStatus })
             
             let isFavorite = self.settings.isFavorite(song)
             if !isFavorite == true {
@@ -327,9 +317,9 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let song = playerProvider.getSong(at: indexPath)
+        let song = playerProvider.getSong(at: indexPath) as? AudioModel
         
-        guard song?.subscription == false else {
+        guard song?.isPlayable ?? false else {
             return
         }
         

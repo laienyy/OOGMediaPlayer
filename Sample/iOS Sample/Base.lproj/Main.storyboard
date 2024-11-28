@@ -82,10 +82,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ogV-mV-yPY">
-                                <rect key="frame" x="16" y="133" width="361" height="213.33333333333337"/>
+                                <rect key="frame" x="16" y="133" width="361" height="193"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qac-mS-pjc" customClass="AudioPlayerWidgetView" customModule="iOS_Sample" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="361" height="213.33333333333334"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="361" height="193"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </view>
                                 </subviews>
@@ -104,7 +104,7 @@
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rxq-1c-ylG">
-                                <rect key="frame" x="16" y="677.66666666666663" width="361" height="80.333333333333371"/>
+                                <rect key="frame" x="16" y="717.66666666666663" width="361" height="80.333333333333371"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="状态" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Re-4s-fVB">
                                         <rect key="frame" x="10" y="30" width="341" height="20.333333333333329"/>
@@ -131,7 +131,7 @@
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="2s3-DD-G4f">
-                                <rect key="frame" x="16" y="366.33333333333331" width="361" height="261.99999999999994"/>
+                                <rect key="frame" x="16" y="346" width="361" height="322.33333333333326"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6sh-Ef-pNr" userLabel="Cache">
                                         <rect key="frame" x="0.0" y="0.0" width="361" height="50.333333333333336"/>
@@ -167,7 +167,7 @@
                                         </userDefinedRuntimeAttributes>
                                     </view>
                                     <view contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="Umi-O0-nnE" userLabel="Volumn">
-                                        <rect key="frame" x="0.0" y="60.333333333333371" width="361" height="50.333333333333343"/>
+                                        <rect key="frame" x="0.0" y="60.333333333333314" width="361" height="50.333333333333343"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="255" horizontalCompressionResistancePriority="255" verticalCompressionResistancePriority="999" text="降低第三方音乐的音量" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="a86-KI-jUv">
                                                 <rect key="frame" x="16" y="14.999999999999998" width="168.66666666666666" height="20.333333333333329"/>
@@ -176,7 +176,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="700" verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LFP-XN-LrA">
-                                                <rect key="frame" x="296" y="9.6666666666666288" width="51" height="31"/>
+                                                <rect key="frame" x="296" y="9.6666666666666856" width="51" height="31"/>
                                                 <color key="onTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <connections>
                                                     <action selector="mixOtherAudioSwitchValueChanged:" destination="bwj-HX-nuh" eventType="valueChanged" id="v5r-DI-Ggv"/>
@@ -197,8 +197,39 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                     </view>
+                                    <view contentMode="scaleToFill" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="tfM-1p-VYu" userLabel="Volumn">
+                                        <rect key="frame" x="0.0" y="120.66666666666667" width="361" height="50.333333333333329"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="255" horizontalCompressionResistancePriority="255" verticalCompressionResistancePriority="999" text="订阅状态" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NkS-aA-Sjj">
+                                                <rect key="frame" x="16" y="14.999999999999998" width="67.666666666666671" height="20.333333333333329"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="700" verticalHuggingPriority="750" horizontalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v9H-zL-j3D">
+                                                <rect key="frame" x="296" y="9.6666666666666288" width="51" height="31"/>
+                                                <color key="onTintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <connections>
+                                                    <action selector="iapSwitchValueChanged:" destination="bwj-HX-nuh" eventType="valueChanged" id="LfD-L4-YUY"/>
+                                                </connections>
+                                            </switch>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstItem="v9H-zL-j3D" firstAttribute="centerY" secondItem="tfM-1p-VYu" secondAttribute="centerY" id="9b6-8z-wWy"/>
+                                            <constraint firstItem="v9H-zL-j3D" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NkS-aA-Sjj" secondAttribute="trailing" constant="20" id="F4H-4M-2MA"/>
+                                            <constraint firstItem="NkS-aA-Sjj" firstAttribute="top" secondItem="tfM-1p-VYu" secondAttribute="top" constant="15" id="N6N-x1-Z7T"/>
+                                            <constraint firstAttribute="bottom" secondItem="NkS-aA-Sjj" secondAttribute="bottom" constant="15" id="YsQ-ZQ-Qpg"/>
+                                        </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.maskToBounds" value="YES"/>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </view>
                                     <view contentMode="scaleToFill" horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="mkl-6Z-b63" userLabel="Control">
-                                        <rect key="frame" x="0.0" y="120.6666666666667" width="361" height="141.33333333333337"/>
+                                        <rect key="frame" x="0.0" y="181" width="361" height="141.33333333333337"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="1000" verticalCompressionResistancePriority="1000" text="—  /  —" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4UC-h5-yws">
                                                 <rect key="frame" x="0.0" y="30" width="361" height="31.333333333333329"/>
@@ -264,6 +295,8 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="a86-KI-jUv" firstAttribute="leading" secondItem="eJh-0V-hTw" secondAttribute="leading" id="DFn-de-xvT"/>
+                                    <constraint firstItem="v9H-zL-j3D" firstAttribute="trailing" secondItem="LFP-XN-LrA" secondAttribute="trailing" id="PQ6-2e-yiV"/>
+                                    <constraint firstItem="NkS-aA-Sjj" firstAttribute="leading" secondItem="a86-KI-jUv" secondAttribute="leading" id="XKA-8h-Zp3"/>
                                     <constraint firstItem="LFP-XN-LrA" firstAttribute="trailing" secondItem="V3R-kM-L9t" secondAttribute="trailing" id="XsG-ad-QQY"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
@@ -278,7 +311,7 @@
                         <color key="backgroundColor" red="0.96862745098039216" green="0.96078431372549022" blue="0.97647058823529409" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="rxq-1c-ylG" firstAttribute="leading" secondItem="ogV-mV-yPY" secondAttribute="leading" id="3rW-9f-qW6"/>
-                            <constraint firstItem="bpd-tt-zvJ" firstAttribute="bottom" secondItem="rxq-1c-ylG" secondAttribute="bottom" constant="60" id="D6N-cS-BLn"/>
+                            <constraint firstItem="bpd-tt-zvJ" firstAttribute="bottom" secondItem="rxq-1c-ylG" secondAttribute="bottom" constant="20" id="D6N-cS-BLn"/>
                             <constraint firstItem="rxq-1c-ylG" firstAttribute="trailing" secondItem="ogV-mV-yPY" secondAttribute="trailing" id="Nfu-Zb-YD5"/>
                             <constraint firstItem="2s3-DD-G4f" firstAttribute="leading" secondItem="ogV-mV-yPY" secondAttribute="leading" id="T3C-ie-gr7"/>
                             <constraint firstItem="rxq-1c-ylG" firstAttribute="top" secondItem="2s3-DD-G4f" secondAttribute="bottom" constant="49.333333333333258" id="WnQ-pK-XEu"/>
@@ -314,6 +347,7 @@
                         <outlet property="backwardButton" destination="Wxw-vM-8P5" id="hHT-tP-vrr"/>
                         <outlet property="cacheEnableSwitch" destination="V3R-kM-L9t" id="Kq9-Oo-ple"/>
                         <outlet property="forwardButton" destination="hR2-34-Ryd" id="rXe-en-9gT"/>
+                        <outlet property="iapSwitch" destination="v9H-zL-j3D" id="VNp-Jc-tN5"/>
                         <outlet property="mixOtherSwitch" destination="LFP-XN-LrA" id="LAn-uQ-UbO"/>
                         <outlet property="playButton" destination="RMZ-0G-TSP" id="81Y-EJ-mAp"/>
                         <outlet property="playerWidgetView" destination="qac-mS-pjc" id="h1d-G1-tJj"/>

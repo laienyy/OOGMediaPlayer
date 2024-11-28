@@ -260,7 +260,12 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         audioPlayer.volume = 0
         let didPlaying = audioPlayer.play()
         
-        log(prefix: .mediaPlayer, didPlaying ? "Did playing \(String(describing: currentItem()))" : "Playing failed \(String(describing: currentItem()))")
+        if let item = currentItem() {
+            log(prefix: .mediaPlayer, didPlaying ? "Did playing \(item)" : "Playing failed \(item)")
+        } else {
+            log(prefix: .mediaPlayer, didPlaying ? "Did playing \(String(describing: currentItem()))" : "Playing failed \(String(describing: currentItem()))")
+        }
+        
         
 //        guard playing else {
 //            return
@@ -340,7 +345,7 @@ extension LocalAudioPlayerProvider {
         
         let itemsDescription = sameItems.map({ "\($0)" }).joined(separator: "\n\t")
 
-        log(prefix: .mediaPlayer, "Set status \(status) to: \(item)")
+        log(prefix: .mediaPlayer, "Set status [ \(status) ] - \(item)")
         
         if Thread.isMainThread {
             sameItems.forEach {

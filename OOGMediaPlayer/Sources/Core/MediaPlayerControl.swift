@@ -103,19 +103,20 @@ open class MediaPlayerControl: NSObject {
     
     /// 插入专辑（支持自动纠正`currentIndexPath`）
     open func insert(section: Int, _ album: any MediaAlbum) {
+        
         guard items.count >= section else {
+            log(prefix: .mediaPlayer, "Insert album [ \(album.albumNameForDebug) ] at section [\(section)] error, section is out range, count: \(items.count)")
             return
         }
         
         if let current = currentIndexPath, current.section >= section {
             // 添加的 seciton 在 currentSection 前面，需要将 currentIndex.section 向后偏移进行纠正
             let new = IndexPath(row: current.row, section: current.section + 1)
+            log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(current) to \(new)")
             currentIndexPath = new
-            log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(new) to \(new)")
         }
         
         if let next = nextIndexPathForShuffleLoop {
-            
             if section <= next.section {
                 // 添加的 seciton 在 `nextIndexPathForShuffleLoop` 前面，需要将其后偏移进行纠正
                 updateNextIndexPathForShuffleLoop(IndexPath(row: next.row, section: next.section + 1))
@@ -123,19 +124,21 @@ open class MediaPlayerControl: NSObject {
         }
         
         items.insert(album, at: section)
+        log(prefix: .mediaPlayer, "Insert album [ \(album.albumNameForDebug) ] at \(section)")
     }
     
-    /// 移除专辑（支持自动纠正`currentIndexPath`）
+    /// 移除专辑
     open func remove(section: Int) {
         guard items.count > section else {
+            log(prefix: .mediaPlayer, "Remove album at section [\(section)] error, section is out range, count: \(items.count)")
             return
         }
         
-        if let current = currentIndexPath, current.section >= section {
-            // 添加的 seciton 在 currentSection 前面，需要将 currentIndex.section 向后偏移进行纠正
+        if let current = currentIndexPath, current.section > section {
+            // 移除的专辑在当前播放歌曲的前面，播放歌曲的位置向前偏移 1 section
             let new = IndexPath(row: current.row, section: current.section - 1)
-            currentIndexPath = new
             log(prefix: .mediaPlayer, "Correct `CurrentIndexPath` from \(current) to \(new)")
+            currentIndexPath = new
         }
         
         if let next = nextIndexPathForShuffleLoop {
@@ -151,6 +154,7 @@ open class MediaPlayerControl: NSObject {
         }
         
         items.remove(at: section)
+        log(prefix: .mediaPlayer, "Remove album of section [ \(section) ]")
     }
     
     
@@ -163,6 +167,10 @@ open class MediaPlayerControl: NSObject {
      */
     open func resetCurrentIndexBy(_ media: MediaPlayable) {
         currentIndexPath = indexPathOf(mediaID: media.resId)
+    }
+    
+    open func resetCurrentIndexBy(_ mediaId: Int) {
+        currentIndexPath = indexPathOf(mediaID: mediaId)
     }
     
     /// 获取上一条数据
