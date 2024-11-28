@@ -239,11 +239,9 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             }
     
         } completion: { [weak self] _ in
-            if !isNeedsRemoveAlbum {
-                // 刷新Header
-                if let header = self?.tableView.headerView(forSection: 0) as? BGMAlbumTableSectionHeaderView {
-                    header.subtitleLabel.text = "\(favAlbum.mediaList.count) 歌曲"
-                }
+            // 刷新Header
+            if let header = self?.tableView.headerView(forSection: 0) as? BGMAlbumTableSectionHeaderView {
+                header.subtitleLabel.text = "\(favAlbum.mediaList.count) 歌曲"
             }
         }
     }
