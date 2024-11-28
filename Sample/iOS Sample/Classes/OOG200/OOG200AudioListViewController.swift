@@ -183,6 +183,11 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
             let indexPath = IndexPath(row: insertIndex, section: 0)
             self.tableView.insertRows(at: [indexPath], with: .bottom)
             
+        } completion: { [weak self] _ in
+            // 刷新Header
+            if let header = self?.tableView.headerView(forSection: 0) as? BGMAlbumTableSectionHeaderView {
+                header.subtitleLabel.text = "\(favAlbum.mediaList.count) 歌曲"
+            }
         }
     }
     
@@ -210,7 +215,6 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
 //            self.playerProvider.reloadData(self.albums)
             
             let isNeedsRemoveAlbum = favAlbum.mediaList.count == 0
-            
             if isNeedsRemoveAlbum {
                 // 需要移除专辑
                 if self.playerProvider.albumList.first?.isFavoriteAlbum ?? false {
@@ -233,9 +237,14 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
                 // 移除了FavAlbum，并且正在播放的歌曲也在FavAlbum，重新定位歌曲位置，否则可能会引起一些问题
                 self.playerProvider.resetCurrentIndexBy(song)
             }
-            
-
-            
+    
+        } completion: { [weak self] _ in
+            if !isNeedsRemoveAlbum {
+                // 刷新Header
+                if let header = self?.tableView.headerView(forSection: 0) as? BGMAlbumTableSectionHeaderView {
+                    header.subtitleLabel.text = "\(favAlbum.mediaList.count) 歌曲"
+                }
+            }
         }
     }
     
@@ -367,6 +376,8 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         // 圆角处理
         header.updateCorner(isFirst: isFirst, isLast: isLast, isFold: isFold)
         
+        header.titleLabel.text = album.playlistName
+        header.subtitleLabel.text = "\(album.mediaList.count) 歌曲"
         header.isLoop = isLoop
         header.loopAction = { [weak self] header in
             guard let `self` = self else { return }
