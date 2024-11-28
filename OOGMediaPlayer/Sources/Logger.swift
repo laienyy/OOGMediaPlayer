@@ -22,11 +22,26 @@ func log(prefix: LogPrefix?, _ args: Any..., file: String = #file, line: Int = #
 
 class Logger {
     
+    typealias LogReceiver = (Logger, Message) -> Void
+    
+    struct Message {
+        let prefix: LogPrefix?
+        let args: [Any]
+        let file: String
+        let line: Int
+    }
+    
     static let share = Logger()
     
+    var receiver: LogReceiver?
+    
+    /// 影响打印，不影响 `receiver` 的接收
     var isEnable: Bool = true
     
     func log(prefix: LogPrefix?, _ args: Any..., file: String = #file, line: Int = #line) {
+        
+        receiver?(self, Message(prefix: prefix, args: args, file: file, line: line))
+        
         guard isEnable else {
             return
         }
