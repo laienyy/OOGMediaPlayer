@@ -41,7 +41,7 @@ public class OOGAudioPlayerProvider<Album: BGMAlbum>: LocalAudioPlayerProvider {
     }
     
     /// 根据`indexPath`获取音乐
-    public func getSong(at indexPath: IndexPath) -> BGMSong? {
+    public func getSong(at indexPath: IndexPath) -> Album.BGMAudioType? {
         
         guard indexPath.section < albumList.count else {
             return nil
