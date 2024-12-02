@@ -17,6 +17,12 @@ public struct FileItem: Codable {
     /// 文件名
     public let fileName: String
     
+    public init(root: FileRootDirectory, directory: FileDirectory, fileName: String) {
+        self.root = root
+        self.directory = directory
+        self.fileName = fileName
+    }
+    
 }
 
 

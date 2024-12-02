@@ -62,6 +62,8 @@ class LocalAudioPlayerViewController: UIViewController, AudioPlayerOwner {
         
         Task {
             do {
+                // 获取缓存
+//                let models = [AudioAlbumModel].getListFromCache(.animation)
                 let info = GetBGMListApiInfo(scheme: .dev, project: .oog200, type: .animation, language: "en")
                 let models = try await playerProvider.getMusicFromServer(info, updateToUseCache: true)
                 playerProvider.reloadData(models)

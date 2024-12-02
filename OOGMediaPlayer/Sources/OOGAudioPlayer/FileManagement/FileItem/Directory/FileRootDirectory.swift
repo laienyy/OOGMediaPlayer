@@ -13,7 +13,7 @@ public enum FileRootDirectory: Int, Codable {
     case document
     case cache
     
-    func asString() -> String {
+    public func asString() -> String {
         switch self {
         case .document:
             return NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).first!
