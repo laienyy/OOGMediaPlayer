@@ -90,7 +90,11 @@ public extension MediaPlayerControl {
         
         guard let indexPath = currentIndexPath else {
             // 当前无有效下标，返回首个播放顺序
-            return getValidMediaIndexPaths().first
+            if loopMode == .shuffle {
+                return getValidMediaRandomIndexPath()
+            } else {
+                return getValidMediaIndexPaths().first
+            }
         }
 
         switch loopMode {
@@ -196,10 +200,7 @@ public extension MediaPlayerControl {
         guard list.count > 0 else {
             return nil
         }
-        var randomGenerator = SystemRandomNumberGenerator()
-        let randomInt = Int.random(in: 0..<list.count, using: &randomGenerator)
-        let indexPath = list[randomInt]
-        return indexPath
+        return list.randomElement()
     }
     
     /// 获取有效多媒体的下标列表
