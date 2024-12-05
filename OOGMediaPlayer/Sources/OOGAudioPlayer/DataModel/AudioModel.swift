@@ -196,7 +196,17 @@ extension AudioModel: BGMSong {
             
             return fileItem
         } catch let error {
-            updateFileProgress(.failed(error))
+            let err = error as NSError
+            if err.domain == NSURLErrorDomain {
+                switch err.code {
+                case NSURLErrorCancelled:
+                    updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
+                case NSURLErrorTimedOut:
+                    updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.timeout))
+                default:
+                    updateFileProgress(.failed(error))
+                }
+            }
             throw error
         }
     }

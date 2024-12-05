@@ -91,21 +91,29 @@ public enum OOGMediaPlayerError {
     
     // 下载错误
     public enum DownloadError: Error, LocalizedError {
-        // 下载的 URL 无效
+        /// 下载的 URL 无效
         case requestUrlInvalid
-        // 请求已经释放
+        /// 请求已经释放
         case requestRelease
-        // 正在下载
+        /// 正在下载
         case hasBeenDownloading
+        /// 超时
+        case timeout
+        /// 取消了
+        case canceled
         
         public var errorDescription: String? {
             switch self {
             case .requestUrlInvalid:
-                return "Request url is invalid"
-            case .requestRelease: 
-                return "Request memory was released"
+                return "Download Request url is invalid"
+            case .requestRelease:
+                return "Download Request memory was released"
             case .hasBeenDownloading:
-                return "Request has been downloading"
+                return "Download Request has been downloading"
+            case .timeout:
+                return "Download Request timeout"
+            case .canceled:
+                return "Download Request was canceled"
             }
         }
     }
