@@ -208,6 +208,8 @@ extension AudioModel: BGMSong {
                 default:
                     updateFileProgress(.failed(error))
                 }
+            } else {
+                updateFileProgress(.failed(error))
             }
             throw error
         }
