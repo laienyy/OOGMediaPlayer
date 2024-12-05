@@ -353,9 +353,17 @@ extension LocalAudioPlayerProvider {
 extension LocalAudioPlayerProvider: AVAudioPlayerDelegate {
 
     public func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-        Task {
-            await setStatus(.finished)
-            try await playNext()
+        
+        if loopMode == .single {
+            // 单曲播放
+            player.currentTime = 0
+            player.play()
+            return
+        } else {
+            Task {
+                await setStatus(.finished)
+                try await playNext()
+            }
         }
     }
     
