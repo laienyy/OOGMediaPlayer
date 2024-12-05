@@ -183,6 +183,10 @@ extension AudioModel: BGMSong {
         
         do {
             let data = try await request.fetchDataInProgress(progress: .init(queue: .main, callback: { [weak self] progress in
+                if self?.downloadRequest == nil {
+                    self?.updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
+                    return
+                }
                 self?.updateFileProgress(.downloading(progress.percentComplete))
                 if progress.isFinished {
                     self?.updateFileProgress(.downloaded)
