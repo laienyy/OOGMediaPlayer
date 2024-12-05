@@ -318,7 +318,7 @@ open class MediaPlayerControl: NSObject {
             }
             
         } catch let error {
-            log(prefix: .mediaPlayer, "Load next item failed, error: \(error)")
+            log(prefix: .mediaPlayer, "Load next item failed, error: \n\(error)")
             await playError(at: next, error: error)
             throw error
         }

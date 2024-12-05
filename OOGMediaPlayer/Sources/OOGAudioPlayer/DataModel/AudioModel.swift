@@ -127,6 +127,7 @@ extension AudioModel: BGMSong {
     public func cancelFileDownload() {
         downloadRequest?.task?.cancel()
         downloadRequest = nil
+        downloadProgress = .failed(OOGMediaPlayerError.DownloadError.canceled)
         log(prefix: .mediaPlayer, "Download Request Canceled")
     }
     
