@@ -200,7 +200,18 @@ public extension MediaPlayerControl {
         guard list.count > 0 else {
             return nil
         }
-        return list.randomElement()
+        var repeatCount = 0
+        var new = list.randomElement()
+        while list.count > 1, currentIndexPath != nil, new == currentIndexPath {
+            new = list.randomElement()
+            repeatCount += 1
+            
+            if repeatCount > 10 {
+                break
+            }
+        }
+        
+        return new
     }
     
     /// 获取有效多媒体的下标列表
