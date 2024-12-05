@@ -32,6 +32,10 @@ public class DownloadRequest: NSObject {
         self.timeoutInterval = timeoutInterval
     }
     
+    deinit {
+        log(prefix: .mediaPlayer, "Download Request released -", url)
+    }
+    
     func fetchDataInProgress(progress: ProgressHandler?) async throws -> Data {
         let progressHandler = progress
         
