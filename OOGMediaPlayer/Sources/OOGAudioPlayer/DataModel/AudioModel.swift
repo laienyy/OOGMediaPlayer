@@ -95,9 +95,10 @@ public class AudioModel: NSObject, Codable {
     /// 更新下载进度
     public func updateFileProgress(_ progress: FileDownloadProgress) {
         downloadProgress = progress
-        // 回调并释放掉需要释放的closure
-        downloadProgressActionsLock.lock()
+        
         DispatchQueue.main.async {
+            // 回调并释放掉需要释放的closure
+            self.downloadProgressActionsLock.lock()
             self.downloadProgressChangedActions = self.downloadProgressChangedActions.filter({ $0.value(self, progress) })
             self.downloadProgressActionsLock.unlock()
         }
