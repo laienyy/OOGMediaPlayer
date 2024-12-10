@@ -129,7 +129,6 @@
 			name = "iOS Sample";
 			packageProductDependencies = (
 				18601E632CD0E9BE003BE37D /* SnapKit */,
-				18601E652CD0E9BE003BE37D /* SnapKit-Dynamic */,
 				18D74DB52CD9C14800940448 /* SDWebImage */,
 				18D74DB72CD9C14800940448 /* SDWebImageMapKit */,
 				E08155E62CDF407500EC9A9D /* Lottie */,
@@ -452,11 +451,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18601E622CD0E9BE003BE37D /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
-		};
-		18601E652CD0E9BE003BE37D /* SnapKit-Dynamic */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18601E622CD0E9BE003BE37D /* XCRemoteSwiftPackageReference "SnapKit" */;
-			productName = "SnapKit-Dynamic";
 		};
 		18D74DB52CD9C14800940448 /* SDWebImage */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -64,10 +64,12 @@ public class AudioModel: NSObject, Codable {
     /// 设置新状态
     public func setNewPlayerStatus(_ status: LocalMediaStatus) {
         self.status = status
-        self.statusChangedActions = self.statusChangedActions.filter({
-            let keepLife = $0.value(self, status)
-            return keepLife
-        })
+        
+        // 回调并释放掉需要释放的closure
+        let needsRemoveItems = self.statusChangedActions.filter({ $0.value(self, status) == false })
+        needsRemoveItems.forEach { item in
+            self.statusChangedActions.removeValue(forKey: item.key)
+        }
     }
     
     //MARK: File Download Status ( Protocol: Downloadable )

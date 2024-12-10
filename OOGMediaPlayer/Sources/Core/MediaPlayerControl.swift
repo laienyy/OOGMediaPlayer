@@ -263,7 +263,8 @@ open class MediaPlayerControl: NSObject {
         log(prefix: .mediaPlayer, "Should load item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
         
         // 暂停当前播放
-        if let indexPathNow = currentIndexPath,
+        if loopMode != .single,
+           let indexPathNow = currentIndexPath,
            let audio = media(at: indexPathNow),
            audio.resId == media(at: next)?.resId {
             /**
