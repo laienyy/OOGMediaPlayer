@@ -263,22 +263,24 @@ open class MediaPlayerControl: NSObject {
         log(prefix: .mediaPlayer, "Should load item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
         
         // 暂停当前播放
-        if loopMode != .single,
-           let indexPathNow = currentIndexPath,
-           let audio = media(at: indexPathNow),
-           audio.resId == media(at: next)?.resId {
-            /**
-             *  音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
-             *
-             *  正常情况此处不应该有重复的`Media`出现，需要 play/pause 切换，在外部自行判断，此处只为避免重复加载一首歌，而出现超出预期的情况
-             */
-            log(prefix: .mediaPlayer, "Try load same one, ignore load this item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
-            currentIndexPath = next
-            return
-        } else {
-            await stop()
-        }
+//        if loopMode != .single || media,
+//           let indexPathNow = currentIndexPath,
+//           let audio = media(at: indexPathNow),
+//           audio.resId == media(at: next)?.resId {
+//            /**
+//             *  音乐是同一首，不进行其他处理，将新的indexPath设置为`currentIndex`
+//             *
+//             *  正常情况此处不应该有重复的`Media`出现，需要 play/pause 切换，在外部自行判断，此处只为避免重复加载一首歌，而出现超出预期的情况
+//             */
+//            log(prefix: .mediaPlayer, "Try load same one, ignore load this item at - (\(next.section), \(next.row))", media(at: next).debugDescription)
+//            currentIndexPath = next
+//            return
+//        } else {
+//            await stop()
+//        }
 
+        let current = currentIndexPath
+        await stop()
         
         let delegateResponseIndexPath = await delegate?.mediaPlayerControl(self, shouldPlay: next, current: currentIndexPath)
 
