@@ -46,9 +46,9 @@ public extension FileItem {
     }
     
     /// 讲 data 写入对应文件路径
-    func write(data: Data) throws {
+    func write(data: Data, overwrite: Bool = true) throws {
         let url = asFilePathUrl()
-        try FileManager.default.write(data: data, to: url, overwrite: true, createDirectoryAuto: true)
+        try FileManager.default.write(data: data, to: url, overwrite: overwrite, createDirectoryAuto: true)
     }
     
     /// 根据文件路径获取 Data
@@ -59,6 +59,10 @@ public extension FileItem {
             return nil
         }
         return FileManager.default.contents(atPath: asFilePathString())
+    }
+    
+    func removeDataFromDisk() throws {
+        try FileManager.default.removeItem(at: asFilePathUrl())
     }
 }
 

@@ -28,12 +28,6 @@ public extension AudioPlayerSettingScheme {
 
 
 extension OOGAudioPlayerSettings {
-    
-    /// 持久化
-    public func save() throws {
-        let data = try JSONEncoder().encode(self)
-        UserDefaults.standard.setValue(data, forKey: .settings, scheme: scheme)
-    }
 }
 
 public class OOGAudioPlayerSettings: Codable {
@@ -83,10 +77,26 @@ public class OOGAudioPlayerSettings: Codable {
 
 public extension OOGAudioPlayerSettings {
     
+    /// 持久化
+    func save() throws {
+        let data = try JSONEncoder().encode(self)
+        let fileItem = FileItem(root: .cache, directory: .backgroundMediaPlayerSettingsCache, fileName: scheme.rawValue)
+        try fileItem.write(data: data)
+    }
+    
     /// 根据 `Scheme` 加载 `Settings` 缓存
     static func loadScheme(_ scheme: AudioPlayerSettingScheme, defaultSettings: OOGAudioPlayerSettings?)
     -> OOGAudioPlayerSettings {
-        guard let settingsData: Data = UserDefaults.standard.value(forKey: .settings, scheme: scheme),
+        
+        let fileItem = FileItem(root: .cache, directory: .backgroundMediaPlayerSettingsCache, fileName: scheme.rawValue)
+        
+        // 兼容老版本的缓存方式
+        if let oldData: Data = UserDefaults.standard.value(forKey: .settings, scheme: scheme) {
+            try? fileItem.write(data: oldData)
+            UserDefaults.standard.setValue(nil, forKey: .settings, scheme: scheme)
+        }
+        
+        guard let settingsData: Data = fileItem.getDataFromDisk(),
               let settings = try? JSONDecoder().decode(OOGAudioPlayerSettings.self, from: settingsData) else {
             return defaultSettings ?? .init(scheme: scheme, isEnablePlayer: true, isEnableCache: true, playerVolumn: 1.0)
         }
@@ -95,8 +105,9 @@ public extension OOGAudioPlayerSettings {
     }
     
     /// 根据 `Scheme` 删除 `Settings` 缓存
-    static func removeSettingsCache(_ scheme: AudioPlayerSettingScheme) {
-        UserDefaults.standard.setValue(nil, forKey: .settings, scheme: scheme)
+    static func removeSettingsCache(_ scheme: AudioPlayerSettingScheme) throws {
+        let fileItem = FileItem(root: .cache, directory: .backgroundMediaPlayerSettingsCache, fileName: scheme.rawValue)
+        try fileItem.removeDataFromDisk()
     }
     
     /// 判断音频是否是喜爱的

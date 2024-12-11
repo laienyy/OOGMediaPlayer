@@ -12,4 +12,6 @@ public extension FileDirectory {
     static let backgroundMedia = FileDirectory(string: "/media/com.7m.BackgroundMedia")
     /// 背景音乐专辑列表 JSON 文件
     static let backgroundMediaAlbumListJson = FileDirectory(string: "/media/com.7m.BackgroundMediaAlbumListJson")
+    /// 背景音乐播放器设置缓存文件
+    static let backgroundMediaPlayerSettingsCache = FileDirectory(string: "/backgroundMediaPlayerSettingsCache")
 }
