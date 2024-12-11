@@ -14,7 +14,7 @@ private let favoriteAlbumID = -1
 extension AudioModel {
     public override var description: String {
         let memeryAddress = Unmanaged.passUnretained(self).toOpaque()
-        return "#ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription), \(memeryAddress)"
+        return "#ID: \(resId), 《 \(musicName ?? "") 》, Subscription - \(subscription), \(memeryAddress)))"
     }
 }
 
@@ -68,6 +68,13 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         
         if let indexPath = playerProvider.currentIndexPath {
             tableView.scrollToRow(at: indexPath, at: .middle, animated: true)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        playerProvider.albumList.flatMap({ $0.mediaList }).forEach { audio in
+            audio.cancelFileDownload()
         }
     }
     

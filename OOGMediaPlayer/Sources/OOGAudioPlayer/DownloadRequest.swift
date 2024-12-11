@@ -26,10 +26,12 @@ public class DownloadRequest: NSObject {
     
     var url: URL
     var timeoutInterval: TimeInterval
+    var debugInfo: String
     
-    init(url: URL, timeoutInterval: TimeInterval = 60) {
+    init(url: URL, timeoutInterval: TimeInterval = 60, debugInfo: String) {
         self.url = url
         self.timeoutInterval = timeoutInterval
+        self.debugInfo = debugInfo
     }
     
     deinit {
@@ -66,6 +68,12 @@ public class DownloadRequest: NSObject {
 //                log(prefix: .mediaPlayer, "End Sleep")
             
             for try await byte in asyncBytes {
+                
+                if task?.progress.isCancelled ?? false {
+                    log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
+                    throw OOGMediaPlayerError.DownloadError.canceled
+                }
+                
                 data.append(byte)
                 
                 if let handler = progressHandler {
@@ -81,7 +89,7 @@ public class DownloadRequest: NSObject {
                     preProgress = Int(data.count)
                     progress.completedUnitCount = Int64(data.count)
                     
-                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.url.relativePath))",
+                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.debugInfo))",
                                                    progress.completedUnitCount,
                                                    progress.totalUnitCount,
                                                    progress.percentComplete * 100))
@@ -90,11 +98,11 @@ public class DownloadRequest: NSObject {
                 }
             }
             
-            log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(data.count / 1024) KB)")
+            log(prefix: .mediaPlayer, "Downloading finished - \(self.debugInfo) (\(data.count / 1024) KB)")
             return data
         }
         
-        log(prefix: .mediaPlayer, "Downloading finished - \(self.url.relativePath) (\(response.count / 1024) KB)")
+        log(prefix: .mediaPlayer, "Downloading finished - \(self.debugInfo) (\(response.count / 1024) KB)")
         
         return response
     }

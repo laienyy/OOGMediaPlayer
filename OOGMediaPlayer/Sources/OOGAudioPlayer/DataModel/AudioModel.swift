@@ -180,7 +180,7 @@ extension AudioModel: BGMSong {
          * 有进度下载方式
          */
         
-        let request = DownloadRequest(url: url, timeoutInterval: timeoutInterval)
+        let request = DownloadRequest(url: url, timeoutInterval: timeoutInterval, debugInfo: displayName ?? "Unknown")
         downloadRequest = request
         
         do {
