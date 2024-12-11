@@ -35,7 +35,7 @@ public class DownloadRequest: NSObject {
     }
     
     deinit {
-        log(prefix: .mediaPlayer, "Download Request released -", url)
+        log(prefix: .mediaPlayer, "Download Request released -", debugInfo)
     }
     
     func fetchDataInProgress(progress: ProgressHandler?) async throws -> Data {
@@ -89,10 +89,10 @@ public class DownloadRequest: NSObject {
                     preProgress = Int(data.count)
                     progress.completedUnitCount = Int64(data.count)
                     
-                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.debugInfo))",
-                                                   progress.completedUnitCount,
-                                                   progress.totalUnitCount,
-                                                   progress.percentComplete * 100))
+//                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.debugInfo))",
+//                                                   progress.completedUnitCount,
+//                                                   progress.totalUnitCount,
+//                                                   progress.percentComplete * 100))
                     
                     handler.queue.async { progressHandler?.callback(progress) }
                 }
