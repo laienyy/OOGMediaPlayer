@@ -61,7 +61,11 @@ public class OOGAudioPlayerSettings: Codable {
     /// 单曲循环ID，用于记录单曲循环指定的音乐ID
     public var loopDesignatedSongID: Int?
     /// 列表循环ID，记录专辑循环指定的专辑ID
-    public var loopDesignateAlbumID: Int?
+    public var loopDesignateAlbumID: Int? {
+        didSet {
+            
+        }
+    }
     
     
     public init(scheme: AudioPlayerSettingScheme,
