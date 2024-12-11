@@ -27,6 +27,8 @@ public class DownloadRequest: NSObject {
     var url: URL
     var timeoutInterval: TimeInterval
     var debugInfo: String
+    var isCanceled: Bool = false
+    var progressHandler: ProgressHandler?
     
     init(url: URL, timeoutInterval: TimeInterval = 60, debugInfo: String) {
         self.url = url
@@ -39,10 +41,14 @@ public class DownloadRequest: NSObject {
     }
     
     func fetchDataInProgress(progress: ProgressHandler?) async throws -> Data {
-        let progressHandler = progress
+        self.progressHandler = progress
         
-        log(prefix: .mediaPlayer, "Start downloading - \(url.relativePath)")
+        log(prefix: .mediaPlayer, "Start downloading - \(debugInfo)")
         let (asyncBytes, urlResponse) = try await URLSession.shared.bytes(from: url)
+        guard !self.isCanceled else {
+            log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
+            throw OOGMediaPlayerError.DownloadError.canceled
+        }
         
         task = asyncBytes.task
         
@@ -51,6 +57,10 @@ public class DownloadRequest: NSObject {
             
             guard let `self` = self else {
                 throw OOGMediaPlayerError.DownloadError.requestRelease
+            }
+            guard !self.isCanceled else {
+                log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
+                throw OOGMediaPlayerError.DownloadError.canceled
             }
             
             let length = (urlResponse.expectedContentLength)
@@ -69,14 +79,14 @@ public class DownloadRequest: NSObject {
             
             for try await byte in asyncBytes {
                 
-                if task?.progress.isCancelled ?? false {
+                guard !self.isCanceled else {
                     log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
                     throw OOGMediaPlayerError.DownloadError.canceled
                 }
                 
                 data.append(byte)
                 
-                if let handler = progressHandler {
+                if let handler = self.progressHandler {
                     
                     // 计算下载进度
                     let diff = data.count - preProgress
@@ -94,7 +104,7 @@ public class DownloadRequest: NSObject {
 //                                                   progress.totalUnitCount,
 //                                                   progress.percentComplete * 100))
                     
-                    handler.queue.async { progressHandler?.callback(progress) }
+                    handler.queue.async { self.progressHandler?.callback(progress) }
                 }
             }
             
@@ -109,6 +119,7 @@ public class DownloadRequest: NSObject {
     
     public func cancel() {
         task?.cancel()
+        isCanceled = true
     }
 }
 
