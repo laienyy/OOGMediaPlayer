@@ -90,15 +90,13 @@ public class AudioModel: NSObject, Codable {
     }
     
     /// 更新下载进度
-    public func updateFileProgress(_ progress: FileDownloadProgress) {
+    @MainActor public func updateFileProgress(_ progress: FileDownloadProgress) {
         downloadProgress = progress
         
-        DispatchQueue.main.async {
-            // 回调并释放掉需要释放的closure
-            let needsRemoveItems = self.downloadProgressChangedActions.filter({ $0.value(self, progress) == false })
-            needsRemoveItems.forEach { item in
-                self.downloadProgressChangedActions.removeValue(forKey: item.key)
-            }
+        // 回调并释放掉需要释放的closure
+        let needsRemoveItems = self.downloadProgressChangedActions.filter({ $0.value(self, progress) == false })
+        needsRemoveItems.forEach { item in
+            self.downloadProgressChangedActions.removeValue(forKey: item.key)
         }
     }
     
@@ -128,12 +126,14 @@ extension AudioModel: BGMSong {
     /// 取消下载
     public func cancelFileDownload() {
         downloadRequest?.cancel()
-        updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
-        
         if downloadRequest != nil {
             log(prefix: .mediaPlayer, "Download Request Canceled:", self)
         }
         downloadRequest = nil
+        
+        Task {
+            await updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
+        }
     }
     
     public func getFileItem() -> FileItem {
@@ -149,7 +149,7 @@ extension AudioModel: BGMSong {
         let fileInfo = getFileItem()
         if useCache, fileInfo.isDataValid() {
             // 返回缓存
-            updateFileProgress(.downloaded)
+            await updateFileProgress(.downloaded)
             log(prefix: .mediaPlayer, "Find cache for: 《 \(fileInfo.fileName) 》")
             return fileInfo.asFilePathUrl()
         }
@@ -161,64 +161,74 @@ extension AudioModel: BGMSong {
     @discardableResult
     public func downloadFileData(timeoutInterval: TimeInterval) async throws -> FileItem {
         
-        guard !downloadProgress.isDownloading else {
-            throw OOGMediaPlayerError.DownloadError.hasBeenDownloading
-        }
-        
-        guard let urlString = audio else {
-            throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
-        }
-        
-        guard let url = URL(string: urlString) else {
-            throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
-        }
-        
-        updateFileProgress(.downloading(0.0))
-        /**
-         * 无进度下载方式
-         */
-//        let data = try await URLSession.shared.download(url: url)
-        
-        /**
-         * 有进度下载方式
-         */
-        
-        let request = DownloadRequest(url: url, timeoutInterval: timeoutInterval, debugInfo: displayName ?? "Unknown")
-        downloadRequest = request
-        
         do {
-            let data = try await request.fetchDataInProgress(progress: .init(queue: .main, callback: { [weak self] progress in
-                if self?.downloadRequest == nil {
-                    self?.updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
-                    return
+            
+            guard !downloadProgress.isDownloading else {
+                throw OOGMediaPlayerError.DownloadError.hasBeenDownloading
+            }
+            
+            guard let urlString = audio else {
+                throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
+            }
+            
+            guard let url = URL(string: urlString) else {
+                throw OOGMediaPlayerError.DownloadError.requestUrlInvalid
+            }
+            
+            await updateFileProgress(.downloading(0.0))
+            /**
+             * 无进度下载方式
+             */
+            //        let data = try await URLSession.shared.download(url: url)
+            
+            /**
+             * 有进度下载方式
+             */
+            
+            let request = DownloadRequest(url: url, timeoutInterval: timeoutInterval, debugInfo: displayName ?? "Unknown")
+            downloadRequest = request
+            
+            let progressHandler: ProgressHandler = .init(queue: .main, callback: { [weak self] progress in
+                Task {
+                    guard let `self` = self else { return }
+                    if self.downloadRequest == nil {
+                        await self.updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
+                        return
+                    }
+                    await self.updateFileProgress(.downloading(progress.percentComplete))
+                    if progress.isFinished {
+                        await self.updateFileProgress(.downloaded)
+                    }
                 }
-                self?.updateFileProgress(.downloading(progress.percentComplete))
-                if progress.isFinished {
-                    self?.updateFileProgress(.downloaded)
-                }
-            }))
+            })
+            
+            let data = try await request.fetchDataInProgress(progress: progressHandler)
             
             let fileItem = getFileItem()
             try fileItem.write(data: data)
             // 根据网络链接存储缓存文件路径
             fileItem.storeFilePath(key: urlString)
             
-            log(prefix: .mediaPlayer, "Download Request Finished: \(downloadRequest?.task?.state.rawValue ?? -1) - \(downloadRequest?.url.relativePath ?? "none")")
+            let stateRawValue = request.task?.state.rawValue ?? -1
+            let debugInfo = request.debugInfo
+            log(prefix: .mediaPlayer, "Download Request Finished: \(stateRawValue) - \(debugInfo)")
             
             return fileItem
+            
         } catch let error {
+            
             let err = error as NSError
             if err.domain == NSURLErrorDomain {
                 switch err.code {
                 case NSURLErrorCancelled:
-                    updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
+                    await updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.canceled))
                 case NSURLErrorTimedOut:
-                    updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.timeout))
+                    await updateFileProgress(.failed(OOGMediaPlayerError.DownloadError.timeout))
                 default:
-                    updateFileProgress(.failed(error))
+                    await updateFileProgress(.failed(error))
                 }
             } else {
-                updateFileProgress(.failed(error))
+                await updateFileProgress(.failed(error))
             }
             throw error
         }

@@ -43,21 +43,22 @@ public class DownloadRequest: NSObject {
     func fetchDataInProgress(progress: ProgressHandler?) async throws -> Data {
         self.progressHandler = progress
         
-        log(prefix: .mediaPlayer, "Start downloading - \(debugInfo)")
-        let (asyncBytes, urlResponse) = try await URLSession.shared.bytes(from: url)
-        guard !self.isCanceled else {
-            log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
-            throw OOGMediaPlayerError.DownloadError.canceled
-        }
-        
-        task = asyncBytes.task
-        
         // 增加超时
         let response =  try await excute(timeout: timeoutInterval) { [weak self] in
             
             guard let `self` = self else {
                 throw OOGMediaPlayerError.DownloadError.requestRelease
             }
+            
+            log(prefix: .mediaPlayer, "Start downloading - \(debugInfo)")
+            let (asyncBytes, urlResponse) = try await URLSession.shared.bytes(from: url)
+            guard !self.isCanceled else {
+                log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
+                throw OOGMediaPlayerError.DownloadError.canceled
+            }
+            
+            task = asyncBytes.task
+            
             guard !self.isCanceled else {
                 log(prefix: .mediaPlayer, "Download was canceled - \(self.debugInfo)")
                 throw OOGMediaPlayerError.DownloadError.canceled
@@ -73,9 +74,9 @@ public class DownloadRequest: NSObject {
             // 记录已经完成的进度
             var preProgress: Int = 0
             
-//                log(prefix: .mediaPlayer, "Start Sleep")
-//                try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
-//                log(prefix: .mediaPlayer, "End Sleep")
+            //                log(prefix: .mediaPlayer, "Start Sleep")
+            //                try await Task.sleep(nanoseconds: 1_000_000_000 * 5)
+            //                log(prefix: .mediaPlayer, "End Sleep")
             
             for try await byte in asyncBytes {
                 
@@ -90,7 +91,7 @@ public class DownloadRequest: NSObject {
                     
                     // 计算下载进度
                     let diff = data.count - preProgress
-                    // 降低回调频率，过滤回调次数过多的问题
+                    // 降低回调频率，过滤回调次数过多的问题（后续需要调整）
                     let isNesessaryToCallback = diff > callbackGranularity || data.count == length
                     guard isNesessaryToCallback else {
                         continue
@@ -98,11 +99,10 @@ public class DownloadRequest: NSObject {
                     
                     preProgress = Int(data.count)
                     progress.completedUnitCount = Int64(data.count)
-                    
-//                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.debugInfo))",
-//                                                   progress.completedUnitCount,
-//                                                   progress.totalUnitCount,
-//                                                   progress.percentComplete * 100))
+                    //                    log(prefix: "Download", String(format: "Progress: %ld / %ld - %.1f%%  -- (\(self.debugInfo))",
+                    //                                                   progress.completedUnitCount,
+                    //                                                   progress.totalUnitCount,
+                    //                                                   progress.percentComplete * 100))
                     
                     handler.queue.async { self.progressHandler?.callback(progress) }
                 }
