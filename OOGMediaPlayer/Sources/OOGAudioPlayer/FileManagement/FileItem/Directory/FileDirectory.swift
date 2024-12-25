@@ -10,7 +10,11 @@ import Foundation
 // 文件夹
 public struct FileDirectory: Codable {
     
-    var string: String
+    public var string: String
+    
+    public init(string: String) {
+        self.string = string
+    }
     
     // 移除反斜杠前缀
     public func asString() -> String {
