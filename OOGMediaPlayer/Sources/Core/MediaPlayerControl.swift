@@ -399,7 +399,12 @@ public extension MediaPlayerControl {
             log(prefix: .mediaPlayer, "IndexPath is out of range", indexPath, items.count)
             return nil
         }
-        let media = items[indexPath.section].mediaList[indexPath.row]
+        let section = indexPath.section
+        let row = indexPath.row
+        guard items.count > section, items[section].mediaList.count > row else {
+            return nil
+        }
+        let media = items[section].mediaList[row]
         return media
     }
     
