@@ -38,6 +38,27 @@ public extension MediaPlayerControl {
             // 随机循环
             return getValidMediaRandomIndexPath()
             
+        case .albumShuffle:
+            
+            guard let albumId = albumIdForShuffle else {
+                Logger.share.log(prefix: .mediaPlayer, "Not found albumIdForShuffle, get previous indexPath failed")
+                return nil
+            }
+            
+            guard let index = getItems().firstIndex(where: { $0.id == albumId}) else {
+                Logger.share.log(prefix: .mediaPlayer, "Not found albumIdForShuffle, get previous indexPath failed")
+                return nil
+            }
+            // 指定歌单/专辑循环
+            guard isExistsValidMedia(at: index) else {
+                Logger.share.log(prefix: .mediaPlayer, "Without valid media for specific album, get previous indexPath failed")
+                return nil
+            }
+            
+            let indexPath = getValidMediaRandomIndexPath(atAlbumIndex: index)
+            return indexPath
+            
+            
         case .album:
             // 歌单、专辑循环
             
@@ -101,6 +122,25 @@ public extension MediaPlayerControl {
         case .single:
             // 单曲循环
             return currentIndexPath
+            
+        case .albumShuffle:
+            guard let albumId = albumIdForShuffle else {
+                Logger.share.log(prefix: .mediaPlayer, "Not found albumIdForShuffle, get previous indexPath failed")
+                return nil
+            }
+            
+            guard let index = getItems().firstIndex(where: { $0.id == albumId}) else {
+                Logger.share.log(prefix: .mediaPlayer, "Not found albumIdForShuffle, get previous indexPath failed")
+                return nil
+            }
+            // 指定歌单/专辑循环
+            guard isExistsValidMedia(at: index) else {
+                Logger.share.log(prefix: .mediaPlayer, "Without valid media for specific album, get previous indexPath failed")
+                return nil
+            }
+            
+            let indexPath = getValidMediaRandomIndexPath(atAlbumIndex: index)
+            return indexPath
             
         case .shuffle:
             // 随机循环 （已有指定的播放位置则返回指定的位置）
@@ -194,14 +234,34 @@ public extension MediaPlayerControl {
         return result
     }
     
+    /// 获取随机一个有效多媒 (指定专辑)
+    func getValidMediaRandomIndexPath(atAlbumIndex index : Int) -> IndexPath? {
+        let list = getValidMediaIndexPaths(at: index)
+        var new = list.randomElement()
+        
+        // 判断是否随机到了当前播放的歌曲
+        var repeatCount = 0
+        while list.count > 1, currentIndexPath != nil, new == currentIndexPath{
+            new = list.randomElement()
+            repeatCount += 1
+            
+            if repeatCount > 10 {
+                break
+            }
+        }
+        return new
+    }
+    
     /// 获取随机一个有效多媒体下标
     func getValidMediaRandomIndexPath() -> IndexPath? {
         let list = getValidMediaIndexPaths()
         guard list.count > 0 else {
             return nil
         }
-        var repeatCount = 0
         var new = list.randomElement()
+        
+        // 判断是否随机到了当前播放的歌曲
+        var repeatCount = 0
         while list.count > 1, currentIndexPath != nil, new == currentIndexPath {
             new = list.randomElement()
             repeatCount += 1
@@ -225,7 +285,7 @@ public extension MediaPlayerControl {
     
     /// 获取某`Section`有效多媒体的的下标列表
     func getValidMediaIndexPaths(at section: Int) -> [IndexPath] {
-        guard getItems().count > section else {
+        guard getItems().count > section, section >= 0 else {
             return []
         }
         let indexPaths = getItems()[section].mediaList.enumerated().compactMap { element in

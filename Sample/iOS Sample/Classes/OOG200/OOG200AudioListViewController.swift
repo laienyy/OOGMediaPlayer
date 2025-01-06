@@ -100,6 +100,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
         tableView.backgroundColor = #colorLiteral(red: 0.9594742656, green: 0.956212461, blue: 0.9530892968, alpha: 1)
         view.addSubview(tableView)
         
+        tableHeaderView.titleLabel.text = "随机播放"
         tableHeaderView.shuffleSwitch.isOn = settings.loopMode == .shuffle
         tableHeaderView.shuffleSwitch.addTarget(self, action: #selector(shuffleSwitchValueChanged), for: .touchUpInside)
         let screenSize = UIScreen.main.bounds.size
@@ -121,6 +122,7 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     @objc func shuffleSwitchValueChanged(_ sender: UISwitch) {
         if sender.isOn {
             setPlayerLoop(mode: .shuffle)
+            tableView.reloadData()
         } else {
             setPlayerLoop(mode: .order)
         }
@@ -331,7 +333,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let song = playerProvider.getSong(at: indexPath) as? AudioModel
+        let song = playerProvider.getSong(at: indexPath)
         
         guard song?.isPlayable ?? false else {
             return
@@ -365,6 +367,7 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
         let isFirst = section == 0
         let isLast = section + 1 == playerProvider.albumList.count
         let isFold = isFold(section: section)
+        let isShuffle = isAlbumShuffle(album)
         
         if album.isFavoriteAlbum {
             // 《喜欢的》专辑 icon
@@ -410,6 +413,21 @@ extension OOG200AudioListViewController: UITableViewDelegate, UITableViewDataSou
                 // 收起
                 self.setFold(true, album: album)
             }
+            self.tableView.reloadData()
+        }
+        
+        header.isShuffle = isShuffle
+        header.shuffleAction = {
+            [weak self] header in
+            guard let `self` = self else { return }
+            
+            let isShuffle = header.isShuffle
+            if isShuffle {
+                self.setPlayerLoop(mode: .order)
+            } else {
+                self.setAlbumShuffleLoop(album: album)
+            }
+            self.tableHeaderView.shuffleSwitch.setOn(false, animated: true)
             self.tableView.reloadData()
         }
         

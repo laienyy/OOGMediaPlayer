@@ -319,11 +319,9 @@ extension LocalAudioPlayerProvider {
         
         // 选出所有id相同的多媒体
         let items = getItems().flatMap({ $0.mediaList }).filter({ $0.resId == item.resId }) as? [LocalMediaPlayable]
-//        DispatchQueue.main.async {
-            for item in items ?? [] {
-                self.setItemStatus(item, status: status)
-            }
-//        }
+        for item in items ?? [] {
+            self.setItemStatus(item, status: status)
+        }
     }
     
     @MainActor
@@ -332,21 +330,10 @@ extension LocalAudioPlayerProvider {
                              .compactMap({ $0 as? LocalMediaPlayable })
                              .filter { $0.resId == item.resId }
         
-        let itemsDescription = sameItems.map({ "\($0)" }).joined(separator: "\n\t")
-
         log(prefix: .mediaPlayer, "Set status [ \(status) ] - \(item)")
-        
-//        if Thread.isMainThread {
-            sameItems.forEach {
-                $0.setNewPlayerStatus(status)
-            }
-//        } else {
-//            DispatchQueue.main.sync {
-//                sameItems.forEach {
-//                    $0.setNewPlayerStatus(status)
-//                }
-//            }
-//        }
+        sameItems.forEach {
+            $0.setNewPlayerStatus(status)
+        }
     }
 }
 

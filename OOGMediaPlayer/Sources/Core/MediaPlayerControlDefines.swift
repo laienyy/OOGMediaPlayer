@@ -40,6 +40,8 @@ extension MediaPlayerControl {
         case album
         /// 单曲循环
         case single
+        /// 专辑内随机
+        case albumShuffle
         /// 随机循环
         case shuffle
         
@@ -49,6 +51,7 @@ extension MediaPlayerControl {
             case .order: return "顺序循环"
             case .album: return "专辑循环"
             case .single: return "单曲循环"
+            case .albumShuffle: return "专辑随机"
             case .shuffle: return "随机循环"
             }
         }

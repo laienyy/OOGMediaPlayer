@@ -7,6 +7,8 @@
 
 import UIKit
 
+typealias SimpleAction<T> = (T) -> Void
+
 class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
 
     let headerContentView = UIView()
@@ -29,6 +31,7 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
     
     let titleLabel = UILabel()
     let subtitleLabel = UILabel()
+    let shuffleButton = UIButton(type: .custom)
     let loopButton = UIButton(type: .custom)
     let foldButton = UIButton(type: .custom)
     
@@ -40,9 +43,16 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
         get { foldButton.isSelected }
         set { foldButton.isSelected = newValue }
     }
+    var isShuffle: Bool {
+        get { shuffleButton.isSelected }
+        set { shuffleButton.isSelected = newValue }
+    }
     
-    var loopAction: ((BGMAlbumTableSectionHeaderView) -> Void)?
-    var foldAction: ((BGMAlbumTableSectionHeaderView) -> Void)?
+    
+    
+    var loopAction: SimpleAction<BGMAlbumTableSectionHeaderView>?
+    var foldAction: SimpleAction<BGMAlbumTableSectionHeaderView>?
+    var shuffleAction: SimpleAction<BGMAlbumTableSectionHeaderView>?
     
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
@@ -79,6 +89,9 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
         titleLabel.text = "Album Name"
         subtitleLabel.text = "Number of songs"
         
+        shuffleButton.setImage(UIImage(named: "icon_random_loop"), for: .normal)
+        shuffleButton.setImage(UIImage(named: "icon_random_loop_sel"), for: .selected)
+        
         loopButton.setImage(UIImage(named: "bgm_list_loop"), for: .normal)
         loopButton.setImage(UIImage(named: "bgm_list_loop_selected"), for: .selected)
         
@@ -87,6 +100,7 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
         
         loopButton.addTarget(self, action: #selector(loopButtonPressed), for: .touchUpInside)
         foldButton.addTarget(self, action: #selector(foldButtonPressed), for: .touchUpInside)
+        shuffleButton.addTarget(self, action: #selector(shuffleButtonPressed), for: .touchUpInside)
             
         let tapRecognizer = UITapGestureRecognizer()
         tapRecognizer.addTarget(self, action: #selector(foldButtonPressed))
@@ -102,7 +116,7 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
         }
         
         
-        headerContentView.addSubviews(specialIconImageView, coverGrayBg2, coverGrayBg1, coverImageView, titleLabel, subtitleLabel, loopButton, foldButton)
+        headerContentView.addSubviews(specialIconImageView, coverGrayBg2, coverGrayBg1, coverImageView, titleLabel, subtitleLabel, shuffleButton, loopButton, foldButton)
         
         coverImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(14)
@@ -143,9 +157,17 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
             make.bottom.equalTo(coverImageView).inset(7)
         }
         
-        loopButton.snp.makeConstraints { make in
+        shuffleButton.snp.makeConstraints { make in
             let width = 40 as CGFloat
             make.leading.equalTo(titleLabel.snp.trailing).offset(8)
+            make.trailing.equalToSuperview().inset(72 - (width - 32) - 8).priority(.high)
+            make.centerY.equalToSuperview()
+            make.width.height.equalTo(width)
+        }
+        
+        loopButton.snp.makeConstraints { make in
+            let width = 40 as CGFloat
+            make.leading.equalTo(shuffleButton.snp.trailing).offset(8)
             make.trailing.equalToSuperview().inset(72 - (width - 32) / 2).priority(.high)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(width)
@@ -169,6 +191,10 @@ class BGMAlbumTableSectionHeaderView: UITableViewHeaderFooterView {
     
     @objc func foldButtonPressed() {
         foldAction?(self)
+    }
+    
+    @objc func shuffleButtonPressed() {
+        shuffleAction?(self)
     }
 
     func updateCorner(isFirst: Bool, isLast: Bool, isFold: Bool) {

@@ -19,6 +19,12 @@ public extension OOGAudioPlayerProvider {
         loopMode = settings.loopMode
         isEnable = settings.isEnablePlayer
         
+        switch loopMode {
+        case .albumShuffle:
+            albumIdForShuffle = settings.loopDesignateAlbumID
+        case .single, .album, .order, .none, .shuffle:
+            break
+        }
     }
     
     /**
@@ -33,7 +39,6 @@ public extension OOGAudioPlayerProvider {
      3. 根据`currentIndex`恢复播放 （如果歌曲无效，取消播放）
      
      */
-    @discardableResult
     func resumePlay(by settings: OOGAudioPlayerSettings, playAutomatically: Bool) async throws {
         
         var specificIndexPath: IndexPath?
@@ -93,16 +98,16 @@ public extension OOGAudioPlayerProvider {
     // 检查是否根据循环模式是否需要切换指定的循环区间的歌曲
     func playDesignatedLoopSongIfNeeds(settings: OOGAudioPlayerSettings) {
         
+        
         if loopMode == .single,
            let songId = settings.loopDesignatedSongID,
            currentSong()?.resId != songId {
             
             playIfExists(id: songId)
         }
-        else if
-            loopMode == .album,
-            let albumId = settings.loopDesignateAlbumID,
-            currentAlbum()?.id != albumId {
+        else if loopMode == .album,
+                let albumId = settings.loopDesignateAlbumID,
+                currentAlbum()?.id != albumId {
             
             guard let albumIndex = albumList.firstIndex(where: { $0.id == albumId }) else {
                 return
@@ -111,6 +116,23 @@ public extension OOGAudioPlayerProvider {
                 return
             }
             let indexPath = IndexPath(row: 0, section: albumIndex)
+            load(indexPath: indexPath, autoPlay: true)
+        }
+        else if loopMode == .albumShuffle,
+                let albumId = settings.loopDesignateAlbumID,
+                currentAlbum()?.id != albumId {
+            
+            guard
+                let albumIndex = albumList.firstIndex(where: { $0.id == albumId }),
+                !albumList[albumIndex].mediaList.isEmpty
+            else {
+                return
+            }
+            
+            guard let indexPath = getValidMediaRandomIndexPath(atAlbumIndex: albumIndex) else {
+                return
+            }
+            
             load(indexPath: indexPath, autoPlay: true)
         }
         

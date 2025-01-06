@@ -436,6 +436,8 @@ extension OOG200AudioPlayerViewController: MediaPlayerControlDelegate {
         playerWidgetView.setAudioName(media.displayName ?? "未命名")
         startActivityIndicator(true)
         
+        statusLabel.text = "正在加载 - \(media.fileName) [\(indexPath.section) - \(indexPath.row)]"
+        
         return indexPath
     }
     

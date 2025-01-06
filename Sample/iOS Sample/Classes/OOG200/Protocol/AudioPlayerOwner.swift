@@ -76,6 +76,21 @@ extension AudioPlayerOwner {
         }
     }
     
+    func setAlbumShuffleLoop(album: any BGMAlbum) {
+        playerProvider.loopMode = .albumShuffle
+        settings.loopMode = .albumShuffle
+        
+        settings.loopDesignateAlbumID = album.id
+        settings.loopDesignatedSongID = nil
+        
+        do {
+            try settings.save()
+            print("AudioPlayer - Set loop mode: \(playerProvider.loopMode.userInterfaceDisplay), album ID: \(album.id)")
+        } catch {
+            print("Save settings error:", error)
+        }
+    }
+    
     
     func isFavorite(song: BGMSong) -> Bool {
         return settings.favoriteList.contains(song.resId)
@@ -87,6 +102,10 @@ extension AudioPlayerOwner {
     
     func isLoop(album: any BGMAlbum) -> Bool {
         return playerProvider.loopMode == .album && settings.loopDesignateAlbumID == album.id
+    }
+    
+    func isAlbumShuffle(_ album: any BGMAlbum) -> Bool {
+        return playerProvider.loopMode == .albumShuffle && settings.loopDesignateAlbumID == album.id
     }
 
     func nextPlayableIndexPath(from: IndexPath) -> IndexPath? {
