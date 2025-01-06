@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "OOGMediaPlayer"
-  spec.version      = "1.1.21"
+  spec.version      = "1.1.22"
   spec.summary      = "A short description of OOGMediaPlayer."
   
   spec.description  = <<-DESC
