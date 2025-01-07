@@ -92,6 +92,7 @@ extension AudioPlayerOwner {
     }
     
     
+    
     func isFavorite(song: BGMSong) -> Bool {
         return settings.favoriteList.contains(song.resId)
     }

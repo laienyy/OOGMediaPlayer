@@ -149,7 +149,8 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         guard let item = currentItem() as? LocalMediaPlayable else {
             log(prefix: .mediaPlayer, "Prepare to play item failed, current item is nil")
-            throw OOGMediaPlayerError.MediaPlayerControlError.currentItemIsNil
+            playError(at: currentIndexPath, error: OOGMediaPlayerError.MediaPlayerControlError.currentItemIsNilWhenPrepareToPlay)
+            throw OOGMediaPlayerError.MediaPlayerControlError.currentItemIsNilWhenPrepareToPlay
         }
         
         guard !isIndexPathInPreparingQueue(indexPath) else {
@@ -212,11 +213,13 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         guard let indexPath = currentIndexPath else {
             log(prefix: .mediaPlayer, "[ERR] Try to play failed, the `currentIndexPath` is nil")
+            playError(at: currentIndexPath, error: OOGMediaPlayerError.LocalAudioPlayerError.currentIndexPathIsNil)
             return
         }
         
         guard isEnable else {
             log(prefix: .mediaPlayer, "Try to play failed, the `isEnable` is false")
+            playError(at: currentIndexPath, error: OOGMediaPlayerError.MediaPlayerControlError.isNotEnable)
             return
         }
         
@@ -228,6 +231,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
             }
             
             log(prefix: .mediaPlayer, "Ignore play for this time, there have no valid media to play")
+            playError(at: currentIndexPath, error: OOGMediaPlayerError.LocalAudioPlayerError.audioPlayerIsNil)
             return
         }
         
@@ -278,6 +282,7 @@ open class LocalAudioPlayerProvider: MediaPlayerControl {
         
         guard let indexPath = currentIndexPath else {
             log(prefix: .mediaPlayer, "ERROR, Can not to post `DidStartPlayingAudio` Notification and call delegate, because currentIndexPath is nil")
+            playError(at: currentIndexPath, error: OOGMediaPlayerError.LocalAudioPlayerError.currentIndexPathIsNil)
             return
         }
         

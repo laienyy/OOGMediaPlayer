@@ -14,8 +14,8 @@ public enum OOGMediaPlayerError {
         case isNotEnable
         // 列表不存在有效的多媒体数据 （MediaPlayable.isValid == False）
         case noInvalidItem
-        // 当前播放的多媒体数据为空
-        case currentItemIsNil
+        // 准备播放是，当前播放的多媒体数据为空
+        case currentItemIsNilWhenPrepareToPlay
         // 文件已经在准备播放期间
         case alreadyBeenPreparing
         
@@ -25,7 +25,7 @@ public enum OOGMediaPlayerError {
                 return "Player is not enable"
             case .noInvalidItem:
                 return "No valid playable item for now"
-            case .currentItemIsNil:
+            case .currentItemIsNilWhenPrepareToPlay:
                 return "Player current item indexPath is none or the indexPath is valid (at indexPath can not found media item)"
             case .alreadyBeenPreparing:
                 return "File already been preparing, Now is during `Downloading` or during `prepareToPlay` step)"
@@ -42,6 +42,10 @@ public enum OOGMediaPlayerError {
         case noPermissionToPlay
         /// 没有合适的indexPath
         case notFoundValidIndexPathBySetting
+        /// 当前 indexPath 是空
+        case currentIndexPathIsNil
+        /// AVAudioPlayer是空
+        case audioPlayerIsNil
         
         public var errorDescription: String? {
             switch self {
@@ -53,6 +57,10 @@ public enum OOGMediaPlayerError {
                 return "Audio no permission to play"
             case .notFoundValidIndexPathBySetting:
                 return "Not found valid indexPath by setting"
+            case .currentIndexPathIsNil:
+                return "Current indexPath is nil"
+            case .audioPlayerIsNil:
+                return "AudioPlayer is nil"
             }
         }
     }
