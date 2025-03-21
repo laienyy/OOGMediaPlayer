@@ -59,30 +59,14 @@ public class AudioModel: NSObject, Codable {
     
     //MARK: File Download Status ( Protocol: Downloadable )
     
-    var downloadProgressChangedActions: [AnyHashable: DownloadStatusChangedClosure] = [:]
     /// 文件状态
-    public var downloadProgress: FileDownloadProgress = .normal
+    @Published public var downloadProgress: FileDownloadProgress = .normal
     /// 下载请求
     public var downloadRequest: DownloadRequest?
-    /// 更新文件状态状态
-    public func observeDownloadProgress(_ observer: AnyHashable, progression: @escaping DownloadStatusChangedClosure) {
-        downloadProgressChangedActions[observer] = progression
-    }
-    
-    /// 移除下载进度监听
-    public func removeDownloadProgressObserver(_ observer: AnyHashable) {
-        downloadProgressChangedActions[self] = nil
-    }
     
     /// 更新下载进度
     @MainActor public func updateFileProgress(_ progress: FileDownloadProgress) {
         downloadProgress = progress
-        
-        // 回调并释放掉需要释放的closure
-        let needsRemoveItems = self.downloadProgressChangedActions.filter({ $0.value(self, progress) == false })
-        needsRemoveItems.forEach { item in
-            self.downloadProgressChangedActions.removeValue(forKey: item.key)
-        }
     }
     
 }

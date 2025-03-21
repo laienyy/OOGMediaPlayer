@@ -108,6 +108,9 @@ class BGMItemTableViewCell: UITableViewCell {
         super.prepareForReuse()
         
         isLock = false
+        
+        cancelables.forEach { $0.cancel() }
+        cancelables.removeAll()
     }
     
     func initialization() {
@@ -281,21 +284,19 @@ extension BGMItemTableViewCell {
         
         downloadProgressView.isHidden = false
         
-        model?.observeDownloadProgress(self) { [weak self] model, status in
-            guard self?.model?.resId == model.resId else {
-                return false
-            }
-            switch status {
-            case .downloading(let progress):
-                self?.downloadProgressView.isHidden = false
-                self?.downloadProgressView.setProgress(progress, animated: false)
-            case .downloaded:
-                self?.downloadProgressView.setProgress(1, animated: false)
-            default:
-                break
-            }
-            
-            return true
+        if let song = model as? AudioModel {
+            song.$downloadProgress.receive(on: DispatchQueue.main).sink { [weak self] status in
+                guard let `self` = self else { return }
+                switch status {
+                case .downloading(let progress):
+                    self.downloadProgressView.isHidden = false
+                    self.downloadProgressView.setProgress(progress, animated: false)
+                case .downloaded:
+                    self.downloadProgressView.setProgress(1, animated: false)
+                default:
+                    break
+                }
+            }.store(in: &cancelables)
         }
     }
     

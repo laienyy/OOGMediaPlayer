@@ -7,6 +7,7 @@
 
 import UIKit
 import OOGMediaPlayer
+import Combine
 
 class AudioTableViewCell: UITableViewCell {
 
@@ -29,6 +30,8 @@ class AudioTableViewCell: UITableViewCell {
     
     private var isCurrentPlay: Bool = false
     private var model: (any BGMSong)?
+    
+    private var cancelables: Set<AnyCancellable> = []
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -72,13 +75,10 @@ class AudioTableViewCell: UITableViewCell {
         loopButton.isSelected = isLoop
         reloadProgressLabel(with: model.downloadProgress)
         
-        model.observeDownloadProgress(self) { [weak self] model, status in
-            guard let `self` = self else { return false }
-            guard self.model != nil, self.model?.resId == model.resId else {
-                return false
-            }
-            self.reloadProgressLabel(with: status)
-            return true
+        if let song = model as? AudioModel {
+            song.$downloadProgress.receive(on: DispatchQueue.main).sink { [weak self] status in
+                self?.reloadProgressLabel(with: status)
+            }.store(in: &cancelables)
         }
         
         reloadSubViews()

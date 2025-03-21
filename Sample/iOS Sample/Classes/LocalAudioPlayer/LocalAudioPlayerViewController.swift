@@ -7,6 +7,7 @@
 
 import UIKit
 import OOGMediaPlayer
+import Combine
 
 
 class LocalAudioPlayerViewController: UIViewController, AudioPlayerOwner {
@@ -43,6 +44,13 @@ class LocalAudioPlayerViewController: UIViewController, AudioPlayerOwner {
     
     
     var settings = OOGAudioPlayerSettings.loadScheme(.bgm, defaultSettings: nil)
+    
+    var cancelables = Set<AnyCancellable>()
+    
+    deinit {
+        cancelables.forEach { $0.cancel() }
+        cancelables.removeAll()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -196,11 +204,9 @@ extension LocalAudioPlayerViewController: MediaPlayerControlDelegate {
         audioItem?.cancelFileDownload()
         
         if let nextSong = playerProvider.getSong(at: indexPath) {
-            nextSong.observeDownloadProgress(self) { [weak self] item, status in
-                guard let `self` = self, self.playerProvider.currentItem()?.resId == item.resId else {
-                    // 当自身释放 or 当前item不是正在播放的item时，释放本closure
-                    return false
-                }
+            
+            nextSong.$downloadProgress.receive(on: DispatchQueue.main).sink { [weak self] status in
+                guard let `self` = self else { return }
                 switch status {
                 case .normal, .downloaded:
                     self.progressView.isHidden = true
@@ -213,8 +219,7 @@ extension LocalAudioPlayerViewController: MediaPlayerControlDelegate {
                 @unknown default:
                     break
                 }
-                return true
-            }
+            }.store(in: &cancelables)
         }
         
         // 即将播放的不变

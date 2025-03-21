@@ -38,16 +38,8 @@ public protocol Downloadable {
     
     /// 文件下载链接
     var fileUrlString: String? { get }
-    
-    
     /// 文件状态
     var downloadProgress: FileDownloadProgress  { get }
-    
-    /// 监听状态回调
-    func observeDownloadProgress(_ observer: AnyHashable, progression: @escaping DownloadStatusChangedClosure)
-    /// 取消监听
-    func removeDownloadProgressObserver(_ observer: AnyHashable)
-    
     
     /// 文件下载请求
     var downloadRequest: DownloadRequest?  { get set }
