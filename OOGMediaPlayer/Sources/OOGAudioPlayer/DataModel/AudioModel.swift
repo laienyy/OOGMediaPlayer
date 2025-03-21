@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import Combine
 
 // MARK: - 音频
 
 public class AudioModel: NSObject, Codable {
     
     enum CodingKeys: CodingKey {
-        case resId, audio, audioDuration, audioName, coverImgUrl, detailImgUrl, displayName, musicName, musicType, shortLink, subscription, useCache, isFavorite, status
+        case resId, audio, audioDuration, audioName, coverImgUrl, detailImgUrl, displayName, musicName, musicType, shortLink, subscription, useCache, isFavorite
     }
     
     /// 数据ID（唯一标识符）
@@ -49,27 +50,11 @@ public class AudioModel: NSObject, Codable {
     //MARK: - Play Status ( LocalMediaPlayable )
     
     /// 播放状态
-    public var status: LocalMediaStatus = .idle
-    /// 播放状态变化回调
-    public var statusChangedActions: [AnyHashable: StatusChangedClosure] = [:]
-    
-    public func observeStatusChanged(_ observer: AnyHashable, _ action: @escaping StatusChangedClosure) {
-        statusChangedActions[observer] = action
-    }
-    
-    public func removeStatusObserver(_ observer: AnyHashable) {
-        statusChangedActions[observer] = nil
-    }
+    @Published public var status: LocalMediaStatus = .idle
     
     /// 设置新状态
     public func setNewPlayerStatus(_ status: LocalMediaStatus) {
         self.status = status
-        
-        // 回调并释放掉需要释放的closure
-        let needsRemoveItems = self.statusChangedActions.filter({ $0.value(self, status) == false })
-        needsRemoveItems.forEach { item in
-            self.statusChangedActions.removeValue(forKey: item.key)
-        }
     }
     
     //MARK: File Download Status ( Protocol: Downloadable )

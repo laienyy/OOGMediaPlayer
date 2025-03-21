@@ -8,6 +8,7 @@
 import UIKit
 import Lottie
 import OOGMediaPlayer
+import Combine
 
 class BGMItemTableViewCell: UITableViewCell {
 
@@ -78,9 +79,11 @@ class BGMItemTableViewCell: UITableViewCell {
     
     var model: (any BGMSong)?
     
-    func removeObservers() {
-        model?.removeStatusObserver(self)
-        model?.removeDownloadProgressObserver(self)
+    var cancelables: [AnyCancellable] = []
+    
+    deinit {
+        cancelables.forEach { $0.cancel() }
+        cancelables.removeAll()
     }
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -105,22 +108,7 @@ class BGMItemTableViewCell: UITableViewCell {
         super.prepareForReuse()
         
         isLock = false
-        
-        model?.removeStatusObserver(self)
-        model?.removeDownloadProgressObserver(self)
-        
     }
-    
-    lazy var statusChangedAction: StatusChangedClosure = {
-        return { [weak self] item, status in
-            guard let `self` = self, let currentModel = self.model, currentModel.resId == item.resId else {
-                return false
-            }
-            self.updateStatusByModel()
-            return true
-        }
-    }()
-    
     
     func initialization() {
         
@@ -248,8 +236,17 @@ class BGMItemTableViewCell: UITableViewCell {
 extension BGMItemTableViewCell {
     
     func load(_ song: any BGMSong) {
+        
+        cancelables.forEach { $0.cancel() }
+        cancelables.removeAll()
+        
         model = song
-        model?.observeStatusChanged(self, statusChangedAction)
+        
+        if let audio = model as? AudioModel {
+            audio.$status.receive(on: DispatchQueue.main).sink { [weak self] state in
+                self?.updateStatusByModel()
+            }.store(in: &cancelables)
+        }
         
         updateStatusByModel()
         nameLabel.text = song.displayName

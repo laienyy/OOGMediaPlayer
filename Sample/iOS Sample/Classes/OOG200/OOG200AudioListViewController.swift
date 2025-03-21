@@ -41,7 +41,6 @@ class OOG200AudioListViewController: UIViewController, AudioPlayerOwner {
     
     deinit {
         // 移除OB，释放资源
-        tableView.visibleCells.compactMap({ $0 as? BGMItemTableViewCell }).forEach({ $0.removeObservers() })
         try? settings.save()
     }
     

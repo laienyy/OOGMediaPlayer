@@ -25,15 +25,6 @@ public protocol LocalMediaPlayable: MediaPlayable, Downloadable {
     /// 状态
     var status: LocalMediaStatus { get set }
     
-    
-    /// 文件状态变化
-    var statusChangedActions: [AnyHashable: StatusChangedClosure]  { get set }
-    
-    // 添加状态变化的回调
-    func observeStatusChanged(_ observer: AnyHashable, _ action: @escaping StatusChangedClosure)
-    // 释放回调
-    func removeStatusObserver(_ observer: AnyHashable)
-    
     /// 设置新状态
     func setNewPlayerStatus(_ status: LocalMediaStatus)
     
