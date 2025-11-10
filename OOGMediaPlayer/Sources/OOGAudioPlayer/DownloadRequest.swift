@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ProgressHandler {
+public struct ProgressHandler {
     typealias Callback = (Progress) -> Void
     
     var queue: DispatchQueue = .main
