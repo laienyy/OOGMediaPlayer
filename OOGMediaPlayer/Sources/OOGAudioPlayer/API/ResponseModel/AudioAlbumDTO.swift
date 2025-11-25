@@ -11,59 +11,70 @@ import Foundation
 
 public struct AudioAlbumDTO: Codable {
     
-    var id: Int = 0
+    public var id: Int = 0
     
     /// 列表名称
-    var playlistName: String?
+    public var playlistName: String?
     /// iPhone 封面图
-    var phoneCoverImgUrl: String?
+    public var phoneCoverImgUrl: String?
     /// iPhone 详情图
-    var phoneDetailImgUrl: String?
+    public var phoneDetailImgUrl: String?
 
     /// 是否收费
-    var subscription: Int? = 0
+    public var subscription: Int? = 0
     /// iPad封面图
-    var tabletCoverImgUrl: String?
+    public var tabletCoverImgUrl: String?
     /// iPad详情图
-    var tabletDetailImgUrl: String?
+    public var tabletDetailImgUrl: String?
     /// 音频信息列表
-    var musicList: [Song]?
+    public var musicList: [Song]?
+    
+    public init(id: Int, playlistName: String? = nil, phoneCoverImgUrl: String? = nil, phoneDetailImgUrl: String? = nil, subscription: Int? = nil, tabletCoverImgUrl: String? = nil, tabletDetailImgUrl: String? = nil, musicList: [Song]? = nil) {
+        self.id = id
+        self.playlistName = playlistName
+        self.phoneCoverImgUrl = phoneCoverImgUrl
+        self.phoneDetailImgUrl = phoneDetailImgUrl
+        self.subscription = subscription
+        self.tabletCoverImgUrl = tabletCoverImgUrl
+        self.tabletDetailImgUrl = tabletDetailImgUrl
+        self.musicList = musicList
+    }
 
 }
 
-extension AudioAlbumDTO {
+public extension AudioAlbumDTO {
     
-    struct Song: Codable {
-        var id: Int = 0
+    public struct Song: Codable {
+        public var id: Int = 0
         /// 数据ID
-        var resId: Int = 0
+        public var resId: Int = 0
         /// 音频文件url
-        var audio: String?
+        public var audio: String?
         /// 音频时长
-        var audioDuration: Int?
+        public var audioDuration: Int?
         /// 音频文件名称
-        var audioName: String?
+        public var audioName: String?
         /// 封面图
-        var coverImgUrl: String?
+        public var coverImgUrl: String?
         /// 详情图
-        var detailImgUrl: String?
+        public var detailImgUrl: String?
         /// 显示名称
-        var displayName: String?
+        public var displayName: String?
         /// 音频名称
-        var musicName: String?
+        public var musicName: String?
         /// 音频类型（关联字典表）
-        var musicType: String?
+        public var musicType: String?
         /// App短链接
-        var shortLink: String?
+        public var shortLink: String?
         // 0不收费 1收费
-        var subscription: Int? = 0
+        public var subscription: Int? = 0
     }
 }
 
 
-extension AudioAlbumDTO {
+public extension AudioAlbumDTO {
     
-    func asAlbumEntity() -> BackgroundMediaAlbumEntity {
+    public func asAlbumEntity() -> BackgroundMediaAlbumEntity {
         var model = BackgroundMediaAlbumEntity()
         model.id = id
         model.playlistName = playlistName
