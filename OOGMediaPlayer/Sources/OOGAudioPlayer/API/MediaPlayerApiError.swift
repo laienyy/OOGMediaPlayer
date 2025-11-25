@@ -8,7 +8,7 @@
 import Foundation
 
 
-enum RequestError: Error {
+public enum RequestError: Error {
     /// URL
     case urlIsInvalid
     /// 获取到的 `Response` 不是 `HTTPURLResponse`

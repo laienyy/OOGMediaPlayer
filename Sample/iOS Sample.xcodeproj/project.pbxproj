@@ -43,7 +43,7 @@
 		1830149C2CC8AF280014469C /* Exceptions for "iOS Sample" folder in "iOS Sample" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Classes/LocalAudioPlayer/View/AudioPlayerWidgetView.swift,
+				Classes/OOG200/LocalAudioPlayer/View/AudioPlayerWidgetView.swift,
 				Info.plist,
 			);
 			target = 183014892CC8AF270014469C /* iOS Sample */;

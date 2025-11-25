@@ -8,7 +8,7 @@
 import Foundation
 
 @DebugDescription
-struct BackgroundMediaAlbumEntity: Codable {
+public struct BackgroundMediaAlbumEntity: Codable {
 
     public var id: Int = 0
     /// 喜欢的
@@ -33,7 +33,7 @@ struct BackgroundMediaAlbumEntity: Codable {
     
 }
 
-struct BackgroundMediaEntity: Codable {
+public struct BackgroundMediaEntity: Codable {
 
     /// 数据ID
     public var resId: Int = 0
@@ -59,7 +59,7 @@ struct BackgroundMediaEntity: Codable {
     public var subscription: Bool = false
 }
 
-extension BackgroundMediaAlbumEntity {
+public extension BackgroundMediaAlbumEntity {
     
     func asAlbumModel() -> AudioAlbumModel {
         let model = AudioAlbumModel()

@@ -29,7 +29,7 @@ public extension Notification.Name {
 
 public typealias MediaPlayerGetUrlClosure = (Result<URL, any Error>) -> Void
 
-extension MediaPlayerControl {
+public extension MediaPlayerControl {
     
     public enum LoopMode: String, Codable {
         /// 无循环

@@ -7,7 +7,7 @@
 
 import Foundation
 
-func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) async throws -> T {
+public func excute<T>(timeout: TimeInterval, task: @escaping () async throws -> T) async throws -> T {
     
     let fetchTask = Task {
         let result = try await task()
