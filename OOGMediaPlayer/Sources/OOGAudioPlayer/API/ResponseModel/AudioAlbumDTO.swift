@@ -74,7 +74,7 @@ public extension AudioAlbumDTO {
 
 public extension AudioAlbumDTO {
     
-    public func asAlbumEntity() -> BackgroundMediaAlbumEntity {
+    func asAlbumEntity() -> BackgroundMediaAlbumEntity {
         var model = BackgroundMediaAlbumEntity()
         model.id = id
         model.playlistName = playlistName
