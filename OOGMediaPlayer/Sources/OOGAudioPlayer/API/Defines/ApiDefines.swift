@@ -47,12 +47,16 @@ public extension OOGProject {
 
 public enum BgmPlayType {
     
+    case normal
+    
     case planClassicAndChair
     case poseLibrary
     case animation
 
     func asParameter() -> [String : AnyHashable] {
         switch self {
+        case .normal:
+            return [:]
         case .planClassicAndChair:
             return ["playType" : "Plan_Classic and Chair"]
         case .poseLibrary:
@@ -64,6 +68,8 @@ public enum BgmPlayType {
     
     var description: String {
         switch self {
+        case .normal:
+            return "Normal"
         case .planClassicAndChair:
             return "Plan_Classic and Chair"
         case .poseLibrary:
